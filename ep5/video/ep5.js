@@ -276,8 +276,10 @@ const WP = [[1.0, 2.8], [-1.6, 3.5], [0.9, 4.3], [-1.4, 5.1], [0.6, 5.8], [-1.2,
 const T = P2(-0.6, 8.9);
 // B8-B9: catena "in fila" verso l'alto (anche qui i neutroni rimbalzano sull'acqua prima di spaccare il nucleo seguente), poi due rami, poi si spegne
 const TCH = [T, P2(0.9, 11.8), P2(-0.8, 14.7), P2(0.8, 17.6), P2(-0.7, 20.5), P2(0.6, 23.4)], T7 = [P2(-1.0, 26.4), P2(1.9, 26.2)];
+// B9 "di più": ogni ramo ne spacca altri due (2 → 4); "di meno": dai 4 nessun neutrone spacca altri nuclei e la catena si spegne
+const T8 = [P2(-2.8, 28.4), P2(-0.2, 29.4), P2(2.5, 28.9), P2(4.2, 27.3)];
 const zigzag = (a, b, nB, amp, sgn) => { const d = dirTo(a, b), pr = V(-d.y, d.x, 0), L = a.distanceTo(b); return Array.from({ length: nB }, (_, i) => a.clone().addScaledVector(d, L * (i + 1) / (nB + 1)).addScaledVector(pr, amp * (i % 2 ? -sgn : sgn))); };
-const LINKS = [...TCH.slice(0, 5).map((p, i) => [p, TCH[i + 1]]), [TCH[5], T7[0]], [TCH[5], T7[1]]];
+const LINKS = [...TCH.slice(0, 5).map((p, i) => [p, TCH[i + 1]]), [TCH[5], T7[0]], [TCH[5], T7[1]], [T7[0], T8[0]], [T7[0], T8[1]], [T7[1], T8[2]], [T7[1], T8[3]]];
 const LINK_WP = LINKS.map(([a, b], i) => zigzag(a, b, i % 2 ? 3 : 2, 0.6, i % 2 ? 1 : -1));
 
 // ---------------- tempi della sequenza atomi (secondi di scaletta)
@@ -285,19 +287,19 @@ const S0_IN = 3.8, CHAIN0 = 6.6, CHAIN_END = 10.6;   // catena dell'apertura: S0
 const S_IN = 10.0, S_HIT = 12.6, FAST1 = 7.0;
 const N5_0 = 17.6;
 const MOL_IN = 21.9, N6_0 = 23.6, T_HIT = 31.4;
-const TCH_HIT = [T_HIT, 33.2, 34.9, 36.6, 38.3, 40.0], T7_HIT = [41.4, 41.7];
+const TCH_HIT = [T_HIT, 33.1, 34.7, 36.3, 37.9, 39.4], T7_HIT = [40.3, 40.5], T8_HIT = [41.2, 41.45, 41.35, 41.65];
 
 // ---------------- nuclei: speciali (si spaccano) + riempimento casuale con distanza minima
 const NUCS = [];
 const special = (c, u, key) => { const n = { c: c.clone(), u, key }; NUCS.push(n); return n; };
 const nS0 = special(S0, true, 'S0'), nSB4 = special(SB4, true, 'S'), nU1 = special(U1, true, 'U1'), nU2 = special(U2, true, 'U2');
-const nT = TCH.map((p, i) => special(p, true, 'T' + i)), nT7 = T7.map((p, i) => special(p, true, 'T7' + i));
+const nT = TCH.map((p, i) => special(p, true, 'T' + i)), nT7 = T7.map((p, i) => special(p, true, 'T7' + i)), nT8 = T8.map((p, i) => special(p, true, 'T8' + i));
 // corridoi lasciati liberi: percorsi dei neutroni scritti a mano
 const polySegs = pts => pts.slice(1).map((p, i) => [pts[i], p]);
 const CAPS = [[S_FROM, SB4], [A5, B5], ...polySegs([E6, ...WP, T]), ...LINKS.flatMap(([a, b], i) => polySegs([a, ...LINK_WP[i], b]))];
 seed = 2025;
 // [x0, x1, y0, y1, tentativi, distanza minima, corridoi]
-[[-10, 13.5, -12, 16, 34000, 1.45, false], [13.5, 25.5, -9.5, 29.5, 12000, 2.25, true]].forEach(([x0, x1, y0, y1, tries, md, caps]) => {
+[[-10, 13.5, -12, 16, 34000, 1.45, false], [13.5, 25.5, -9.5, 37, 14000, 2.25, true]].forEach(([x0, x1, y0, y1, tries, md, caps]) => {
   for (let k = 0; k < tries; k++) {
     const p = V(lerp(x0, x1, rnd()), lerp(y0, y1, rnd()), 0);
     if (NUCS.some(n => xy(n.c, p) < md)) continue;
@@ -467,12 +469,16 @@ const FISS = [];
   while (queue.length) {
     queue.sort((a, b) => a.hit - b.hit); const e = queue.shift(), t = e.hit;
     const a = hash(t * 5.3 + e.c.x) * 6.28; fragmentsBounce(e, t, V(Math.cos(a), Math.sin(a), 0)); FISS.push(e);
-    const k = hash(t * 2.9) < 0.5 ? 2 : 3, want = FISS.length > 30 ? 0 : Math.min(k, hash(t * 7.7) < 0.8 ? 2 : 1);
-    const cands = NUCS.filter(u235Free).map(n => [xy(n.c, e.c), n]).filter(([d, n]) => d > 1.4 && d < 9 && clearLine(e.c, n.c, [e, n])).sort((p, q) => p[0] - q[0]);
+    const k = e === nS0 ? 3 : hash(t * 2.9) < 0.5 ? 2 : 3, want = FISS.length > 34 ? 0 : k;
+    // si preferiscono gli U-235 lontani dalle fissioni già avvenute: la catena si allarga in tutte le direzioni (anche in alto a sinistra)
+    const done = NUCS.filter(n => n.hit !== undefined && n.c.x < 12), far = n => Math.min(...done.map(f => xy(f.c, n.c)));
+    const cands = NUCS.filter(u235Free).map(n => [xy(n.c, e.c), n]).filter(([d]) => d > 1.4 && d < 9).map(([d, n]) => [d - 0.9 * far(n) + (clearLine(e.c, n.c, [e, n]) ? 0 : 0.05) - (e === nS0 ? 0.5 * dirTo(e.c, n.c).y : 0), n]).sort((p, q) => p[0] - q[0]);
     let links = 0; const used = [];
-    for (const [, n] of cands) {
-      if (links >= want) break;
-      const t1 = t + 0.05 + n.c.distanceTo(e.c) / SPN; if (t1 > CHAIN_END) continue;
+    // i neutroni di una stessa fissione vanno in direzioni diverse (penalità per le direzioni già usate)
+    const pool = cands.filter(([, n]) => t + 0.05 + n.c.distanceTo(e.c) / SPN <= CHAIN_END);
+    while (links < want && pool.length) {
+      pool.sort((p, q) => (p[0] + 3 * Math.max(0, ...used.map(u => u.dot(dirTo(e.c, p[1].c))))) - (q[0] + 3 * Math.max(0, ...used.map(u => u.dot(dirTo(e.c, q[1].c))))));
+      const [, n] = pool.shift(), t1 = t + 0.05 + n.c.distanceTo(e.c) / SPN;
       n.hit = t1; queue.push(n); linkTo(e, n, t + 0.05, t1); used.push(dirTo(e.c, n.c)); links++;
     }
     emitOthers(e, t, k - links, SPN, used);
@@ -498,7 +504,9 @@ nT.forEach((e, i) => {
   if (i < 5) { linkZig(i, t + 0.1, TCH_HIT[i + 1]); used.push(dirTo(e.c, LINK_WP[i][0])); emitOthers(e, t, 2, 2.6, used, true); }
   else { [5, 6].forEach((li, k) => { linkZig(li, t + 0.1, T7_HIT[k]); used.push(dirTo(e.c, LINK_WP[li][0])); }); emitOthers(e, t, 1, 2.6, used, true); }
 });
-nT7.forEach((e, i) => { fragments(e, T7_HIT[i], V(1, 0.4 - i * 0.8, 0)); FISS.push(e); emitOthers(e, T7_HIT[i], 3, 2.4, [dirTo(e.c, nT[5].c)], true); });
+nT7.forEach((e, i) => { fragments(e, T7_HIT[i], V(1, 0.4 - i * 0.8, 0)); FISS.push(e); const used = [dirTo(e.c, nT[5].c)];
+  [7 + 2 * i, 8 + 2 * i].forEach((li, k) => { linkZig(li, T7_HIT[i] + 0.1, T8_HIT[2 * i + k]); used.push(dirTo(e.c, LINK_WP[li][0])); }); emitOthers(e, T7_HIT[i], 1, 2.6, used, true); });
+nT8.forEach((e, i) => { fragments(e, T8_HIT[i], V(1, hash(i + 9) - 0.5, 0)); FISS.push(e); emitOthers(e, T8_HIT[i], 3, 2.4, [dirTo(e.c, nT7[i < 2 ? 0 : 1].c)], true); });
 const fissFlash = FISS.map(e => { const s = glow(0xfff0c0, atomScene, 2.2); s.position.copy(e.c); s.position.z += 0.3; s.userData.e = e; return s; });
 console.log('fissioni', FISS.length, 'neutroni', NEUT.length, 'nuclei', NUCS.length, 'nuclei scaldati', heated.length);
 
@@ -506,7 +514,7 @@ console.log('fissioni', FISS.length, 'neutroni', NEUT.length, 'nuclei', NUCS.len
 { const paths = NEUT.filter(n => tEnd(n) > MOL_IN && n.keys[0][0].x > 12).flatMap(n => n.keys.slice(1).map((k, i) => [n.keys[i][0], k[0]]));
   seed = 99;
   for (let k = 0; k < 5000; k++) {
-    const c = V(lerp(13.5, 25.5, rnd()), lerp(1.0, 29.5, rnd()), 0);
+    const c = V(lerp(13.5, 25.5, rnd()), lerp(1.0, 37, rnd()), 0);
     if (NUCS.some(n => xy(n.c, c) < 0.72)) continue;
     if (MOLS.some(m => xy(m.c, c) < 0.95)) continue;
     if (paths.some(([a, b]) => segDist(c, a, b) < 0.42)) continue;
@@ -647,7 +655,8 @@ function makeWatch(parent) {
   return { g, set(u) { hand.rotation.z = -u * Math.PI * 2; } };
 }
 const icThermo = icon(-1.14, -0.97, 0.31), thermo = makeThermo(icThermo.c);
-const icBal = icon(0, 1.55, 0.5), balance = makeBalance(icBal.c);
+const icBal = icon(-0.98, 1.72, 0.4)   // in alto a sinistra, per non coprire le fissioni della B9
+, balance = makeBalance(icBal.c);
 const PAR = 1 - (11 - 0.2) / (11 + 0.1);
 const centerIcons = () => [icThermo, icBal].forEach(ic => ic.c.position.set(-ic.g.position.x * PAR, -(ic.g.position.y - 0.2) * PAR, 0));
 
@@ -712,8 +721,8 @@ function rodCamAt(tn) {
 const view = (x, y, z) => [x, y, z, x, y];
 const ATOM_TRACK = track(rt([[4.75, view(0, 1.2, 24)], [5.9, view(0, 1.0, 14)], [7.0, view(0, 1.5, 14)], [9.4, view(0.5, 2.5, 46)], [10.3, view(0.6, 2.5, 48)], [11.6, view(X2 - 0.3, -3.6, 13)],
   [16.6, view(X2 - 0.3, -3.6, 13)], [17.5, view(X2, -1.4, 16)], [21.2, view(X2, -1.4, 16)], [22.6, view(X2, 5.6, 15)], [30.4, view(X2, 6.4, 15)],
-  [31.4, view(X2 - 0.4, 8.6, 11)], [32.6, view(X2, 10.0, 16)], [34.9, view(X2, 12.8, 17)], [36.6, view(X2, 15.6, 17)], [38.3, view(X2, 18.4, 17)],
-  [40.0, view(X2, 21.3, 18)], [41.7, view(X2 + 0.3, 23.8, 19)], [44.1, view(X2 + 0.3, 24.0, 19)]]));
+  [31.4, view(X2 - 0.4, 8.6, 11)], [32.6, view(X2, 11.0, 22)], [34.7, view(X2, 13.6, 23)], [36.3, view(X2, 16.0, 23)], [37.9, view(X2, 18.6, 24)],
+  [39.4, view(X2 + 0.6, 24.6, 29)], [41.0, view(X2 + 0.7, 26.6, 31)], [44.1, view(X2 + 0.7, 26.8, 31)]]));
 function atomCamAt(tn) {
   const A1 = [fwarp(44.1), fwarp(44.9)];
   if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 44, u), v[3], v[4]]; }
