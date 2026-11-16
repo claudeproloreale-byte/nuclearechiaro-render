@@ -1,0 +1,88 @@
+# Rendering di un video del canale su più macchine di GitHub nello stesso momento.
+# Il video viene diviso in JOBS pezzi; ogni macchina ne fa uno (con due processi), poi l'ultima macchina li unisce.
+# Il risultato si trova come artefatto della corsa e nel ramo render-<tag>.
+name: Rendering
+on:
+  workflow_dispatch:
+    inputs:
+      dir:     { description: 'Cartella con la pagina e render.js', default: 'ep5/video' }
+      page:    { description: 'Pagina da disegnare',               default: 'ep5.html' }
+      seconds: { description: 'Durata in secondi',                 default: '85.0' }
+      jobs:    { description: 'Quante macchine (max 20)',          default: '20' }
+      tag:     { description: 'Nome del file finale',              default: 'ep5_prova' }
+permissions:
+  contents: write
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      idx: ${{ steps.p.outputs.idx }}
+    steps:
+      - id: p
+        run: python3 -c "import json; print('idx=' + json.dumps(list(range(int('${{ inputs.jobs }}')))))" >> "$GITHUB_OUTPUT"
+  render:
+    needs: plan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        i: ${{ fromJson(needs.plan.outputs.idx) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: ffmpeg
+        run: which ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Librerie (three, playwright senza browser)
+        working-directory: ${{ inputs.dir }}
+        env: { PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' }
+        run: npm install --no-audit --no-fund
+      - name: Rendering del pezzo
+        working-directory: ${{ inputs.dir }}
+        env: { PAGE: '${{ inputs.page }}', VW: '1080', VH: '1920' }
+        run: |
+          echo "processori: $(nproc)"; google-chrome --version
+          N=$(python3 -c "print(round(float('${{ inputs.seconds }}') * 30))")
+          J=${{ inputs.jobs }}; I=${{ matrix.i }}
+          A=$(( I * N / J )); B=$(( (I + 1) * N / J )); M=$(( (A + B) / 2 ))
+          echo "fotogrammi $A-$B"
+          node render.js seg $A $M part_a.mp4 2> err_a.txt &
+          node render.js seg $M $B part_b.mp4 2> err_b.txt &
+          wait
+          grep -v "CONSOLE" err_a.txt err_b.txt || true
+          test -f part_a.mp4 && test -f part_b.mp4
+          printf "file 'part_a.mp4'\nfile 'part_b.mp4'\n" > l.txt
+          ffmpeg -y -loglevel error -f concat -safe 0 -i l.txt -c copy seg_$(printf %02d $I).mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seg-${{ matrix.i }}
+          path: ${{ inputs.dir }}/seg_*.mp4
+          retention-days: 3
+  join:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: segs, pattern: 'seg-*', merge-multiple: true }
+      - name: ffmpeg
+        run: which ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - name: Unione
+        run: |
+          mkdir -p pub
+          ls segs | sort | sed "s|^|file 'segs/|; s|$|'|" > list.txt
+          cat list.txt
+          ffmpeg -y -loglevel error -f concat -safe 0 -i list.txt -c copy pub/${{ inputs.tag }}.mp4
+          ffprobe -v error -show_entries format=duration -of csv=p=0 pub/${{ inputs.tag }}.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.tag }}
+          path: pub/${{ inputs.tag }}.mp4
+          retention-days: 14
+      - name: Pubblicazione nel ramo render-${{ inputs.tag }}
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          cd pub
+          git init -q -b main
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git add -f . && git commit -q -m "Rendering ${{ inputs.tag }} (corsa ${{ github.run_id }})"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" HEAD:refs/heads/render-${{ inputs.tag }}
