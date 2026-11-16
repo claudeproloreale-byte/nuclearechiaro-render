@@ -7,9 +7,9 @@ on:
     inputs:
       dir:     { description: 'Cartella con la pagina e render.js', default: 'ep5/video' }
       page:    { description: 'Pagina da disegnare',               default: 'ep5.html' }
-      seconds: { description: 'Durata in secondi',                 default: '85.0' }
+      seconds: { description: 'Durata in secondi',                 default: '75.0' }
       jobs:    { description: 'Quante macchine (max 20)',          default: '20' }
-      tag:     { description: 'Nome del file finale',              default: 'ep5_prova' }
+      tag:     { description: 'Nome del file finale',              default: 'ep5_prova2' }
 permissions:
   contents: write
 jobs:
