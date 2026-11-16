@@ -281,7 +281,7 @@ const LINKS = [...TCH.slice(0, 5).map((p, i) => [p, TCH[i + 1]]), [TCH[5], T7[0]
 const LINK_WP = LINKS.map(([a, b], i) => zigzag(a, b, i % 2 ? 3 : 2, 0.6, i % 2 ? 1 : -1));
 
 // ---------------- tempi della sequenza atomi (secondi di scaletta)
-const CHAIN0 = 5.2, CHAIN_END = 10.2;      // catena dell'apertura
+const S0_IN = 3.8, CHAIN0 = 6.6, CHAIN_END = 10.6;   // catena dell'apertura: S0 colpito da un neutrone lento che arriva dal basso
 const S_IN = 10.0, S_HIT = 12.6, FAST1 = 7.0;
 const N5_0 = 17.6;
 const MOL_IN = 21.9, N6_0 = 23.6, T_HIT = 31.4;
@@ -377,7 +377,7 @@ function fragmentsBounce(entry, t, axis, dur = 2.4) {
   o.fp = [0, 1].map(f => bounceFrom(entry.c.clone().add(o.cent[f]).setZ(0.1), o.axis.clone().multiplyScalar(f ? 1 : -1), 3, obst, 2.0, 0.2));
   const S = u => easeOut(u, 2.8);
   o.fragFn = (f, tt) => o.fp[f].getPointAt(S(ramp(tt, t + 0.05, t + dur))).sub(entry.c);
-  o.fade = tt => 1 - smooth(ramp(tt, t + dur + 0.5, t + dur + 1.2));
+  o.fade = () => 1;                       // i frammenti restano dove si fermano (richiesta dell'autore)
   o.rest = t + dur;
   for (let k = 0; k <= 48; k++) {
     const tt = t + 0.05 + dur * k / 48;
@@ -442,7 +442,8 @@ function emitOthers(entry, t, k, v, avoid = [], water = false) {
     const tgt = bg.filter(n => !absorbed.has(n) && Math.abs(n.c.x - entry.c.x) < 6).map(n => [xy(n.c, entry.c), n])
       .filter(([d, n]) => d > 1.2 && d < 4.2 && dirTo(entry.c, n.c).dot(dir) > 0.8 && clearLine(entry.c, n.c, [entry, n])).sort((p, q) => p[0] - q[0])[0];
     let end, kind;
-    if (tgt) { const n = tgt[1]; absorbed.add(n); end = n.c.clone().addScaledVector(dirTo(n.c, start), 0.3); kind = 'abs'; }
+    let host = null;
+    if (tgt) { const n = tgt[1]; absorbed.add(n); host = n; end = n.c.clone().addScaledVector(dirTo(n.c, start), 0.3); kind = 'abs'; }
     else { end = start.clone().addScaledVector(dir, 16); kind = 'exit'; }
     let mid = null;
     if (water) for (const sd of [1, -1]) {
@@ -451,8 +452,8 @@ function emitOthers(entry, t, k, v, avoid = [], water = false) {
       if (freeForMol(m)) { mid = m; break; }
       if (kind === 'exit') end = start.clone().addScaledVector(dir, 16);
     }
-    if (mid) zigNeutron([start, mid, end], t + 0.05, { v0: v, K: 0.8, end: kind });
-    else neutron(seg(start.setZ(0.15), end.setZ(0.15), t + 0.05, v), kind);
+    const nn = mid ? zigNeutron([start, mid, end], t + 0.05, { v0: v, K: 0.8, end: kind }) : neutron(seg(start.setZ(0.15), end.setZ(0.15), t + 0.05, v), kind);
+    if (host) { nn.host = host; nn.m.material = neutM.clone(); }   // il neutrone assorbito diventa parte del nucleo: trema e si scalda con lui
     done++;
   }
 }
@@ -462,6 +463,7 @@ const FISS = [];
 // ---------------- zona 1: reazione a catena dell'apertura (seme fisso). Neutroni veloci, frammenti che rimbalzano e scaldano.
 { const SPN = 6.5, u235Free = n => n.u && n.hit === undefined && !n.key && n.c.x < 12;
   nS0.hit = CHAIN0; const queue = [nS0];
+  { const from = V(0.45, -4.4, 0); neutron([[from.clone().setZ(0.15), S0_IN], [S0.clone().addScaledVector(dirTo(from, S0), -0.25).setZ(0.15), CHAIN0]], 'hit'); }
   while (queue.length) {
     queue.sort((a, b) => a.hit - b.hit); const e = queue.shift(), t = e.hit;
     const a = hash(t * 5.3 + e.c.x) * 6.28; fragmentsBounce(e, t, V(Math.cos(a), Math.sin(a), 0)); FISS.push(e);
@@ -708,7 +710,7 @@ function rodCamAt(tn) {
   const u = ein(ramp(tn, R3[0], R3[1])); return [0, ROD_LOW[1], logZ(ROD_LOW[2], 80, u), 0, ROD_LOW[4]];
 }
 const view = (x, y, z) => [x, y, z, x, y];
-const ATOM_TRACK = track(rt([[4.75, view(0, 2, 26)], [5.8, view(0, 2, 14)], [6.3, view(0, 2, 14)], [9.9, view(0.5, 2.5, 32)], [11.3, view(X2 - 0.3, -3.6, 13)],
+const ATOM_TRACK = track(rt([[4.75, view(0, 1.2, 24)], [5.9, view(0, 1.0, 14)], [7.0, view(0, 1.5, 14)], [9.4, view(0.5, 2.5, 46)], [10.3, view(0.6, 2.5, 48)], [11.6, view(X2 - 0.3, -3.6, 13)],
   [16.6, view(X2 - 0.3, -3.6, 13)], [17.5, view(X2, -1.4, 16)], [21.2, view(X2, -1.4, 16)], [22.6, view(X2, 5.6, 15)], [30.4, view(X2, 6.4, 15)],
   [31.4, view(X2 - 0.4, 8.6, 11)], [32.6, view(X2, 10.0, 16)], [34.9, view(X2, 12.8, 17)], [36.6, view(X2, 15.6, 17)], [38.3, view(X2, 18.4, 17)],
   [40.0, view(X2, 21.3, 18)], [41.7, view(X2 + 0.3, 23.8, 19)], [44.1, view(X2 + 0.3, 24.0, 19)]]));
@@ -774,7 +776,7 @@ window.renderFrame = function (tn) {
     const zoomK = 1 + Math.max(0, atomCam.position.z - 12) / 12;
     placeMols(t, tn);
     // U-238 scaldati dai frammenti della catena dell'apertura: tremano, diventano arancioni e brillano
-    if (t < 12) heated.forEach((n, k) => { const h = heatOf(n, t), vib = 0.06 * h; placeBg(n, Math.sin(tn * 23 + n.ph) * vib, Math.cos(tn * 19 + n.ph * 1.3) * vib, h); heatGlows[k].position.set(n.c.x, n.c.y, n.c.z + 0.2); heatGlows[k].material.opacity = 0.5 * h; heatGlows[k].scale.setScalar((0.9 + 0.3 * h) * Math.min(zoomK, 2)); });
+    if (t < 12) heated.forEach((n, k) => { const h = heatOf(n, t), vib = 0.06 * h; n.vx = Math.sin(tn * 23 + n.ph) * vib; n.vy = Math.cos(tn * 19 + n.ph * 1.3) * vib; n.hh = h; placeBg(n, n.vx, n.vy, h); heatGlows[k].position.set(n.c.x, n.c.y, n.c.z + 0.2); heatGlows[k].material.opacity = 0.5 * h; heatGlows[k].scale.setScalar((0.9 + 0.3 * h) * Math.min(zoomK, 2)); });
     instP.instanceMatrix.needsUpdate = instN.instanceMatrix.needsUpdate = true; instP.instanceColor.needsUpdate = instN.instanceColor.needsUpdate = true;
     // nuclei speciali (U-235): alone giallo finché non si spaccano
     NUCS.forEach((sn, si) => {
@@ -804,6 +806,7 @@ window.renderFrame = function (tn) {
     NEUT.forEach(n => {
       const p = npos(n, t), t1 = tEnd(n);
       n.m.visible = !!p; if (p) { n.m.position.copy(p); n.m.scale.setScalar(t < t1 ? Math.min(zoomK, 2.2) : 1); }
+      if (p && n.host && t >= t1 && n.host.heat && t < 12) { n.m.position.x += n.host.vx || 0; n.m.position.y += n.host.vy || 0; n.m.material.color.copy(C_N).lerp(C_HOT, 0.75 * (n.host.hh || 0)); n.m.material.emissiveIntensity = 0.35 * (1 - (n.host.hh || 0)); }
       if (n.flash) { n.flash.position.copy(n.keys[n.keys.length - 1][0]); n.flash.material.opacity = t > t1 ? 0.8 * Math.max(0, 1 - (t - t1) / 0.45) : 0; }
       if (n.trailS) n.trailS.forEach((s, k) => {
         const tt = t - (k + 1) * 0.028, q = npos(n, tt), q2 = npos(n, tt - 0.02);
