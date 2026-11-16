@@ -696,7 +696,7 @@ const ein = u => clamp01(u) ** 2, eout = u => 1 - (1 - clamp01(u)) ** 2;
 const CAM_WIDE = [-1, 3.8, 11, -1, 3.0, -40], CAM_CORE = [2.95, 2.45, -33.0, 2.95, 2.34, -39.75], CAM_PUSH = [2.95, 2.34, -38.8, 2.95, 2.34, -39.75];
 const CAM_W = track(rt([[1.2, CAM_WIDE], [2.75, CAM_CORE], [3.4, CAM_PUSH], [68.4, CAM_PUSH], [69.2, CAM_CORE], [71.0, CAM_WIDE]]));
 const DOME = track(rt([[1.0, 1], [2.0, 0.1], [69.8, 0.1], [70.7, 1]]));
-const OFF = 63.5;    // dopo la caduta delle barre la centrale è spenta (nocciolo scuro, niente scintille sul cavo)
+const OFF = Infinity;   // bozza 5: nel finale la centrale resta in funzione (l'autore non la voleva ferma); con un tempo qui torna spenta
 // barre di controllo: quanto sono dentro (0 = fuori, 1 = tutte dentro)
 const INS = track([[0, 0], [48.4, 0], [51.1, 0.38], [55.0, 0.38], [56.0, 0.74], [56.7, 0.74], [57.9, 0.24], [62.0, 0.24]]);
 const SCRAM_OFF = 62.2, SCRAM = 62.5, SCRAM_END = 63.9;   // magneti spenti, barre che cadono
@@ -783,6 +783,7 @@ window.renderFrame = function (tn) {
     worldPass.scene = atomScene; worldPass.camera = atomCam;
     const c = atomCamAt(tn); atomCam.position.set(c[0] + Math.sin(tn * 0.3) * 0.04, c[1] + Math.sin(tn * 0.23) * 0.03, c[2]); atomCam.lookAt(c[3], c[4], 0); atomCam.updateMatrixWorld();
     const zoomK = 1 + Math.max(0, atomCam.position.z - 12) / 12;
+    const nK = Math.min(1 + Math.max(0, atomCam.position.z - 14) / 50, 1.3);   // dopo l'apertura i neutroni si ingrandiscono poco da lontano (in B9 erano troppo grandi)
     placeMols(t, tn);
     // U-238 scaldati dai frammenti della catena dell'apertura: tremano, diventano arancioni e brillano
     if (t < 12) heated.forEach((n, k) => { const h = heatOf(n, t), vib = 0.06 * h; n.vx = Math.sin(tn * 23 + n.ph) * vib; n.vy = Math.cos(tn * 19 + n.ph * 1.3) * vib; n.hh = h; placeBg(n, n.vx, n.vy, h); heatGlows[k].position.set(n.c.x, n.c.y, n.c.z + 0.2); heatGlows[k].material.opacity = 0.5 * h; heatGlows[k].scale.setScalar((0.9 + 0.3 * h) * Math.min(zoomK, 2)); });
@@ -814,7 +815,7 @@ window.renderFrame = function (tn) {
     // neutroni
     NEUT.forEach(n => {
       const p = npos(n, t), t1 = tEnd(n);
-      n.m.visible = !!p; if (p) { n.m.position.copy(p); n.m.scale.setScalar(t < t1 ? Math.min(zoomK, 2.2) : 1); }
+      n.m.visible = !!p; if (p) { n.m.position.copy(p); n.m.scale.setScalar(t < t1 ? (t < 12 ? Math.min(zoomK, 2.2) : nK) : 1); }
       if (p && n.host && t >= t1 && n.host.heat && t < 12) { n.m.position.x += n.host.vx || 0; n.m.position.y += n.host.vy || 0; n.m.material.color.copy(C_N).lerp(C_HOT, 0.75 * (n.host.hh || 0)); n.m.material.emissiveIntensity = 0.35 * (1 - (n.host.hh || 0)); }
       if (n.flash) { n.flash.position.copy(n.keys[n.keys.length - 1][0]); n.flash.material.opacity = t > t1 ? 0.8 * Math.max(0, 1 - (t - t1) / 0.45) : 0; }
       if (n.trailS) n.trailS.forEach((s, k) => {
