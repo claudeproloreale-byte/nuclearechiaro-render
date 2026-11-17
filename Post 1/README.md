@@ -3,16 +3,16 @@
 Primo video del canale **Nucleare chiaro per tutti** (`nuclearechiaro`). Pubblicato il 17/11/2026 su Instagram, poi su YouTube Shorts e TikTok.
 Verticale 1080×1920, 30 fps, 37 s, voce dell'autore, musica ed effetti originali sintetizzati via codice, sottotitoli impressi.
 
-In questa cartella c'è tutto per ricreare il video da zero: registrazioni originali, codice dell'animazione, audio, sottotitoli, copertine e descrizione.
+In questa cartella c'è tutto per ricreare il video da zero: registrazioni originali, codice dell'animazione, audio, sottotitoli, copertina e descrizione.
 
 ## Contenuto
 
 | Cartella | Cosa c'è |
 |---|---|
-| `output/` | Video pubblicato (`neutrone_intro_sottotitoli.mp4`), versione senza sottotitoli, video muto (`intro_muto.mp4`), sottotitoli `.srt`, due copertine, due foto profilo |
+| `output/` | Video pubblicato (`neutrone_intro_sottotitoli.mp4`), versione senza sottotitoli, video muto (`intro_muto.mp4`), sottotitoli `.srt`, copertina, due foto profilo |
 | `sorgenti/` | Le registrazioni dell'autore: `Prova_1-mejorada-v2.wav` (ripresa completa, passata in Adobe Podcast) e `Modifica_1.m4a` (primi 6 s rifatti per dire "funzionare") |
 | `audio/` | Script dell'audio e i due risultati già pronti: `voice_fx.wav` (voce montata) e `mix_final.wav` (traccia finale) |
-| `video/` | Animazione (`intro.html` + `intro.js`, three.js), rendering, sottotitoli, copertine, foto profilo |
+| `video/` | Animazione (`intro.html` + `intro.js`, three.js), rendering, sottotitoli, copertina, foto profilo |
 | `descrizione.md` | Descrizione con hashtag (Instagram, TikTok, YouTube) e titolo per YouTube |
 
 ## Requisiti
@@ -57,14 +57,13 @@ Stile del canale: Poppins grassetto bianco, contorno blu `#0c1c4a`, una riga di 
 Punteggiatura: tolte le virgolette «» e punti, virgole e due punti a fine riga; **? e ! restano** (richiesta dell'autore del 17/11/2026).
 Alla pubblicazione vanno disattivati i sottotitoli automatici di Instagram/TikTok.
 
-## Copertine
-- `output/copertina_1_bocca_aperta.png`: fotogramma a 34,8 s + titolo.
+## Copertina
+- `output/copertina.png`: fotogramma a 34,8 s + titolo "NUCLEARE / chiaro per tutti" e pillola "Ciao, mi presento!".
   ```
   cd video && PAGE=intro.html VW=1080 VH=1920 PREFIX=t node render.js still 34.8
   FONTS=fonts python3 make_cover_intro.py t_34.8.jpg copertina.png
   ```
   (lo script riproduce la copertina pixel per pixel, verificato)
-- `output/copertina_2_tranquilla.png`: stessa grafica, mascotte con un sorriso chiuso e posa calma. La posa si ottiene con `node cover_intro.js sfondo.jpg '<posa json>'` (`intro.js` accetta `window.COVER` con i campi `mx, my, ms, gaze, hx, hy, hz, eyeS, squint, sad, browY, open, smile, hr, hl`), poi `make_cover_intro.py`. I valori esatti di quella posa non sono stati salvati: l'immagine finale è comunque qui.
 - Foto profilo (`foto_profilo_open.png`, usata, e `foto_profilo_smile.png`): `node avatar.js` in `video/`, poi ritaglio a 1080×1080.
 
 ## Voce: cosa è stato fatto

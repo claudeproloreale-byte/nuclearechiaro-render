@@ -1,8 +1,7 @@
 # Titolo e pillola della copertina del video introduttivo sopra un fotogramma 1080x1920.
 # uso: python3 make_cover_intro.py sfondo.jpg copertina.png
-# Sfondo della copertina 1 ("bocca aperta"): fotogramma a 34,8 s ->
+# Sfondo: fotogramma a 34,8 s ->
 #   PAGE=intro.html VW=1080 VH=1920 PREFIX=t node render.js still 34.8   (crea t_34.8.jpg)
-# Sfondo della copertina 2 ("tranquilla"): node cover_intro.js sfondo.jpg '<posa json>' (vedi README)
 import sys, os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 src, out = sys.argv[1:3]

@@ -308,7 +308,6 @@ const END = 37.0;
 
 window.renderFrame = function (tn) {
   const t = unwarp(tn), fi = Math.min(LIP.open.length - 1, Math.max(0, Math.round(tn * 30)));
-  const CP = window.COVER || null;
   const day = T.day(t), sp = T.sp(t);
   // sky + light
   C1.copy(SKY.fear[0]).lerp(SKY.day[0], day).lerp(SKY.space[0], sp); skyMat.uniforms.top.value.copy(C1);
@@ -347,33 +346,31 @@ window.renderFrame = function (tn) {
   mascot.position.set(mx + Math.sin(t * 43) * 0.018 * tremble, my + bob + Math.sin(t * 37) * 0.012 * tremble + zz * 0.4, zz * 9.6);
   mascot.scale.setScalar(ms);
   mascot.visible = t < 42.05;
-  if (CP) { mascot.position.set(CP.mx, CP.my, 0); mascot.scale.setScalar(CP.ms); }
-  const env = CP ? 0 : LIP.env[fi];
-  const [gx, gy] = CP ? CP.gaze : T.gaze(t);
+  const env = LIP.env[fi];
+  const [gx, gy] = T.gaze(t);
   const nod = env * Math.sin(t * 5.2) * 0.035;
   head.rotation.set(-gy * 0.3 + nod, gx * 0.36, Math.sin(t * 1.1) * 0.05 + env * Math.sin(t * 2.6) * 0.04 - gx * 0.06);
   const anticip = ramp(t, 41.1, 41.45) * (1 - ramp(t, 41.45, 41.6));
   head.scale.set(1 + 0.1 * anticip, 1 - 0.12 * anticip, 1 + 0.1 * anticip);
-  if (CP) head.rotation.set(CP.hx, CP.hy, CP.hz);
   // eyes
   let blink = 0; for (const b of BLINKS) blink = Math.max(blink, 1 - Math.abs(t - b) / 0.085);
-  blink = CP ? 0 : clamp01(blink);
-  const wink = CP ? 0 : win(t, 39.45, 39.95, 0.08);
-  const es = CP ? CP.eyeS : T.eyeS(t), happySquint = CP ? CP.squint : 0.1 * Math.max(0, T.smile(t) - 0.6) / 0.4;
+  blink = clamp01(blink);
+  const wink = win(t, 39.45, 39.95, 0.08);
+  const es = T.eyeS(t), happySquint = 0.1 * Math.max(0, T.smile(t) - 0.6) / 0.4;
   for (const e of eyes) {
     const closed = Math.max(blink, e.sd === 1 ? wink : 0);
     e.g.scale.set(es, es * Math.max(0.07, (1 - closed) * (1 - happySquint)), 1);
     e.pupil.position.set(gx * 0.075 - e.sd * 0.018, gy * 0.085, 0);
   }
-  const sad = CP ? CP.sad : T.sad(t), by = CP ? CP.browY : T.browY(t), asym = CP ? 0 : T.browAsym(t);
+  const sad = T.sad(t), by = T.browY(t), asym = T.browAsym(t);
   for (const b of brows) {
     const x = b.sd * 0.35, y = 0.535 + by + (b.sd === 1 ? asym : 0) + blink * -0.015;
     b.m.position.set(x, y, onSphere(x, y, 1.03));
     b.m.rotation.set(-0.45, b.sd * 0.3, -b.sd * sad + b.sd * -0.06);
   }
   // mouth
-  const open = CP ? CP.open : LIP.open[fi] * 0.78, narrow = CP ? 0 : LIP.narrow[fi] * 0.32, syl = 1;
-  const smile = CP ? CP.smile : T.smile(t);
+  const open = LIP.open[fi] * 0.78, narrow = LIP.narrow[fi] * 0.32, syl = 1;
+  const smile = T.smile(t);
   const surprise = win(t, 25.75, 26.4, 0.12) * (1 - env);
   setMouth((0.29 + 0.06 * Math.max(0, smile)) * (1 - narrow) * (1 - 0.45 * surprise), smile * (1 - 0.35 * open), Math.max(open, surprise * 0.55, wink * 0.25 * (1 - env)));
   // hands
@@ -381,7 +378,6 @@ window.renderFrame = function (tn) {
   const wave = win(t, 1.1, 2.9, 0.25), beckon = win(t, 40.0, 40.8, 0.15), talk = env * 0.05;
   hands[1].position.set(hr[0] + wave * Math.sin(t * 11) * 0.2 + beckon * Math.sin(t * 16) * 0.05, hr[1] + Math.sin(t * 2.3) * 0.03 + talk * Math.sin(t * 6.1) + beckon * Math.cos(t * 16) * 0.12 + bob * 0.3, hr[2]);
   hands[0].position.set(hl[0], hl[1] + Math.sin(t * 2.3 + 1.7) * 0.03 + talk * Math.sin(t * 5.3 + 2) + bob * 0.3, hl[2]);
-  if (CP) { hands[1].position.set(...CP.hr); hands[0].position.set(...CP.hl); }
   // hat
   const hatIn = ramp(t, 25.75, 26.1), hatOut = ramp(t, 35.15, 35.6);
   hat.visible = t > 25.75 && t < 35.6;
