@@ -1,0 +1,14 @@
+# In questa cartella i video finali vanno conservati (la regola generale del repository esclude *.mp4 e *.jpg)
+!*.mp4
+!*.jpg
+node_modules/
+video/seg/
+audio/new_raw.wav
+audio/den*.wav
+audio/vtmp.wav
+audio/voice_edit.wav
+audio/voice_fx_take1.wav
+audio/music.wav
+audio/sfx.wav
+audio/music_ducked.wav
+audio/mix_pre.wav
