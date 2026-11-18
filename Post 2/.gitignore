@@ -1,0 +1,13 @@
+# In questa cartella i video finali e la copertina vanno conservati (la regola generale del repository esclude *.mp4 e *.jpg)
+!*.mp4
+!*.jpg
+node_modules/
+video/seg/
+video/cov_*.jpg
+video/prova_*.jpg
+audio/voice3_edit.wav
+audio/voice3_lim.wav
+audio/music2.wav
+audio/sfx2.wav
+audio/mix2_pre.wav
+audio/v16.wav
