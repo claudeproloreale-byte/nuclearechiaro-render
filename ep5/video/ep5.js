@@ -1,4 +1,4 @@
-// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 9)
+// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 10)
 // Parte da ep4.js: stessa mascotte, stessa centrale, stesse barrette, stessi nuclei. Tre mondi disegnati uno alla volta
 // sotto il primo piano, con un breve lampo chiaro a ogni passaggio:
 //  - CENTRALE (apertura e chiusura);
@@ -266,11 +266,12 @@ const dirTo = (a, b) => V(b.x - a.x, b.y - a.y, 0).normalize();
 // i nuclei stanno solo dentro le barre, le molecole d'acqua solo fra le barre. Un neutrone esce da una barra, rallenta nell'acqua
 // rimbalzando sugli idrogeni e rientra in un'altra barra, dove fa fissione (prima l'acqua era mescolata ai nuclei: non realistico).
 // Barra 0 = C (centro X2), barra 1 = R, barra -1 = L.
-const X2 = 40, RW = 3.6, GAP = 3.6, PITCH = RW + GAP, RODK = [-2, -1, 0, 1, 2];   // bozza 7: acqua più larga (era 2,4), più molecole
+const X2 = 40, RW = 14, GAP = 3.6, PITCH = RW + GAP, RODK = [-1, 0, 1, 2];   // bozza 10: barre molto più larghe (erano 3,6), con molti più atomi dentro
 const P2 = (dx, y) => V(X2 + dx, y, 0);
 const rodC = k => X2 + PITCH * k;
 const gapL = k => rodC(k) + RW / 2, gapR = k => rodC(k) + RW / 2 + GAP;     // acqua fra la barra k e la k+1
 const rodOf = x => Math.round((x - X2) / PITCH);
+const G0 = gapL(0) + GAP / 2;                                                  // centro dell'acqua fra la barra C e la barra R
 const CX1 = gapL(1) + GAP / 2, TUBE = 0.85;                                  // centro e mezza larghezza del tubo guida della barra di controllo
 const inWater = (x, m = 0) => { const k = Math.floor((x - X2 - RW / 2) / PITCH); return x > gapL(k) + m && x < gapR(k) - m; };
 const S0 = V(0, 2, 0);
@@ -282,11 +283,11 @@ const perp5 = V(-(B5.y - A5.y), B5.x - A5.x, 0).normalize(), along5 = y => A5.cl
 const U1 = along5(-1.8).addScaledVector(perp5, 0.5), U2 = along5(1.2).addScaledVector(perp5, -0.5);
 // B6: un neutrone veloce esce dalla barra C, rimbalza sugli idrogeni dell'acqua fra C e R (sempre più lento), entra nella barra R e spacca T (B7)
 // percorso irregolare (bozza 7): 5 urti sparsi nell'acqua invece di 9 urti regolari sui bordi
-const E6 = P2(0.6, 1.4);
-const WP = [[3.9, 3.3], [2.6, 4.1], [4.4, 4.9], [3.0, 6.0], [4.7, 6.8]].map(([dx, y]) => P2(dx, y));
+const E6 = V(gapL(0) - 1.2, 1.4, 0);
+const WP = [[3.9, 3.3], [2.6, 4.1], [4.4, 4.9], [3.0, 6.0], [4.7, 6.8]].map(([dx, y]) => V(gapL(0) - 1.8 + dx, y, 0));   // posizioni rispetto al bordo destro della barra C
 const T = V(gapR(0) + 0.8, 7.7, 0);
 // B8-B9: catena che passa da una barra all'altra (C ↔ R) attraverso l'acqua, poi due rami (di più) che ne spaccano quattro, poi si spegne
-const inC = (dx, y) => P2(dx, y), inR = (dx, y) => V(gapR(0) + dx, y, 0);
+const inC = (dx, y) => V(gapL(0) - 1.8 + dx, y, 0), inR = (dx, y) => V(gapR(0) + dx, y, 0);
 const TCH = [T, inC(0.85, 11.6), inR(0.85, 14.5), inC(0.85, 17.4), inR(0.85, 20.3)];   // bozza 8: un collegamento in meno, neutroni più lenti
 const T7 = [inC(0.9, 22.6), inC(-0.5, 25.0)];
 const T8 = [inR(0.8, 24.2), inR(2.3, 25.8), inR(0.8, 27.4), inR(2.3, 29.0)];
@@ -298,17 +299,17 @@ const LINK_WP = LINKS.map(([a, b], i) => gapWP(a, b, 2, i + 1));
 
 // ---------------- tempi della sequenza atomi (secondi di scaletta)
 const S0_IN = 3.8, CHAIN0 = 6.6, CHAIN_END = 10.6;   // catena dell'apertura: S0 colpito da un neutrone lento che arriva dal basso
-const S_IN = 11.2, S_HIT = 13.6, FAST1 = 7.0;   // bozza 9: passaggio alle barre più lento, S si spacca più tardi
-const N5_0 = 17.6;
-const MOL_IN = 21.9, N6_0 = 25.8, T_HIT = 30.9;    // il neutrone della B6 parte su "dopo una ventina di urti"
-const TCH_HIT = [T_HIT, 32.7, 34.5, 36.3, 38.1], T7_HIT = [39.9, 40.1], T8_HIT = [41.55, 41.75, 41.65, 41.9];
+const S_IN = 15.0, S_HIT = 17.4, FAST1 = 7.0;   // bozza 9: passaggio alle barre più lento, S si spacca più tardi
+const N5_0 = 21.4;
+const MOL_IN = 25.7, N6_0 = 29.6, T_HIT = 34.7;    // il neutrone della B6 parte su "dopo una ventina di urti"
+const TCH_HIT = [T_HIT, 36.5, 38.3, 40.1, 41.9], T7_HIT = [43.7, 43.9], T8_HIT = [45.35, 45.55, 45.45, 45.7];
 
 // ---------------- nuclei: speciali (si spaccano) + riempimento casuale con distanza minima
 const NUCS = [];
 const special = (c, u, key) => { const n = { c: c.clone(), u, key }; NUCS.push(n); return n; };
 // B10 (bozza 9): anche vicino alla barra di controllo c'è una reazione a catena (barra R ↔ barra RR attraverso l'acqua);
 // quando la barra di controllo è entrata, i neutroni dell'ultima fissione finiscono negli atomi neri e la catena si ferma
-const FC = [V(CX1 - 2.7, 16.6, 0), V(CX1 + 2.6, 19.0, 0), V(CX1 - 2.5, 21.6, 0)], FC_HIT = [44.7, 45.4, 46.05];
+const FC = [V(CX1 - 2.7, 16.6, 0), V(CX1 + 2.6, 19.0, 0), V(CX1 - 2.5, 21.6, 0)], FC_HIT = [49.6, 50.3, 50.95];   // bozza 10: dopo la panoramica attraverso la barra R
 const gapWPk = (a, b, k, seedK) => [V(lerp(gapL(k) + 0.5, gapR(k) - 0.5, hash(seedK * 5.1)), lerp(a.y, b.y, 0.35 + 0.3 * hash(seedK * 1.9)), 0)];
 const FC_WP = [gapWPk(FC[0], FC[1], 1, 21), gapWPk(FC[1], FC[2], 1, 22)];
 const FC_FROM = V(gapL(1) + 0.7, 12.4, 0);
@@ -320,7 +321,7 @@ const CAPS = [[S_FROM, SB4], [A5, B5], [FC_FROM, FC[0]], ...polySegs([FC[0], ...
 seed = 2025;
 // [x0, x1, y0, y1, tentativi, distanza minima, corridoi]
 // zona 2: una striscia per ogni barra (i nuclei restano ad almeno 0,45 dalle pareti)
-[[-10, 13.5, -12, 16, 34000, 1.45, false], ...RODK.map(k => [rodC(k) - RW / 2 + 0.45, rodC(k) + RW / 2 - 0.45, -12, 40, 4000, 2.0, true])].forEach(([x0, x1, y0, y1, tries, md, caps]) => {
+[[-10, 13.5, -12, 16, 34000, 1.45, false], ...RODK.map(k => [rodC(k) - RW / 2 + 0.45, rodC(k) + RW / 2 - 0.45, -12, 36, 9000, 2.0, true])].forEach(([x0, x1, y0, y1, tries, md, caps]) => {
   for (let k = 0; k < tries; k++) {
     const p = V(lerp(x0, x1, rnd()), lerp(y0, y1, rnd()), 0);
     if (NUCS.some(n => xy(n.c, p) < md)) continue;
@@ -511,10 +512,10 @@ const heatGlows = heated.map(() => glow(0xff8a30, atomScene, 1.0));
 { const pelM2 = basic(0x5a5f80, { transparent: true, opacity: 0.3, depthWrite: false }), watM2 = basic(0x3f96f0, { transparent: true, opacity: 0.2, depthWrite: false });
   const wallM = std(0xc3cedf, { metalness: 0.5, roughness: 0.35, transparent: true, opacity: 0.8 });
   RODK.forEach(k => {
-    const c = rodC(k); mesh(new THREE.PlaneGeometry(RW, 64), pelM2, atomScene, V(c, 12, -0.7)).renderOrder = -10;
-    [-1, 1].forEach(sd => mesh(new THREE.BoxGeometry(0.14, 64, 0.3), wallM, atomScene, V(c + sd * (RW / 2 + 0.07), 12, -0.25)));
+    const c = rodC(k); mesh(new THREE.PlaneGeometry(RW, 170), pelM2, atomScene, V(c, 12, -0.7)).renderOrder = -10;
+    [-1, 1].forEach(sd => mesh(new THREE.BoxGeometry(0.14, 170, 0.3), wallM, atomScene, V(c + sd * (RW / 2 + 0.07), 12, -0.25)));
   });
-  [-3, ...RODK].forEach(k => { mesh(new THREE.PlaneGeometry(GAP - 0.28, 64), watM2, atomScene, V(gapL(k) + GAP / 2, 12, -0.7)).renderOrder = -10; });
+  [-2, ...RODK].forEach(k => { mesh(new THREE.PlaneGeometry(GAP - 0.28, 170), watM2, atomScene, V(gapL(k) + GAP / 2, 12, -0.7)).renderOrder = -10; });
 }
 // pastiglie (bozza 7): all'arrivo nella zona 2 le barre si vedono piene di pastiglie grigie, poi le pastiglie diventano trasparenti
 // e si vedono i nuclei dentro; così è chiaro che quelle sono le barre di uranio e in mezzo c'è l'acqua
@@ -523,11 +524,11 @@ const pelStack = new THREE.Group(); atomScene.add(pelStack);
 const pelM3 = new THREE.MeshStandardMaterial({ color: 0x47474f, roughness: 0.95, metalness: 0, transparent: true });   // bozza 9: più scure
 const pelCoreM = new THREE.MeshStandardMaterial({ color: 0x2c2c33, roughness: 1, metalness: 0, transparent: true });   // dietro le fessure fra le pastiglie: i nuclei non si vedono finché le pastiglie non spariscono
 const cladM3 = new THREE.MeshStandardMaterial({ color: 0xc3cedf, metalness: 0, roughness: 0.95, transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide });
-const pelGeo = (() => { const R = RW / 2 - 0.06, Hh = 3.26 / 2, c = 0.14;
+const pelGeo = (() => { const R = RW / 2 - 0.1, Hh = 11.8 / 2, c = 0.45;
   return new THREE.LatheGeometry([V(0, -Hh, 0), V(R - c, -Hh, 0), V(R, -Hh + c, 0), V(R, Hh - c, 0), V(R - c, Hh, 0), V(0, Hh, 0)].map(p => new THREE.Vector2(p.x, p.y)), 56); })();
-RODK.forEach(k => { mesh(new THREE.CylinderGeometry(RW / 2 - 0.3, RW / 2 - 0.3, 70, 40), pelCoreM, pelStack, V(rodC(k), 20, 0));
-  for (let j = 0; j < 20; j++) mesh(pelGeo, pelM3, pelStack, V(rodC(k), -14 + j * 3.42, 0)).rotation.y = j * 0.7;
-  mesh(new THREE.CylinderGeometry(RW / 2 + 0.12, RW / 2 + 0.12, 70, 40, 1, true), cladM3, pelStack, V(rodC(k), 20, 0)).renderOrder = 3; });
+RODK.forEach(k => { mesh(new THREE.CylinderGeometry(RW / 2 - 0.6, RW / 2 - 0.6, 170, 48), pelCoreM, pelStack, V(rodC(k), 12, 0));
+  for (let j = -6; j <= 7; j++) mesh(pelGeo, pelM3, pelStack, V(rodC(k), j * 12.0, 0)).rotation.y = j * 0.7;
+  mesh(new THREE.CylinderGeometry(RW / 2 + 0.12, RW / 2 + 0.12, 170, 48, 1, true), cladM3, pelStack, V(rodC(k), 12, 0)).renderOrder = 3; });
 const pelLight = new THREE.DirectionalLight(0xffffff, 0); pelLight.position.set(-6, 2, 8); atomScene.add(pelLight);   // luce di lato: la superficie laterale si vede curva
 // barra di controllo fatta di atomi neri (B10): scende dall'alto nel tubo guida
 const CTRL = []; for (let j = 0; j < 30; j++) CTRL.push(V(CX1 + (j % 2 ? 0.4 : -0.4), 14.5 + j * 0.95, 0.05 * (hash(j) - 0.5)));
@@ -539,7 +540,7 @@ const ctrlGroup = new THREE.Group(); atomScene.add(ctrlGroup);
   const body = mesh(new THREE.CylinderGeometry(TUBE, TUBE, L, 40), bodyM2, ctrlGroup, V(CX1, 13.6 + L / 2, 0)); body.renderOrder = 4;
   mesh(new THREE.SphereGeometry(TUBE, 32, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), bodyM2, ctrlGroup, V(CX1, 13.6, 0)).renderOrder = 4;
   mesh(new THREE.CylinderGeometry(TUBE + 0.02, TUBE + 0.02, 0.35, 40), std(0xffc93a, { roughness: 0.6, transparent: true, opacity: 0.7 }), ctrlGroup, V(CX1, 38.5, 0)); }
-const CTRL_IN = [45.3, 46.6], ctrlY = t => 32 * (1 - smooth(ramp(t, CTRL_IN[0], CTRL_IN[1])));
+const CTRL_IN = [50.1, 51.4], ctrlY = t => 32 * (1 - smooth(ramp(t, CTRL_IN[0], CTRL_IN[1])));
 // neutroni che non portano avanti la catena (zona 2): escono dalla barra, urtano una volta nell'acqua e sono assorbiti da un U-238
 // della barra accanto, oppure escono dall'inquadratura lungo l'acqua
 function emitOthersRod(entry, t, k, v, used = []) {
@@ -590,7 +591,7 @@ nFC.forEach((e, i) => { fragments(e, FC_HIT[i], VERT(i + 20)); FISS.push(e); });
   zigNeutron([a.clone().addScaledVector(dirTo(a, wp[0]), 0.32), ...wp, b.clone().addScaledVector(dirTo(wp[0], b), -0.25)], FC_HIT[i] + 0.08, { t1: FC_HIT[i + 1], K: 0.5 });
   emitOthersRod(nFC[i], FC_HIT[i], 2, 2.2, [dirTo(a, wp[0])]); });
 // l'ultima fissione: due neutroni vanno verso la barra di controllo (ormai entrata) e sono assorbiti dagli atomi neri; il terzo dall'altra parte
-[[CTRL[8], 46.75], [CTRL[6], 46.95]].forEach(([c, t1], k) => {
+[[CTRL[8], 51.55], [CTRL[6], 51.75]].forEach(([c, t1], k) => {
   const a = FC[2], h = V(gapL(1) + 0.45, lerp(a.y, c.y, 0.5) + (k ? -0.5 : 0.5), 0), st = a.clone().addScaledVector(dirTo(a, h), 0.32), end = c.clone().addScaledVector(dirTo(c, h), 0.3);
   zigNeutron([st, h, end], FC_HIT[2] + 0.08, { t1, K: 0.5, end: 'abs' }); });
 emitOthersRod(nFC[2], FC_HIT[2], 1, 2.2, [V(1, 0.3, 0).normalize(), V(1, -0.3, 0).normalize()]);
@@ -598,7 +599,7 @@ emitOthersRod(nFC[2], FC_HIT[2], 1, 2.2, [V(1, 0.3, 0).normalize(), V(1, -0.3, 0
 { const paths = NEUT.filter(n => !n.fast && n.keys[0][0].x > 20).flatMap(n => n.keys.slice(1).map((k, i) => [n.keys[i][0], k[0]]));
   seed = 99;
   for (let k = 0; k < 16000; k++) {
-    const c = V(lerp(rodC(-3), rodC(3), rnd()), lerp(-12, 40, rnd()), 0);
+    const c = V(lerp(rodC(-1) - PITCH / 2, rodC(3), rnd()), lerp(-12, 40, rnd()), 0);
     if (!inWater(c.x, 0.33)) continue;
     if (MOLS.some(m => Math.abs(m.c.y - c.y) < 0.95 && xy(m.c, c) < 0.95)) continue;
     if (paths.some(([a, b]) => segDist(c, a, b) < 0.36)) continue;
@@ -758,9 +759,9 @@ const startOverlay = mesh(new THREE.PlaneGeometry(4, 4), basic(0x2f86e6, { trans
 // ============================================================ TEMPI (secondi "di scaletta", bozza 2 con le modifiche dell'autore)
 // B1 0,2–0,8 · B2 1,3–5,3 · B3 5,8–10,3 · B4 10,8–16,6 · B5 17,1–21,1 · B6 21,6–29,2 · B7 29,7–32,2 · B8 32,7–39,1 · B9 39,6–44,1
 // barrette da 44,9: B10 45,9–54,4 · B11 54,9–58,7 · B12 59,2–67,2 · centrale da 68,4: B13 69,6–72,0 · paesaggio fino a 75,0
-const SPEECH = [[0.2, 0.8], [1.3, 5.3], [5.8, 10.3], [10.8, 12.1], [12.25, 16.6], [17.1, 21.1], [21.6, 25.6], [25.75, 29.2], [29.7, 32.2],
-  [32.7, 34.9], [35.05, 39.1], [39.6, 41.6], [41.75, 44.1], [45.9, 49.6], [49.75, 54.4], [54.9, 56.4], [56.55, 58.7], [59.2, 62.0], [62.15, 67.2],
-  [69.6, 72.0]];
+const SPEECH = [[0.2, 0.8], [1.3, 5.3], [5.8, 10.3], [14.6, 15.9], [16.05, 20.4], [20.9, 24.9], [25.4, 29.4], [29.55, 33], [33.5, 36],
+  [36.5, 38.7], [38.85, 42.9], [43.4, 45.4], [45.55, 47.9], [49.7, 53.4], [55.85, 60.5], [61, 62.5], [62.65, 64.8], [65.3, 68.1], [68.25, 73.3],
+  [75.7, 78.1]];
 const speechEnv = t => { let e = 0; for (const [a, b] of SPEECH) e = Math.max(e, Math.min(ramp(t, a, a + 0.07), 1 - ramp(t, b - 0.09, b))); return e; };
 let LIP = null;   // quando arriva la voce: { open, narrow, env } a 30 fps
 function lip(tn, t) {
@@ -768,7 +769,7 @@ function lip(tn, t) {
   const env = speechEnv(t), syl = Math.floor(t * 5.5), u = t * 5.5 - syl;
   return { env, open: env * Math.sin(u * Math.PI) ** 0.7 * (0.55 + 0.45 * hash(syl)), narrow: env * (0.25 + 0.6 * hash(syl + 50)) };
 }
-const END = 75.0;
+const END = 81.1;
 const BLINKS = []; for (let b = 3.1; b < END - 2; b += 3.3 + hash(b) * 0.8) BLINKS.push(b);
 const WARP = [[0, 0], [END, END]];
 function unwarp(tn) { for (let i = 0; i < WARP.length - 1; i++) { const [o0, n0] = WARP[i], [o1, n1] = WARP[i + 1]; if (tn <= n1) return o0 + (o1 - o0) * (tn - n0) / (n1 - n0); } return END; }
@@ -776,18 +777,18 @@ function fwarp(t) { for (let i = 0; i < WARP.length - 1; i++) { const [o0, n0] =
 const rt = keys => keys.map(([k, v]) => [fwarp(k), v]);
 window.WARP = WARP;
 
-const SWITCH = [[3.35, 'rod', 1, 0.28], [4.75, 'atom', 1, 0.28], [11.0, 'atom', 0.8, 0.35], [47.4, 'rod', 0.6, 0.25], [68.4, 'world', 0.7, 0.28]];
+const SWITCH = [[3.35, 'rod', 1, 0.28], [4.75, 'atom', 1, 0.28], [11.0, 'atom', 0.45, 0.6], [53.5, 'rod', 0.6, 0.25], [74.5, 'world', 0.7, 0.28]];
 const worldAt = t => { let w = 'world'; for (const [s, n] of SWITCH) if (t >= s) w = n; return w; };
 const fadeAt = t => { let f = 0; for (const [s, , k, d] of SWITCH) f = Math.max(f, k * clamp01(1 - Math.abs(t - s) / d) ** 0.8); return f; };
 const logZ = (z0, z1, u) => z0 * Math.pow(z1 / z0, u);
 const ein = u => clamp01(u) ** 2, eout = u => 1 - (1 - clamp01(u)) ** 2;
 const CAM_WIDE = [-1, 3.8, 11, -1, 3.0, -40], CAM_CORE = [2.95, 2.45, -33.0, 2.95, 2.34, -39.75], CAM_PUSH = [2.95, 2.34, -38.8, 2.95, 2.34, -39.75];
-const CAM_W = track(rt([[1.2, CAM_WIDE], [2.75, CAM_CORE], [3.4, CAM_PUSH], [68.4, CAM_PUSH], [69.2, CAM_CORE], [71.0, CAM_WIDE]]));
-const DOME = track(rt([[1.0, 1], [2.0, 0.1], [69.8, 0.1], [70.7, 1]]));
+const CAM_W = track(rt([[1.2, CAM_WIDE], [2.75, CAM_CORE], [3.4, CAM_PUSH], [74.5, CAM_PUSH], [75.3, CAM_CORE], [77.1, CAM_WIDE]]));
+const DOME = track(rt([[1.0, 1], [2.0, 0.1], [75.9, 0.1], [76.8, 1]]));
 const OFF = Infinity;   // bozza 5: nel finale la centrale resta in funzione (l'autore non la voleva ferma); con un tempo qui torna spenta
 // barre di controllo: quanto sono dentro (0 = fuori, 1 = tutte dentro)
-const INS = track([[0, 0], [48.9, 0], [51.4, 0.38], [55.0, 0.38], [56.0, 0.74], [56.7, 0.74], [57.9, 0.24], [62.0, 0.24]]);
-const SCRAM_OFF = 62.2, SCRAM = 62.5, SCRAM_END = 63.9;   // magneti spenti, barre che cadono
+const INS = track([[0, 0], [55, 0], [57.5, 0.38], [61.1, 0.38], [62.1, 0.74], [62.8, 0.74], [64, 0.24], [68.1, 0.24]]);
+const SCRAM_OFF = 68.3, SCRAM = 68.6, SCRAM_END = 70;   // magneti spenti, barre che cadono
 const crY = ins => lerp(CR_OUT, CR_IN, ins);
 function rodBottom(t) {
   if (t < SCRAM) return crY(INS(t));
@@ -798,9 +799,9 @@ function rodBottom(t) {
 const power = t => t > SCRAM ? lerp(1 - 0.9 * INS(SCRAM), 0.04, smooth(ramp(t, SCRAM + 0.2, SCRAM_END + 0.8))) : 1 - 0.9 * INS(t - 0.35);
 const ROD_IN = track(rt([[3.35, [0, 0.5, 30, 0, 0.3]], [4.75, [0, 0.0, 0.95, 0, 0]]]));
 const ROD_MAIN = [0, 5.6, 33, 0, 5.1], ROD_MAG = [0, 18.6, 20, 0, 18.4], ROD_LOW = [0, 3.6, 34, 0, 3.2];
-const ROD_HOLD = track(rt([[48.9, ROD_MAIN], [59.2, ROD_MAIN], [60.8, ROD_MAG], [62.6, ROD_MAG], [64.2, ROD_LOW], [67.4, ROD_LOW]]));
+const ROD_HOLD = track(rt([[55, ROD_MAIN], [65.3, ROD_MAIN], [66.9, ROD_MAG], [68.7, ROD_MAG], [70.3, ROD_LOW], [73.5, ROD_LOW]]));
 function rodCamAt(tn) {
-  const R1 = [fwarp(47.4), fwarp(48.9)], R3 = [fwarp(67.4), fwarp(68.4)];
+  const R1 = [fwarp(53.5), fwarp(55)], R3 = [fwarp(73.5), fwarp(74.5)];
   if (tn < R1[0] - 1) return ROD_IN(tn);
   if (tn < R1[1]) { const u = eout(ramp(tn, R1[0], R1[1])); return [0, lerp(0, ROD_MAIN[1], u), logZ(1.0, ROD_MAIN[2], u), 0, lerp(0, ROD_MAIN[4], u)]; }
   if (tn < R3[0]) return ROD_HOLD(tn);
@@ -809,16 +810,22 @@ function rodCamAt(tn) {
 const view = (x, y, z) => [x, y, z, x, y];
 const ATOM_TRACK = track(rt([[4.75, view(0, 1.2, 24)], [5.9, view(0, 1.0, 14)], [7.0, view(0, 1.5, 14)], [9.4, view(0.5, 2.5, 46)], [10.0, view(0.6, 2.5, 47)],
   // dalla pastiglia (zona 1) alle barre con l'acqua (zona 2): zoom all'indietro, lampo, barre viste da lontano, poi dentro la barra C
-  [11.0, view(X2 + 3.6, 2.5, 46)], [11.6, view(X2 + 3.2, 1.5, 42)], [12.9, view(X2, -3.6, 14)], [16.6, view(X2, -3.6, 14)], [17.5, view(X2, -1.4, 16)], [21.2, view(X2, -1.4, 16)],
-  [22.6, view(X2 + 3.6, 4.4, 19)], [29.9, view(X2 + 3.7, 5.4, 19)], [30.9, view(X2 + 5.2, 7.4, 12)],
-  [32.6, view(X2 + 3.6, 10.6, 22)], [34.5, view(X2 + 3.6, 13.2, 22)], [36.3, view(X2 + 3.6, 16.0, 22)], [38.1, view(X2 + 3.6, 18.8, 23)],
-  [39.6, view(X2 + 3.4, 22.2, 27)], [41.2, view(X2 + 3.4, 25.2, 30)], [44.1, view(X2 + 3.4, 25.4, 30)],
-  // B10: la camera si sposta sul tubo guida, dove scende la barra di controllo fatta di atomi neri
-  [44.6, view(CX1 + 0.3, 20.4, 27)], [47.1, view(CX1 + 0.3, 20.2, 27)]]));
+  [14.6, view(X2, -3.6, 14)], [20.4, view(X2, -3.6, 14)], [21.3, view(X2, -1.4, 16)], [25.0, view(X2, -1.4, 16)],
+  [26.4, view(G0, 4.4, 19)], [33.7, view(G0 + 0.1, 5.4, 19)], [34.7, view(G0 + 1.6, 7.4, 12)],
+  [36.4, view(G0, 10.6, 22)], [38.3, view(G0, 13.2, 22)], [40.1, view(G0, 16.0, 22)], [41.9, view(G0, 18.8, 23)],
+  [43.4, view(G0 - 0.2, 22.2, 27)], [45.0, view(G0 - 0.2, 25.2, 30)], [47.9, view(G0 - 0.2, 25.4, 30)],
+  // B10: la camera attraversa la barra R fino al suo altro bordo, dove c'è una reazione in corso e scende la barra di controllo
+  [49.4, view(CX1 + 0.3, 20.4, 27)], [53.2, view(CX1 + 0.3, 20.2, 27)]]));
 function atomCamAt(tn) {
+  // bozza 10: dopo il lampo le barre si vedono da molto lontano, poi zoom lento (scala logaritmica) fino al centro della barra C
+  const Z2 = [fwarp(11.0), fwarp(12.2), fwarp(14.6)];
+  if (tn >= Z2[0] && tn < Z2[2]) {
+    if (tn < Z2[1]) { const u = ramp(tn, Z2[0], Z2[1]); return view(lerp(G0 - 2, G0 - 4, u), lerp(1, 0, u), lerp(150, 138, u)); }
+    const u = smooth(ramp(tn, Z2[1], Z2[2])); return view(lerp(G0 - 4, X2, u), lerp(0, -3.6, u), logZ(138, 14, u));
+  }
   const Z1 = [fwarp(10.0), fwarp(11.0)];
   if (tn > Z1[0] && tn < Z1[1]) { const u = ein(ramp(tn, Z1[0], Z1[1])), v = ATOM_TRACK(Z1[0]); return [v[0], v[1], logZ(v[2], 95, u), v[3], v[4]]; }
-  const A1 = [fwarp(47.1), fwarp(47.4)];
+  const A1 = [fwarp(53.2), fwarp(53.5)];
   if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 70, u), v[3], v[4]]; }
   return ATOM_TRACK(tn);
 }
@@ -827,12 +834,12 @@ const CORNER = [0.82, -0.99, 0.17];
 const R0 = [1.2, -0.3, 0.35], WAVE = [1.32, 0.8, 0.3], POINT = [1.62, 0.32, 0.3];
 const T_ = {
   pos: track([[0, [0, 0.2, 0.8]], [0.92, [0, 0.2, 0.8]], [1.45, CORNER]]),
-  smile: track([[0, 1], [1.4, 0.95], [5, 0.8], [6.8, 0.8], [7.3, 0.3], [10.3, 0.3], [10.8, 0.8], [62.2, 0.8], [62.5, 0.5], [64.0, 0.5], [64.5, 0.85], [68.4, 0.85], [68.9, 1], [END, 1]]),
-  browY: track([[0, 0.1], [1.4, 0.07], [6.8, 0.07], [7.3, 0.14], [10.3, 0.14], [10.8, 0.07], [62.2, 0.07], [62.5, 0.13], [64.0, 0.13], [64.5, 0.07], [68.4, 0.07], [68.9, 0.11], [END, 0.09]]),
-  gaze: track([[0, [0, 0]], [1.3, [0, 0]], [1.8, [-0.6, 0.6]], [69.2, [-0.6, 0.6]], [69.6, [0, 0]], [70.4, [0, 0]], [70.7, [0.85, 0.25]], [71.9, [0.85, 0.25]], [72.2, [0, 0]], [END, [0, 0]]]),
-  handR: track([[0, R0], [0.12, WAVE], [0.9, WAVE], [1.35, R0], [70.3, R0], [70.7, POINT], [71.8, POINT], [72.1, R0], [72.4, WAVE], [END, WAVE]]),
+  smile: track([[0, 1], [1.4, 0.95], [5, 0.8], [6.8, 0.8], [7.3, 0.3], [10.3, 0.3], [14.6, 0.8], [68.3, 0.8], [68.6, 0.5], [70.1, 0.5], [70.6, 0.85], [74.5, 0.85], [75, 1], [END, 1]]),
+  browY: track([[0, 0.1], [1.4, 0.07], [6.8, 0.07], [7.3, 0.14], [10.3, 0.14], [14.6, 0.07], [68.3, 0.07], [68.6, 0.13], [70.1, 0.13], [70.6, 0.07], [74.5, 0.07], [75, 0.11], [END, 0.09]]),
+  gaze: track([[0, [0, 0]], [1.3, [0, 0]], [1.8, [-0.6, 0.6]], [75.3, [-0.6, 0.6]], [75.7, [0, 0]], [76.5, [0, 0]], [76.8, [0.85, 0.25]], [78, [0.85, 0.25]], [78.3, [0, 0]], [END, [0, 0]]]),
+  handR: track([[0, R0], [0.12, WAVE], [0.9, WAVE], [1.35, R0], [76.4, R0], [76.8, POINT], [77.9, POINT], [78.2, R0], [78.5, WAVE], [END, WAVE]]),
 };
-const EXIT = 73.3;
+const EXIT = 79.4;
 window.renderFrame = function (tn) {
   const t = unwarp(tn);
   const where = worldAt(t);
@@ -879,7 +886,7 @@ window.renderFrame = function (tn) {
     const zoomK = 1 + Math.max(0, atomCam.position.z - 12) / 12;
     const nK = Math.min(1 + Math.max(0, atomCam.position.z - 14) / 50, 1.3);   // dopo l'apertura i neutroni si ingrandiscono poco da lontano (in B9 erano troppo grandi)
     placeMols(t, tn);
-    const po = t > 10.9 ? 1 - smooth(ramp(t, 11.9, 13.1)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = pelCoreM.opacity = po; pelM3.depthWrite = pelCoreM.depthWrite = po > 0.99; cladM3.opacity = 0.18 * po; pelLight.intensity = 1.4 * po;
+    const po = t > 10.9 ? 1 - smooth(ramp(t, 13.2, 15.2)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = pelCoreM.opacity = po;   // bozza 10: dissolvenza lenta e senza scatto cladM3.opacity = 0.18 * po; pelLight.intensity = 1.4 * po;
     ctrlGroup.visible = t > CTRL_IN[0] - 0.1; ctrlGroup.position.y = ctrlY(t);
     // U-238 scaldati dai frammenti della catena dell'apertura: tremano, diventano arancioni e brillano
     if (t < 12) heated.forEach((n, k) => { const h = heatOf(n, t), vib = 0.06 * h; n.vx = Math.sin(tn * 23 + n.ph) * vib; n.vy = Math.cos(tn * 19 + n.ph * 1.3) * vib; n.hh = h; placeBg(n, n.vx, n.vy, h); heatGlows[k].position.set(n.c.x, n.c.y, n.c.z + 0.2); heatGlows[k].material.opacity = 0.5 * h; heatGlows[k].scale.setScalar((0.9 + 0.3 * h) * Math.min(zoomK, 2)); });
@@ -927,8 +934,8 @@ window.renderFrame = function (tn) {
 
   // ---------------- PRIMO PIANO: icone
   // bilancia in equilibrio (B8), poi pende da una parte (di più) e dall'altra (di meno); il termometro sale e scende (B9)
-  showIcon(icBal, pop(t, 33.2, 44.6)); balance.set(0.34 * smooth(ramp(t, 39.8, 40.4)) - 0.68 * smooth(ramp(t, 41.9, 42.5)) + 0.03 * Math.sin(tn * 2.2) * (1 - ramp(t, 39.6, 39.8)));
-  showIcon(icThermo, pop(t, 39.7, 44.6)); thermo.set(0.45 + 0.45 * smooth(ramp(t, 39.9, 41.0)) - 0.75 * smooth(ramp(t, 42.0, 43.2)));
+  showIcon(icBal, pop(t, 37, 48.4)); balance.set(0.34 * smooth(ramp(t, 43.6, 44.2)) - 0.68 * smooth(ramp(t, 45.7, 46.3)) + 0.03 * Math.sin(tn * 2.2) * (1 - ramp(t, 43.4, 43.6)));
+  showIcon(icThermo, pop(t, 43.5, 48.4)); thermo.set(0.45 + 0.45 * smooth(ramp(t, 43.7, 44.8)) - 0.75 * smooth(ramp(t, 45.8, 47)));
   // ---------------- mascotte: grande al centro per il saluto, poi piccola in basso a destra
   let [mx, my, ms] = T_.pos(t);
   ms *= backOut(ramp(t, 0.0, 0.35)) * (1 - smooth(ramp(t, EXIT - 0.25, EXIT)));
@@ -945,7 +952,7 @@ window.renderFrame = function (tn) {
   for (const b of brows) { const x = b.sd * 0.35, y = 0.535 + by + blink * -0.015; b.m.position.set(x, y, onSphere(x, y, 1.03)); b.m.rotation.set(-0.45, b.sd * 0.3, b.sd * 0.03 + b.sd * -0.06 + (by > 0.12 ? b.sd * 0.18 : 0)); }
   const open = L.open * 0.78, narrow = L.narrow * 0.32;
   setMouth((0.29 + 0.06 * Math.max(0, smile)) * (1 - narrow), smile * (1 - 0.35 * open), open);
-  const hr = T_.handR(t), wave = win(t, 0.15, 1.0, 0.2) + win(t, 72.4, 73.2, 0.2), point = win(t, 70.7, 71.8, 0.25), talk = env * 0.04;
+  const hr = T_.handR(t), wave = win(t, 0.15, 1.0, 0.2) + win(t, 78.5, 79.3, 0.2), point = win(t, 76.8, 77.9, 0.25), talk = env * 0.04;
   hands[1].position.set(hr[0] + wave * Math.sin(t * 13) * 0.2 + point * Math.abs(Math.sin(t * 6.5)) * 0.1, hr[1] + Math.sin(tn * 2.3) * 0.03 + talk * Math.sin(tn * 6.1) + bob * 0.3, hr[2]);
   hands[0].position.set(-R0[0], R0[1] + Math.sin(tn * 2.3 + 1.7) * 0.03 + talk * Math.sin(tn * 5.3 + 2) + bob * 0.3, R0[2]);
   centerIcons();
