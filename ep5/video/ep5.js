@@ -1,4 +1,4 @@
-// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 12)
+// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 13)
 // Parte da ep4.js: stessa mascotte, stessa centrale, stesse barrette, stessi nuclei. Tre mondi disegnati uno alla volta
 // sotto il primo piano, con un breve lampo chiaro a ogni passaggio:
 //  - CENTRALE (apertura e chiusura);
@@ -310,6 +310,8 @@ const special = (c, u, key) => { const n = { c: c.clone(), u, key }; NUCS.push(n
 // B10 (bozza 9): anche vicino alla barra di controllo c'è una reazione a catena (barra R ↔ barra RR attraverso l'acqua);
 // quando la barra di controllo è entrata, i neutroni dell'ultima fissione finiscono negli atomi neri e la catena si ferma
 const nS0 = special(S0, true, 'S0'), nSB4 = special(SB4, true, 'S'), nU1 = special(U1, true, 'U1'), nU2 = special(U2, true, 'U2');
+// bozza 13: U-235 che non si spaccano, perché la barra di controllo assorbe tutti i neutroni
+const nX = [inC(-1.2, 29.6), inC(0.7, 31.8), inC(-2.8, 33.2), inC(-3.2, 27.6), inR(1.4, 32.0)].map((p, i) => special(p, true, 'X' + i));
 const nT = TCH.map((p, i) => special(p, true, 'T' + i)), nT7 = T7.map((p, i) => special(p, true, 'T7' + i)), nT8 = T8.map((p, i) => special(p, true, 'T8' + i));
 // corridoi lasciati liberi: percorsi dei neutroni scritti a mano
 const polySegs = pts => pts.slice(1).map((p, i) => [pts[i], p]);
@@ -432,26 +434,40 @@ function npos(n, t) {
 const tEnd = n => n.keys[n.keys.length - 1][1];
 // ---------------- molecole d'acqua (ossigeno azzurro con due idrogeni): nei rimbalzi c'è un idrogeno esattamente sul punto d'urto
 const MOLS = [];
+// bozza 13: tutte le molecole d'acqua sono distribuite in modo uniforme una volta sola (stessa densità ovunque);
+// i neutroni rimbalzano su quelle che ci sono già (anche più neutroni sulla stessa molecola)
 const OH = 0.19, HA = 52 * Math.PI / 180;
-function addMol(c, a, extra = {}) { MOLS.push({ c: c.clone(), a, ph: hash(MOLS.length * 1.7) * 6.28, ...extra }); }
-const bounceMol = (p, din, dout, hitT) => {
-  const nrm = din.clone().sub(dout).normalize(), c = p.clone().addScaledVector(nrm, OH);
-  addMol(c.setZ(0.15), Math.atan2(-nrm.y, -nrm.x) + HA, { hitT, nrm, fixed: true });
-};
+function addMol(c, a, extra = {}) { MOLS.push({ c: c.clone(), a, ph: hash(MOLS.length * 1.7) * 6.28, hits: [], ...extra }); }
+{ const sv = seed; seed = 99;
+  for (let k = 0; k < 40000; k++) {
+    const c = V(lerp(rodC(-1) - PITCH / 2, rodC(3), rnd()), lerp(-46, 44, rnd()), 0);
+    if (!inWater(c.x, 0.33)) continue;
+    if (MOLS.some(m => Math.abs(m.c.y - c.y) < 0.95 && xy(m.c, c) < 0.95)) continue;
+    c.z = -0.1 + rnd() * 0.3; addMol(c, rnd() * 6.28, { push: Math.abs(c.x - G0) < TUBE + 0.3 && c.y > 12.5 ? (c.x < G0 ? -1 : 1) : 0 });
+  }
+  seed = sv; }
+const nearestMol = (p, avoidPush) => { let best = null, bd = 1e9; for (const m of MOLS) { if (avoidPush && m.push) continue; const d = xy(m.c, p); if (d < bd) { bd = d; best = m; } } return best; };
 // neutrone che rimbalza sull'acqua: pts = [partenza, punti d'urto..., arrivo]; rallenta di K a ogni urto.
 // Si dà il tempo d'arrivo (t1) oppure la velocità iniziale (v0).
-function zigNeutron(pts, t0, { t1, v0, K = 0.8, end = 'hit', trail = 0 }) {
+function zigNeutron(pts, t0, { t1, v0, K = 0.8, end = 'hit', trail = 0, avoidPush = false }) {
   pts = pts.map(p => p.clone().setZ(0.15));
+  // ogni punto d'urto si sposta sulla molecola più vicina: il neutrone tocca la molecola dal lato da cui arriva
+  const hitM = [];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const din = dirTo(pts[i - 1], pts[i]), dout = dirTo(pts[i], pts[i + 1]), nrm = din.clone().sub(dout);
+    if (nrm.lengthSq() < 1e-6) nrm.set(-din.y, din.x, 0); nrm.normalize();
+    const m = nearestMol(pts[i], avoidPush); pts[i] = m.c.clone().addScaledVector(nrm, -0.22).setZ(0.15); hitM.push([m, nrm]);
+  }
   if (!v0) { let s = 0; for (let i = 0; i < pts.length - 1; i++) s += pts[i].distanceTo(pts[i + 1]) / Math.pow(K, i); v0 = s / (t1 - t0); }
   let t = t0; const keys = [[pts[0], t]];
   for (let i = 0; i < pts.length - 1; i++) { t += pts[i].distanceTo(pts[i + 1]) / (v0 * Math.pow(K, i)); keys.push([pts[i + 1], t]); }
   const n = neutron(keys, end, trail ? { trail } : {});
-  n.bounces = pts.slice(1, -1).map((p, i) => { bounceMol(p, dirTo(pts[i], p), dirTo(p, pts[i + 2]), keys[i + 1][1]); return { p, t: keys[i + 1][1], s: glow(0xdff4ff, atomScene, 0.7) }; });
+  n.bounces = pts.slice(1, -1).map((p, i) => { const [m, nrm] = hitM[i]; m.hits.push({ t: keys[i + 1][1], nrm }); m.fixed = true; return { p, t: keys[i + 1][1], s: glow(0xdff4ff, atomScene, 0.7) }; });
   n.v0 = v0; return n;
 }
 const absorbed = new Set();
 const clearLine = (a, b, skip) => NUCS.every(n => skip.includes(n) || segDist(n.c, a, b) > 0.4);
-const freeForMol = p => NUCS.every(n => xy(n.c, p) > 0.8) && MOLS.every(m => xy(m.c, p) > 0.6);
+const freeForMol = p => inWater(p.x, 0.3);
 // neutroni "che non portano avanti la catena": assorbiti da un U-238 vicino o fuori dall'inquadratura.
 // Con water = true (zona 2, dopo la B6) rimbalzano una volta su una molecola d'acqua prima di arrivare.
 function emitOthers(entry, t, k, v, avoid = [], water = false) {
@@ -526,7 +542,8 @@ const pelCoreM = new THREE.MeshStandardMaterial({ color: 0x2c2c33, roughness: 1,
 const cladM3 = new THREE.MeshStandardMaterial({ color: 0xc3cedf, metalness: 0, roughness: 0.95, transparent: true, opacity: 0.18, depthWrite: false });
 // bozza 11: ogni barra è UN solo cilindro (profilo con le pastiglie smussate e una scanalatura fra una e l'altra):
 // niente oggetti trasparenti sovrapposti, così la dissolvenza è uniforme e senza scatti
-const pelGeo = (() => { const R = RW / 2 - 0.1, Hh = 11.8 / 2, c = 0.45, g = 0.55, pts = [new THREE.Vector2(0, -6 * 12 - Hh - 0.1)];
+const pelGeo = (() => { const R = RW / 2, Hh = 11.8 / 2, c = 0.3, g = 0.1,   // bozza 13: scanalature poco profonde (prima un nucleo vicino alla parete sporgeva)
+  pts = [new THREE.Vector2(0, -6 * 12 - Hh - 0.1)];
   for (let j = -6; j <= 7; j++) { const y0 = j * 12 - Hh, y1 = j * 12 + Hh;
     pts.push(new THREE.Vector2(R - g, y0 - 0.1), new THREE.Vector2(R - c, y0), new THREE.Vector2(R, y0 + c), new THREE.Vector2(R, y1 - c), new THREE.Vector2(R - c, y1), new THREE.Vector2(R - g, y1 + 0.1)); }
   pts.push(new THREE.Vector2(0, 7 * 12 + Hh + 0.1)); return new THREE.LatheGeometry(pts, 72); })();
@@ -592,25 +609,27 @@ nT7.forEach((e, i) => { fragments(e, T7_HIT[i], VERT(i + 7)); FISS.push(e); cons
       const want = e.c.y + d; const j = CTRL.map((c, jj) => [Math.abs(c.y - want) + (jj % 2 ? 0 : 0.6), jj]).filter(([, jj]) => !usedJ.has(jj)).sort((p, q2) => p[0] - q2[0])[0][1]; usedJ.add(j);   // atomo nero libero più vicino (meglio la colonna di destra)
       const c = CTRL[j], h = V(gapR(0) - 0.47, lerp(e.c.y, c.y, 0.55) + 0.25 * (hash(i * 3 + k) - 0.5), 0);
       const st = e.c.clone().addScaledVector(dirTo(e.c, h), 0.32), end = c.clone().addScaledVector(dirTo(c, h), 0.3);
-      zigNeutron([st, h, end], T8_HIT[i] + 0.08, { t1: 46.85 + 0.1 * idx++, K: 0.5, end: 'abs' });
+      zigNeutron([st, h, end], T8_HIT[i] + 0.08, { t1: 46.85 + 0.1 * idx++, K: 0.5, end: 'abs', avoidPush: true });
     }); }); }
 const fissFlash = FISS.map(e => { const s = glow(0xfff0c0, atomScene, 2.2); s.position.copy(e.c); s.position.z += 0.3; s.userData.e = e; return s; });
 console.log('fissioni', FISS.length, 'neutroni', NEUT.length, 'nuclei', NUCS.length, 'nuclei scaldati', heated.length);
 
-// ---------------- le altre molecole d'acqua: solo fra le barre, lontane dai percorsi dei neutroni (tranne quelli velocissimi di B4 e B5)
-{ const paths = NEUT.filter(n => !n.fast && n.keys[0][0].x > 20).flatMap(n => n.keys.slice(1).map((k, i) => [n.keys[i][0], k[0]]));
-  seed = 99;
-  for (let k = 0; k < 30000; k++) {
-    const c = V(lerp(rodC(-1) - PITCH / 2, rodC(3), rnd()), lerp(-46, 44, rnd()), 0);
-    if (!inWater(c.x, 0.33)) continue;
-    if (MOLS.some(m => Math.abs(m.c.y - c.y) < 0.95 && xy(m.c, c) < 0.95)) continue;
-    if (paths.some(([a, b]) => segDist(c, a, b) < 0.36)) continue;
-    c.z = -0.1 + rnd() * 0.3; addMol(c, rnd() * 6.28);
+// ---------------- le molecole che stanno sul cammino di un neutrone (senza urtarlo) si spostano un poco di lato
+{ const segs = NEUT.filter(n => !n.fast && n.keys[0][0].x > 20).flatMap(n => n.keys.slice(1).map((k, i) => [n.keys[i][0], k[0]]));
+  for (let it = 0; it < 3; it++) for (const m of MOLS) {
+    if (m.fixed) continue;
+    for (const [a, b] of segs) {
+      const d = segDist(m.c, a, b); if (d >= 0.34) continue;
+      const ab = b.clone().sub(a).setZ(0), u = clamp01(m.c.clone().sub(a).setZ(0).dot(ab) / Math.max(1e-6, ab.lengthSq())), foot = a.clone().addScaledVector(ab, u);
+      let dir = m.c.clone().sub(foot).setZ(0); if (dir.lengthSq() < 1e-6) dir.set(-ab.y, ab.x, 0); dir.normalize();
+      const np = m.c.clone().addScaledVector(dir, 0.36 - d); if (!inWater(np.x, 0.3)) np.copy(m.c).addScaledVector(dir, -(0.36 + d));
+      if (inWater(np.x, 0.3)) { m.c.x = np.x; m.c.y = np.y; }
+    }
   } }
 const molO = new THREE.InstancedMesh(new THREE.SphereGeometry(0.15, 18, 14), std(0x6fa8e0, { roughness: 0.6 }), MOLS.length);
 const molH = new THREE.InstancedMesh(new THREE.SphereGeometry(0.085, 14, 10), std(0xc9d6e6, { roughness: 0.6 }), MOLS.length * 2);
 atomScene.add(molO, molH);
-MOLS.forEach(m => { if (Math.abs(m.c.x - CRX) < TUBE + 0.3 && m.c.y > 12.5) m.push = m.c.x < CRX ? -1 : 1; });
+
 console.log('molecole', MOLS.length, 'spinte dalla barra', MOLS.filter(m => m.push).length);
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3();
 function placeMols(t, tn) {
@@ -619,7 +638,7 @@ function placeMols(t, tn) {
     _p.copy(m.c);
     const jig = m.fixed ? 0.006 : 0.015;
     _p.x += Math.sin(tn * 7 + m.ph) * jig; _p.y += Math.cos(tn * 6 + m.ph * 1.3) * jig;
-    if (m.hitT !== undefined) { const k = ramp(t, m.hitT, m.hitT + 0.1) * (1 - ramp(t, m.hitT + 0.1, m.hitT + 0.9)); _p.addScaledVector(m.nrm, 0.13 * k); }
+    for (const h of m.hits) { const k = ramp(t, h.t, h.t + 0.1) * (1 - ramp(t, h.t + 0.1, h.t + 0.9)); if (k > 0) _p.addScaledVector(h.nrm, 0.13 * k); }
     // B10: la barra di controllo che scende spinge le molecole sul suo cammino: prima verso il basso, poi di lato
     if (m.push) { const p = m.c.y - (13.6 - TUBE + ctrlY(t)) + 0.35;   // quanto la punta della barra è già scesa oltre la molecola
       if (p > 0) { const f = smooth(ramp(p, 0.5, 1.5)); _p.y -= Math.min(p, 1.2); _p.x = lerp(_p.x, CRX + m.push * (TUBE + 0.4), f); } }
