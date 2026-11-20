@@ -1,4 +1,4 @@
-// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 10)
+// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 11)
 // Parte da ep4.js: stessa mascotte, stessa centrale, stesse barrette, stessi nuclei. Tre mondi disegnati uno alla volta
 // sotto il primo piano, con un breve lampo chiaro a ogni passaggio:
 //  - CENTRALE (apertura e chiusura);
@@ -329,8 +329,12 @@ seed = 2025;
     p.z = (rnd() - 0.5) * 0.4; NUCS.push({ c: p, u: false });
   }
 });
+// bozza 11: fasce di nuclei in più attorno alla zona 1, così nello zoom all'indietro non si vedono bordi vuoti
+// (aggiunte dopo il riempimento originale e escluse dalla scelta degli U-235: la catena dell'apertura resta identica)
+[[-14, 13.5, 16, 22], [-14, 13.5, -18, -12], [-14, -10, -12, 16]].forEach(([x0, x1, y0, y1]) => {
+  for (let k = 0; k < 6000; k++) { const p = V(lerp(x0, x1, rnd()), lerp(y0, y1, rnd()), 0); if (NUCS.some(n => xy(n.c, p) < 1.45)) continue; p.z = (rnd() - 0.5) * 0.4; NUCS.push({ c: p, u: false, edge: true }); } });
 // U-235 della catena dell'apertura (1 su 10, mai a meno di 3,4 l'uno dall'altro). Nella zona 2 ci sono solo quelli scritti a mano.
-{ const free = NUCS.filter(n => !n.key && n.c.x < 12), U = [S0], want = Math.round(free.length * 0.14);
+{ const free = NUCS.filter(n => !n.key && !n.edge && n.c.x < 12), U = [S0], want = Math.round(free.length * 0.14);
   let got = 0;
   for (const n of free.map((n, i) => [hash(i * 3.7 + 11), n]).sort((a, b) => a[0] - b[0]).map(x => x[1])) {
     if (got >= want) break;
@@ -523,12 +527,15 @@ const pelStack = new THREE.Group(); atomScene.add(pelStack);
 // bozza 8: pastiglie con superficie laterale ben visibile (bordi smussati) e un piccolissimo spazio fra una e l'altra; materiali opachi, senza riflessi
 const pelM3 = new THREE.MeshStandardMaterial({ color: 0x47474f, roughness: 0.95, metalness: 0, transparent: true });   // bozza 9: più scure
 const pelCoreM = new THREE.MeshStandardMaterial({ color: 0x2c2c33, roughness: 1, metalness: 0, transparent: true });   // dietro le fessure fra le pastiglie: i nuclei non si vedono finché le pastiglie non spariscono
-const cladM3 = new THREE.MeshStandardMaterial({ color: 0xc3cedf, metalness: 0, roughness: 0.95, transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide });
-const pelGeo = (() => { const R = RW / 2 - 0.1, Hh = 11.8 / 2, c = 0.45;
-  return new THREE.LatheGeometry([V(0, -Hh, 0), V(R - c, -Hh, 0), V(R, -Hh + c, 0), V(R, Hh - c, 0), V(R - c, Hh, 0), V(0, Hh, 0)].map(p => new THREE.Vector2(p.x, p.y)), 56); })();
-RODK.forEach(k => { mesh(new THREE.CylinderGeometry(RW / 2 - 0.6, RW / 2 - 0.6, 170, 48), pelCoreM, pelStack, V(rodC(k), 12, 0));
-  for (let j = -6; j <= 7; j++) mesh(pelGeo, pelM3, pelStack, V(rodC(k), j * 12.0, 0)).rotation.y = j * 0.7;
-  mesh(new THREE.CylinderGeometry(RW / 2 + 0.12, RW / 2 + 0.12, 170, 48, 1, true), cladM3, pelStack, V(rodC(k), 12, 0)).renderOrder = 3; });
+const cladM3 = new THREE.MeshStandardMaterial({ color: 0xc3cedf, metalness: 0, roughness: 0.95, transparent: true, opacity: 0.18, depthWrite: false });
+// bozza 11: ogni barra è UN solo cilindro (profilo con le pastiglie smussate e una scanalatura fra una e l'altra):
+// niente oggetti trasparenti sovrapposti, così la dissolvenza è uniforme e senza scatti
+const pelGeo = (() => { const R = RW / 2 - 0.1, Hh = 11.8 / 2, c = 0.45, g = 0.55, pts = [new THREE.Vector2(0, -6 * 12 - Hh - 0.1)];
+  for (let j = -6; j <= 7; j++) { const y0 = j * 12 - Hh, y1 = j * 12 + Hh;
+    pts.push(new THREE.Vector2(R - g, y0 - 0.1), new THREE.Vector2(R - c, y0), new THREE.Vector2(R, y0 + c), new THREE.Vector2(R, y1 - c), new THREE.Vector2(R - c, y1), new THREE.Vector2(R - g, y1 + 0.1)); }
+  pts.push(new THREE.Vector2(0, 7 * 12 + Hh + 0.1)); return new THREE.LatheGeometry(pts, 72); })();
+RODK.forEach(k => { const m = mesh(pelGeo, pelM3, pelStack, V(rodC(k), 0, 0)); m.renderOrder = 6;
+  const cl = mesh(new THREE.CylinderGeometry(RW / 2 + 0.12, RW / 2 + 0.12, 170, 72, 1, true), cladM3, pelStack, V(rodC(k), 12, 0)); cl.renderOrder = 7; });
 const pelLight = new THREE.DirectionalLight(0xffffff, 0); pelLight.position.set(-6, 2, 8); atomScene.add(pelLight);   // luce di lato: la superficie laterale si vede curva
 // barra di controllo fatta di atomi neri (B10): scende dall'alto nel tubo guida
 const CTRL = []; for (let j = 0; j < 30; j++) CTRL.push(V(CX1 + (j % 2 ? 0.4 : -0.4), 14.5 + j * 0.95, 0.05 * (hash(j) - 0.5)));
@@ -824,9 +831,9 @@ function atomCamAt(tn) {
     const u = smooth(ramp(tn, Z2[1], Z2[2])); return view(lerp(G0 - 4, X2, u), lerp(0, -3.6, u), logZ(138, 14, u));
   }
   const Z1 = [fwarp(10.0), fwarp(11.0)];
-  if (tn > Z1[0] && tn < Z1[1]) { const u = ein(ramp(tn, Z1[0], Z1[1])), v = ATOM_TRACK(Z1[0]); return [v[0], v[1], logZ(v[2], 95, u), v[3], v[4]]; }
+  if (tn > Z1[0] && tn < Z1[1]) { const u = ein(ramp(tn, Z1[0], Z1[1])), v = ATOM_TRACK(Z1[0]); return [v[0], v[1], logZ(v[2], 52, u), v[3], v[4]]; }   // bozza 11: non oltre 52, altrimenti si vedono i bordi della zona piena di atomi
   const A1 = [fwarp(53.2), fwarp(53.5)];
-  if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 70, u), v[3], v[4]]; }
+  if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 44, u), v[3], v[4]]; }
   return ATOM_TRACK(tn);
 }
 // mascotte
@@ -886,7 +893,7 @@ window.renderFrame = function (tn) {
     const zoomK = 1 + Math.max(0, atomCam.position.z - 12) / 12;
     const nK = Math.min(1 + Math.max(0, atomCam.position.z - 14) / 50, 1.3);   // dopo l'apertura i neutroni si ingrandiscono poco da lontano (in B9 erano troppo grandi)
     placeMols(t, tn);
-    const po = t > 10.9 ? 1 - smooth(ramp(t, 13.2, 15.2)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = pelCoreM.opacity = po;   // bozza 10: dissolvenza lenta e senza scatto cladM3.opacity = 0.18 * po; pelLight.intensity = 1.4 * po;
+    const po = t > 10.9 ? 1 - smooth(ramp(t, 13.2, 15.2)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = po;   // bozza 10: dissolvenza lenta e senza scatto cladM3.opacity = 0.18 * po; pelLight.intensity = 1.4 * po;
     ctrlGroup.visible = t > CTRL_IN[0] - 0.1; ctrlGroup.position.y = ctrlY(t);
     // U-238 scaldati dai frammenti della catena dell'apertura: tremano, diventano arancioni e brillano
     if (t < 12) heated.forEach((n, k) => { const h = heatOf(n, t), vib = 0.06 * h; n.vx = Math.sin(tn * 23 + n.ph) * vib; n.vy = Math.cos(tn * 19 + n.ph * 1.3) * vib; n.hh = h; placeBg(n, n.vx, n.vy, h); heatGlows[k].position.set(n.c.x, n.c.y, n.c.z + 0.2); heatGlows[k].material.opacity = 0.5 * h; heatGlows[k].scale.setScalar((0.9 + 0.3 * h) * Math.min(zoomK, 2)); });
