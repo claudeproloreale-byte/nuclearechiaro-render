@@ -1,0 +1,8 @@
+{
+  "name": "nuclearechiaro-post4",
+  "private": true,
+  "dependencies": {
+    "three": "0.187.0",
+    "playwright": "1.63.0"
+  }
+}
