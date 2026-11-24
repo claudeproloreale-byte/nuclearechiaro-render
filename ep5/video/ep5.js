@@ -530,7 +530,7 @@ const heated = bg.filter(n => n.heat);
 const heatOf = (n, t) => { let h = 0; for (const [tt, v] of n.heat) if (t > tt) h = Math.max(h, v * ramp(t, tt, tt + 0.25)); return h; };
 const heatGlows = heated.map(() => glow(0xff8a30, atomScene, 1.0));
 // ---------------- zona 2: barre con l'acqua in mezzo (pastiglia grigio-viola, acqua azzurra, guaina metallica ai bordi)
-{ const pelM2 = basic(0x5a5f80, { transparent: true, opacity: 0.3, depthWrite: false }), watM2 = basic(0x3f96f0, { transparent: true, opacity: 0.2, depthWrite: false });
+{ const pelM2 = basic(0x5a5f80, { transparent: true, opacity: 0.3, depthWrite: false }), watM2 = basic(0x4fa3f5, { transparent: true, opacity: 0.3, depthWrite: false });   // voce 6: acqua un po' più chiara, come nelle barrette 3D
   const wallM = std(0xc3cedf, { metalness: 0.5, roughness: 0.35, transparent: true, opacity: 0.8 });
   RODK.forEach(k => {
     const c = rodC(k); mesh(new THREE.PlaneGeometry(RW, 170), pelM2, atomScene, V(c, 12, -0.7)).renderOrder = -10;
@@ -542,7 +542,7 @@ const heatGlows = heated.map(() => glow(0xff8a30, atomScene, 1.0));
 // e si vedono i nuclei dentro; così è chiaro che quelle sono le barre di uranio e in mezzo c'è l'acqua
 const pelStack = new THREE.Group(); atomScene.add(pelStack);
 // bozza 8: pastiglie con superficie laterale ben visibile (bordi smussati) e un piccolissimo spazio fra una e l'altra; materiali opachi, senza riflessi
-const pelM3 = new THREE.MeshStandardMaterial({ color: 0x47474f, roughness: 0.95, metalness: 0, transparent: true });   // bozza 9: più scure
+const pelM3 = new THREE.MeshStandardMaterial({ color: 0x70301f, roughness: 0.95, metalness: 0, transparent: true, emissive: 0xff6a10, emissiveIntensity: 0.03 });   // voce 6: color rame come le barrette 3D (prima grigio 0x47474f)   // bozza 9: più scure
 const pelCoreM = new THREE.MeshStandardMaterial({ color: 0x2c2c33, roughness: 1, metalness: 0, transparent: true });   // dietro le fessure fra le pastiglie: i nuclei non si vedono finché le pastiglie non spariscono
 const cladM3 = new THREE.MeshStandardMaterial({ color: 0xc3cedf, metalness: 0, roughness: 0.95, transparent: true, opacity: 0.18, depthWrite: false });
 // bozza 11: ogni barra è UN solo cilindro (profilo con le pastiglie smussate e una scanalatura fra una e l'altra):
