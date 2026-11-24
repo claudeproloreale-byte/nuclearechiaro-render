@@ -445,7 +445,7 @@ const OH = 0.19, HA = 52 * Math.PI / 180;
 function addMol(c, a, extra = {}) { MOLS.push({ c: c.clone(), a, ph: hash(MOLS.length * 1.7) * 6.28, hits: [], ...extra }); }
 { const sv = seed; seed = 99;
   for (let k = 0; k < 70000; k++) {
-    const c = V(lerp(rodC(-1) - PITCH / 2, rodC(3), rnd()), lerp(-46, 44, rnd()), 0);
+    const c = V(lerp(rodC(-1) - RW / 2, rodC(3), rnd()), lerp(-46, 44, rnd()), 0);   // voce 5: niente acqua a sinistra della barra L (con l'acqua larga entrava nella zona 1, striscia azzurra a 0:09)
     if (!inWater(c.x, 0.33)) continue;
     if (MOLS.some(m => Math.abs(m.c.y - c.y) < 0.95 && xy(m.c, c) < 0.95)) continue;
     c.z = -0.1 + rnd() * 0.3; addMol(c, rnd() * 6.28, { push: Math.abs(c.x - G0) < TUBE + 0.3 && c.y > 12.5 ? (c.x < G0 ? -1 : 1) : 0 });
@@ -536,7 +536,7 @@ const heatGlows = heated.map(() => glow(0xff8a30, atomScene, 1.0));
     const c = rodC(k); mesh(new THREE.PlaneGeometry(RW, 170), pelM2, atomScene, V(c, 12, -0.7)).renderOrder = -10;
     [-1, 1].forEach(sd => mesh(new THREE.BoxGeometry(0.14, 170, 0.3), wallM, atomScene, V(c + sd * (RW / 2 + 0.07), 12, -0.25)));
   });
-  [-2, ...RODK].forEach(k => { mesh(new THREE.PlaneGeometry(GAP - 0.28, 170), watM2, atomScene, V(gapL(k) + GAP / 2, 12, -0.7)).renderOrder = -10; });
+  RODK.forEach(k => { mesh(new THREE.PlaneGeometry(GAP - 0.28, 170), watM2, atomScene, V(gapL(k) + GAP / 2, 12, -0.7)).renderOrder = -10; });
 }
 // pastiglie (bozza 7): all'arrivo nella zona 2 le barre si vedono piene di pastiglie grigie, poi le pastiglie diventano trasparenti
 // e si vedono i nuclei dentro; così è chiaro che quelle sono le barre di uranio e in mezzo c'è l'acqua
