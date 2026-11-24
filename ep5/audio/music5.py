@@ -160,8 +160,12 @@ put(sfx, w(25.7), bub * np.minimum(1, tt(2.0) / 0.3) * np.minimum(1, (2.0 - tt(2
 put(sfx, w(37.0), pop(420, 1050), 0.15, pan=-0.6)                                                       # bilancia
 put(sfx, w(43.5), pop(420, 1050), 0.15, pan=-0.6)                                                       # termometro
 sweep(w(43.7), w(44.8) - w(43.7) + 0.2, 500, 1300, 0.05, pan=-0.6); sweep(w(45.8), w(47.0) - w(45.8) + 0.2, 1300, 450, 0.05, pan=-0.6)
-put(sfx, w(45.5), whoosh(w(46.7) - w(45.5), 900, 250), 0.10, pan=0.2)                                   # scende la barra di controllo fatta di atomi
-put(sfx, w(46.7), lp(noise(0.3), 300) * np.exp(-tt(0.3) * 14), 0.25, pan=0.2)
+D = w(46.7) - w(45.5)                                                                                   # scende la barra di controllo fatta di atomi (voce 2: più forte)
+put(sfx, w(45.5), whoosh(D, 900, 220), 0.26, pan=0.15)
+put(sfx, w(45.5), lp(noise(D), 140) * np.minimum(1, tt(D) / 0.3) ** 2, 0.22)                            # rombo basso durante la discesa
+sweep(w(45.5), D, 220, 70, 0.10)
+put(sfx, w(46.7), lp(noise(0.7), 200) * np.exp(-tt(0.7) * 6), 0.75, pan=0.15); put(sfx, w(46.7), kick(), 0.6)   # colpo d'arresto
+for i, m in enumerate([50, 57, 62]): put(sfx, w(46.7) + 0.01 * i, chime(midi(m + 24), 1.2), 0.05, pan=0.15)   # risonanza metallica
 put(sfx, w(50.8), lp(hp(noise(w(53.3) - w(50.8)), 200), 900) * np.sin(np.pi * tt(w(53.3) - w(50.8)) / (w(53.3) - w(50.8))), 0.05)   # barre che scendono
 sweep(w(57.0), w(57.9) - w(57.0), 400, 260, 0.04); sweep(w(58.6), w(59.8) - w(58.6), 260, 420, 0.04)   # le abbassi / le alzi
 hum = np.sin(2 * np.pi * 100 * tt(w(64.1) - w(61.1))) * 0.6 + 0.4 * np.sin(2 * np.pi * 200 * tt(w(64.1) - w(61.1)))   # ronzio degli elettromagneti

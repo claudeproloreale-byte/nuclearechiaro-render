@@ -555,11 +555,23 @@ const pelLight = new THREE.DirectionalLight(0xffffff, 0); pelLight.position.set(
 // bozza 12: la barra di controllo scende nell'acqua fra la barra C e la barra R, nel momento in cui la catena è al massimo (B9)
 const CRX = G0;
 const CTRL = []; for (let j = 0; j < 30; j++) CTRL.push(V(CRX + (j % 2 ? 0.4 : -0.4), 14.5 + j * 0.95, 0.05 * (hash(j) - 0.5)));
+// targhetta "Barra di Uranio" sulla barra C vista da lontano (voce 2): con lo zoom esce dall'inquadratura (circa 13,6) e poi svanisce
+const rodLabel = (() => {
+  const text = 'Barra di Uranio', font = '700 84px Poppins', c = document.createElement('canvas'), g0 = c.getContext('2d'); g0.font = font;
+  const w = Math.ceil(g0.measureText(text).width) + 150, h = 172; c.width = w; c.height = h;
+  const g = c.getContext('2d'), lw = 10, r = h / 2;
+  g.beginPath(); g.arc(r, r, r - lw / 2, Math.PI / 2, -Math.PI / 2); g.lineTo(w - r, lw / 2); g.arc(w - r, r, r - lw / 2, -Math.PI / 2, Math.PI / 2); g.closePath();
+  g.fillStyle = '#ffffff'; g.fill(); g.lineWidth = lw; g.strokeStyle = '#0c1c4a'; g.stroke();
+  g.fillStyle = '#0c1c4a'; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + 6);
+  const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, transparent: true, depthTest: false, depthWrite: false }));
+  sp.renderOrder = 50; sp.userData.ar = w / h; sp.position.set(X2, 9, 0.5); atomScene.add(sp); return sp;
+})();
 const ctrlGroup = new THREE.Group(); atomScene.add(ctrlGroup);
 { const darkNucM = std(0x2b2e38, { roughness: 0.45, metalness: 0.3 }), parts = CTRL.flatMap((c, j) => rotated(j * 31 + 5).map(({ p }) => p.clone().add(c)));
   const im = new THREE.InstancedMesh(instGeo, darkNucM, parts.length), m4 = new THREE.Matrix4(); parts.forEach((p, i) => { m4.makeTranslation(p.x, p.y, p.z); im.setMatrixAt(i, m4); }); ctrlGroup.add(im);
   // la barra vera, trasparente (grigio scuro con la fascia gialla, come le barre di controllo 3D): gli atomi neri si vedono dentro
-  const bodyM2 = std(0x3a404c, { roughness: 0.6, transparent: true, opacity: 0.38, depthWrite: false }), L = 27;
+  const bodyM2 = std(0x1c2028, { roughness: 0.55, metalness: 0.2, transparent: true, opacity: 0.66, depthWrite: false }), L = 27;   // voce 2: più scura (prima 0x3a404c, opacità 0,38)
   const body = mesh(new THREE.CylinderGeometry(TUBE, TUBE, L, 40), bodyM2, ctrlGroup, V(CRX, 13.6 + L / 2, 0)); body.renderOrder = 4;
   mesh(new THREE.SphereGeometry(TUBE, 32, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), bodyM2, ctrlGroup, V(CRX, 13.6, 0)).renderOrder = 4;
   mesh(new THREE.CylinderGeometry(TUBE + 0.02, TUBE + 0.02, 0.35, 40), std(0xffc93a, { roughness: 0.6, transparent: true, opacity: 0.7 }), ctrlGroup, V(CRX, 38.5, 0)); }
@@ -797,7 +809,7 @@ const END = 76.9;
 const BLINKS = []; for (let b = 3.1; b < END - 2; b += 3.3 + hash(b) * 0.8) BLINKS.push(b);
 // tempi della scaletta -> tempi reali della voce (audio/warp5.json). Il video parte da 1,0 di scaletta: niente saluto (B1),
 // si comincia con lo zoom nella centrale (B2).
-const WARP = [[1.0, 0.0], [1.3, 0.4], [4.36, 3.46], [5.8, 4.9], [9.91, 9.01], [14.6, 13.7], [15.3, 14.4], [16.05, 15.15], [20.4, 20.13], [20.9, 20.63], [24.87, 24.6], [25.4, 25.13], [28.57, 28.3], [29.55, 29.28], [32.95, 32.68], [33.5, 33.23], [34.7, 37.54], [36.5, 38.95], [37.4, 39.85], [38.85, 41.3], [42.9, 47.58], [43.4, 48.08], [45.4, 50.21], [45.55, 50.56], [47.75, 52.76], [48.4, 53.86], [50.85, 56.31], [52.25, 57.71], [56.3, 62.34], [56.8, 62.84], [58.3, 64.92], [58.45, 65.27], [59.85, 66.67], [61.1, 67.92], [63.9, 70.77], [64.05, 71.12], [68.86, 75.93], [71.5, 78.57], [73.75, 80.82], [76.9, 83.82]];
+const WARP = [[1.0, 0.0], [1.3, 0.4], [4.36, 3.46], [5.8, 4.9], [9.91, 9.01], [11.0, 9.71], [12.2, 10.71], [13.6, 11.76], [14.3, 12.46], [16.05, 13.46], [20.4, 18.44], [20.9, 18.94], [24.87, 22.91], [25.4, 23.91], [28.57, 27.08], [29.55, 28.06], [32.95, 31.46], [33.5, 32.01], [34.7, 36.32], [36.5, 37.73], [37.4, 38.63], [38.85, 40.08], [42.9, 46.36], [43.4, 46.86], [45.4, 48.99], [45.55, 49.34], [47.75, 51.54], [48.4, 52.64], [50.85, 55.09], [52.25, 56.49], [56.3, 61.12], [56.8, 61.62], [58.3, 63.7], [58.45, 64.05], [59.85, 65.45], [61.1, 66.7], [63.9, 69.55], [64.05, 69.9], [68.86, 74.71], [71.5, 77.35], [73.75, 79.6], [76.9, 82.6]];
 function unwarp(tn) { for (let i = 0; i < WARP.length - 1; i++) { const [o0, n0] = WARP[i], [o1, n1] = WARP[i + 1]; if (tn <= n1) return o0 + (o1 - o0) * (tn - n0) / (n1 - n0); } return END; }
 function fwarp(t) { for (let i = 0; i < WARP.length - 1; i++) { const [o0, n0] = WARP[i], [o1, n1] = WARP[i + 1]; if (t <= o1) return n0 + (n1 - n0) * (t - o0) / (o1 - o0); } return WARP[WARP.length - 1][1]; }
 const rt = keys => keys.map(([k, v]) => [fwarp(k), v]);
@@ -911,6 +923,7 @@ window.renderFrame = function (tn) {
     const nK = Math.min(1 + Math.max(0, atomCam.position.z - 14) / 50, 1.3);   // dopo l'apertura i neutroni si ingrandiscono poco da lontano (in B9 erano troppo grandi)
     placeMols(t, tn);
     const po = t > 10.9 ? 1 - smooth(ramp(t, 13.2, 15.2)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = po; cladM3.opacity = 0.18 * po; pelLight.intensity = 1.4 * po;   // dissolvenza lenta; bozza 11: prima il commento troncava la riga e la guaina restava visibile fino a sparire di colpo
+    { const v = pop(t, 11.25, 14.0, 0.35, 0.3), hgt = 5.0 * v; rodLabel.visible = v > 0.001; rodLabel.scale.set(hgt * rodLabel.userData.ar, Math.max(hgt, 1e-3), 1); rodLabel.material.opacity = Math.min(1, v * 1.5); }
     ctrlGroup.visible = t > CTRL_IN[0] - 0.1; ctrlGroup.position.y = ctrlY(t);
     // U-238 scaldati dai frammenti della catena dell'apertura: tremano, diventano arancioni e brillano
     if (t < 12) heated.forEach((n, k) => { const h = heatOf(n, t), vib = 0.06 * h; n.vx = Math.sin(tn * 23 + n.ph) * vib; n.vy = Math.cos(tn * 19 + n.ph * 1.3) * vib; n.hh = h; placeBg(n, n.vx, n.vy, h); heatGlows[k].position.set(n.c.x, n.c.y, n.c.z + 0.2); heatGlows[k].material.opacity = 0.5 * h; heatGlows[k].scale.setScalar((0.9 + 0.3 * h) * Math.min(zoomK, 2)); });

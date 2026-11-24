@@ -12,12 +12,13 @@ FPS = 30
 RAW = json.load(open('phrases_raw.json'))           # 23 frasi rilevate (detect5.py)
 # frasi lunghe divise sulle pause interne: "le abbassi... | le alzi..." e "...elettromagneti | se dovesse mancare..."
 PH = RAW[:19] + [[69.23, 71.31], [71.72, 73.12], [75.06, 77.91], [78.36, 83.17]] + RAW[21:]
-BLK = [(1.3, 5.3, [0]), (5.8, 10.3, [1]), (14.6, 15.9, [2]), (16.05, 20.4, [3]), (20.9, 24.9, [4, 5]),
+BLK = [(1.3, 5.3, [0]), (5.8, 10.3, [1]), (13.6, 15.9, [2]), (16.05, 20.4, [3]), (20.9, 24.9, [4, 5]),
        (25.4, 29.4, [6]), (29.55, 33.0, [7]), (33.5, 36.0, [8, 9]), (36.5, 38.7, [10]), (38.85, 42.9, [11]),
        (43.4, 45.4, [12, 13]), (45.55, 47.9, [14, 15]), (48.4, 52.1, [16]), (52.25, 56.3, [17, 18]),
        (56.8, 58.3, [19]), (58.45, 60.6, [20]), (61.1, 63.9, [21]), (64.05, 69.1, [22]), (71.5, 73.9, [23, 24])]
 T0, END_S, TAIL = 1.0, 76.9, 3.0                    # la scaletta parte da 1,0 (cupola chiusa, zoom che comincia)
-MINP = {8: 1.0, 12: 1.1}                            # pausa minima prima del blocco: dopo "che si spacca"; dopo "si spegne" (neutroni assorbiti)
+MINP = {5: 1.0, 8: 1.0, 12: 1.1}                    # 5: un po' di pausa prima di "Per questo nel reattore..." (richiesta dell'autore)
+MAXP = {3: 1.0}                                     # "Primo segreto:" e "i neutroni appena nati" non troppo distanti                            # pausa minima prima del blocco: dopo "che si spacca"; dopo "si spegne" (neutroni assorbiti)
 starts = [None] * len(PH); W = [[T0, 0.0]]; r = (BLK[0][0] - T0) + 0.1
 for bi, (ss, se, idx) in enumerate(BLK):
     t = r
@@ -28,7 +29,10 @@ for bi, (ss, se, idx) in enumerate(BLK):
     W.append([ss, round(r, 2)])
     if ss == 33.5: W.append([34.7, round(starts[9] + 0.3, 2)])   # B7: il nucleo si spacca su "spacca"
     if ss != 33.5: W.append([round(e_eff, 2), round(t, 2)])   # in B7 i frammenti non accelerano dopo "spacca": si va dritti alla B8
-    if bi + 1 < len(BLK): r = t + max(MINP.get(bi + 1, 0.35), BLK[bi + 1][0] - e_eff)
+    if bi + 1 == 2:   # dopo la B3 (pausa accorciata, richiesta dell'autore): zoom indietro 0,7 s, barre da lontano con la targhetta 1,0 s,
+                      # poi zoom dentro la barra; "Primo segreto" comincia durante lo zoom (13,6 di scaletta)
+        W.append([11.0, round(t + 0.7, 2)]); W.append([12.2, round(t + 1.7, 2)]); r = t + 1.7 + (13.6 - 12.2) * 0.75
+    elif bi + 1 < len(BLK): r = t + min(MAXP.get(bi + 1, 99), max(MINP.get(bi + 1, 0.35), BLK[bi + 1][0] - e_eff))
 W.append([END_S, round(t + TAIL, 2)])
 for p, q in zip(W, W[1:]): assert q[0] > p[0] and q[1] > p[1], (p, q)
 TOTAL = W[-1][1]
