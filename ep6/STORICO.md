@@ -14,4 +14,4 @@
 - Tolti pezzi mai usati: materiale dei protoni, geometria `nucGeo`, colore `C_HOT`, funzione `ang`, il blocco disattivato degli "altri U-235 fermi" della zona R (`if (false && ...)`).
 - `render.js` comune: serve anche `/comune/`; con `FMT=png` salva fotogrammi senza compressione per i confronti.
 - Verifica: 20 fotogrammi a metà risoluzione (da 0,1 a 48,5 s, uno per ogni scena e passaggio) e 3 a piena risoluzione identici pixel per pixel alla versione precedente; stessi conteggi di nuclei, fissioni, neutroni e molecole.
-- Da fare: copiare `comune/` e `ep6/` nel repository `nuclearechiaro-render` (in questa sessione l'accesso a GitHub non è stato concesso).
+- Caricati nel repository `nuclearechiaro-render`, ramo `fase0-ep6` (24/11/2026, dopo che l'autore ha reso pubblico il repository); provati dalla cartella del repository: identici. Da fare: unire il ramo in `main` e lanciare il workflow (la chiave `gh` della sessione non funzionava).
