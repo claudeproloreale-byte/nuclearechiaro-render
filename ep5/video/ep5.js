@@ -787,7 +787,7 @@ const centerIcons = () => [icThermo, icBal].forEach(ic => ic.c.position.set(-ic.
 
 const composer = new EffectComposer(renderer); composer.setSize(W, H);
 const worldPass = new RenderPass(scene, camera); composer.addPass(worldPass);
-{ const p = new RenderPass(hud, hudCam); p.clear = false; p.clearDepth = true; composer.addPass(p); }
+{ const p = new RenderPass(hud, hudCam); p.clear = false; p.clearDepth = true; p.enabled = q.get('cover') !== '1'; composer.addPass(p); }   // ?cover=1: sfondo della copertina, senza mascotte e icone
 composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), 0.45, 0.5, 1.0));
 composer.addPass(new OutputPass());
 const startOverlay = mesh(new THREE.PlaneGeometry(4, 4), basic(0x2f86e6, { transparent: true, opacity: 0, depthTest: false, depthWrite: false }), hudCam, V(0, 0, -1)); startOverlay.renderOrder = 1000;
