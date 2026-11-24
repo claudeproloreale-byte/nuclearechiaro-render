@@ -542,18 +542,25 @@ const heatGlows = heated.map(() => glow(0xff8a30, atomScene, 1.0));
 // e si vedono i nuclei dentro; così è chiaro che quelle sono le barre di uranio e in mezzo c'è l'acqua
 const pelStack = new THREE.Group(); atomScene.add(pelStack);
 // bozza 8: pastiglie con superficie laterale ben visibile (bordi smussati) e un piccolissimo spazio fra una e l'altra; materiali opachi, senza riflessi
-const pelM3 = new THREE.MeshStandardMaterial({ color: 0x70301f, roughness: 0.95, metalness: 0, transparent: true, emissive: 0xff6a10, emissiveIntensity: 0.03 });   // voce 6: color rame come le barrette 3D (prima grigio 0x47474f)   // bozza 9: più scure
+const pelM3 = new THREE.MeshStandardMaterial({ color: 0x76290e, roughness: 0.7, metalness: 0, transparent: true, emissive: 0xff6a10, emissiveIntensity: 0.06 });   // voce 6: color rame come le barrette 3D (prima grigio 0x47474f)   // bozza 9: più scure
 const pelCoreM = new THREE.MeshStandardMaterial({ color: 0x2c2c33, roughness: 1, metalness: 0, transparent: true });   // dietro le fessure fra le pastiglie: i nuclei non si vedono finché le pastiglie non spariscono
-const cladM3 = new THREE.MeshStandardMaterial({ color: 0xc3cedf, metalness: 0, roughness: 0.95, transparent: true, opacity: 0.18, depthWrite: false });
+const cladM3 = new THREE.MeshStandardMaterial({ color: 0xbfcad8, metalness: 0.5, roughness: 0.42, transparent: true, opacity: 0.3, depthWrite: false });   // voce 7: guaina lucida come nelle barrette 3D (riflesso verticale)
 // bozza 11: ogni barra è UN solo cilindro (profilo con le pastiglie smussate e una scanalatura fra una e l'altra):
 // niente oggetti trasparenti sovrapposti, così la dissolvenza è uniforme e senza scatti
-const pelGeo = (() => { const R = RW / 2, Hh = 11.8 / 2, c = 0.3, g = 0.1,   // bozza 13: scanalature poco profonde (prima un nucleo vicino alla parete sporgeva)
-  pts = [new THREE.Vector2(0, -6 * 12 - Hh - 0.1)];
-  for (let j = -6; j <= 7; j++) { const y0 = j * 12 - Hh, y1 = j * 12 + Hh;
+// voce 7: pastiglie basse come nelle barrette 3D (altezza circa metà del diametro): passo 7,8 invece di 12
+const PP = 7.8, PJ0 = -10, PJ1 = 12;
+const pelGeo = (() => { const R = RW / 2, Hh = (PP - 0.2) / 2, c = 0.6, g = 0.1,   // bozza 13: scanalature poco profonde (prima un nucleo vicino alla parete sporgeva)
+  pts = [new THREE.Vector2(0, PJ0 * PP - Hh - 0.1)];
+  for (let j = PJ0; j <= PJ1; j++) { const y0 = j * PP - Hh, y1 = j * PP + Hh;
     pts.push(new THREE.Vector2(R - g, y0 - 0.1), new THREE.Vector2(R - c, y0), new THREE.Vector2(R, y0 + c), new THREE.Vector2(R, y1 - c), new THREE.Vector2(R - c, y1), new THREE.Vector2(R - g, y1 + 0.1)); }
-  pts.push(new THREE.Vector2(0, 7 * 12 + Hh + 0.1)); return new THREE.LatheGeometry(pts, 72); })();
+  pts.push(new THREE.Vector2(0, PJ1 * PP + Hh + 0.1)); return new THREE.LatheGeometry(pts, 72); })();
 RODK.forEach(k => { const m = mesh(pelGeo, pelM3, pelStack, V(rodC(k), 0, 0)); m.renderOrder = 6;
   const cl = mesh(new THREE.CylinderGeometry(RW / 2 + 0.12, RW / 2 + 0.12, 170, 72, 1, true), cladM3, pelStack, V(rodC(k), 12, 0)); cl.renderOrder = 7; });
+// voce 7: bagliori arancioni dentro le barre, come nelle barrette 3D (si vedono solo da lontano, poi svaniscono con le pastiglie)
+const pelGlows = []; { const sv = seed; seed = 4242;
+  for (let i = 0; i < 70; i++) { const k = RODK[Math.floor(rnd() * RODK.length)], g = glow(0xff7a30, pelStack, 4 + 4 * rnd());
+    g.position.set(rodC(k) + (rnd() - 0.5) * (RW - 3), -45 + 90 * rnd(), RW / 2 + 0.5); g.material.depthTest = false; g.renderOrder = 8; pelGlows.push({ g, ph: rnd() * 6.28, a: 0.25 + 0.3 * rnd() }); }
+  seed = sv; }
 const pelLight = new THREE.DirectionalLight(0xffffff, 0); pelLight.position.set(-6, 2, 8); atomScene.add(pelLight);   // luce di lato: la superficie laterale si vede curva
 // barra di controllo fatta di atomi neri (B10): scende dall'alto nel tubo guida
 // bozza 12: la barra di controllo scende nell'acqua fra la barra C e la barra R, nel momento in cui la catena è al massimo (B9)
@@ -926,7 +933,7 @@ window.renderFrame = function (tn) {
     const zoomK = 1 + Math.max(0, atomCam.position.z - 12) / 12;
     const nK = Math.min(1 + Math.max(0, atomCam.position.z - 14) / 50, 1.3);   // dopo l'apertura i neutroni si ingrandiscono poco da lontano (in B9 erano troppo grandi)
     placeMols(t, tn);
-    const po = t > 10.9 ? 1 - smooth(ramp(t, 13.2, 15.2)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = po; cladM3.opacity = 0.18 * po; pelLight.intensity = 1.4 * po;   // dissolvenza lenta; bozza 11: prima il commento troncava la riga e la guaina restava visibile fino a sparire di colpo
+    const po = t > 10.9 ? 1 - smooth(ramp(t, 13.2, 15.2)) : 0; pelStack.visible = po > 0.003; pelM3.opacity = po; cladM3.opacity = 0.3 * po; pelLight.intensity = 1.4 * po; for (const p of pelGlows) p.g.material.opacity = po * p.a * (0.75 + 0.25 * Math.sin(tn * 2.3 + p.ph));   // dissolvenza lenta; bozza 11: prima il commento troncava la riga e la guaina restava visibile fino a sparire di colpo
     { const v = pop(t, 11.25, 14.0, 0.35, 0.3), hgt = 5.0 * v; rodLabel.visible = v > 0.001; rodLabel.scale.set(hgt * rodLabel.userData.ar, Math.max(hgt, 1e-3), 1); rodLabel.material.opacity = Math.min(1, v * 1.5); }
     ctrlGroup.visible = t > CTRL_IN[0] - 0.1; ctrlGroup.position.y = ctrlY(t);
     // U-238 scaldati dai frammenti della catena dell'apertura: tremano, diventano arancioni e brillano
