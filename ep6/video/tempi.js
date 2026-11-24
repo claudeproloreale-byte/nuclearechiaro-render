@@ -1,20 +1,24 @@
-// Puntata 6 — tempi comuni a tutto il video (secondi "di scaletta", bozza 1).
+// Puntata 6 — tempi comuni a tutto il video (secondi "di scaletta", v2 dalla scaletta dell'app di produzione, 24/11/2026).
 // I tempi dei singoli eventi stanno nel file della scena che li usa (scene/*.js).
 import { creaWarp } from '/comune/base.js';
 
-export const END = 49.4;
-// battute: B1 0,2–0,8 · B2 1,3–4,8 · B3 5,3–8,8 · B4 9,3–13,6 · B5 14,1–19,9 · B6 20,4–25,0 · B7 25,5–29,4 · B8 29,9–34,0 · B9 34,5–40,0
-// centrale da 40,6: B10 40,5–44,0 · B11 44,5–46,9 · paesaggio fino a 49,4
-export const SPEECH = [[0.2, 0.8], [1.3, 4.8], [5.3, 5.7], [5.9, 8.8], [9.3, 13.6], [14.1, 16.3], [16.45, 19.9], [20.4, 25.0], [25.5, 29.4],
-  [29.9, 34.0], [34.5, 37.0], [37.15, 40.0], [40.5, 44.0], [44.5, 45.6], [45.75, 46.9]];
+export const END = 55.4;
+// battute (niente saluto): B1 0,5–4,0 · B2 4,5–8,0 · B3 8,5–12,8 · B4 13,3–20,3 · B5 20,8–23,8 · B6 24,3–28,9 · B7 29,4–33,3
+// B8 33,8–37,9 · B9 38,4–43,9 · B10 44,4–50,4 · B11 50,9–53,3 · paesaggio pulito da 53,9 a 55,4
+export const SPEECH = [[0.5, 4.0], [4.5, 4.9], [5.1, 8.0], [8.5, 12.8], [13.3, 15.3], [15.45, 17.0], [17.15, 20.3], [20.8, 23.8], [24.3, 28.9],
+  [29.4, 33.3], [33.8, 37.9], [38.4, 40.9], [41.05, 43.9], [44.4, 47.1], [47.25, 50.4], [50.9, 52.0], [52.15, 53.3]];
 export const LIP = null;   // quando arriva la voce: { open, narrow, env } a 30 fps
 // tabella WARP [[t scaletta, t video], ...]: per ora è l'identità (niente voce ancora)
 export const WARP = [[0, 0], [END, END]];
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
-// passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]
-export const SWITCH = [[5.0, 'atom', 1, 0.3], [40.6, 'world', 0.8, 0.3]];
-// lampo bianco della bomba (B5); sotto il bianco, a CUT, si passa dalla zona B alla zona R
-export const FLASH_UP = 18.7, FLASH_FULL = 19.45, CUT = 20.25, FLASH_DOWN = 21.3;
+// passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:
+// bomba 3D → atomi (zona B) dentro la palla di uranio; atomi → centrale sotto il lampo bianco (CUT, senza lampo chiaro);
+// centrale → atomi (barre con l'acqua) dopo lo zoom nel nocciolo; atomi → centrale per la B10
+export const BAR_IN = 25.5, BACK = 44.5;
+export const SWITCH = [[8.55, 'atom', 1, 0.3], [20.6, 'world', 0, 0.3], [BAR_IN, 'atom', 1, 0.3], [BACK, 'world', 0.8, 0.3]];
+export const START_WORLD = 'bomba';
+// lampo bianco della bomba (B4, su "tutta l'energia"); sotto il bianco, a CUT, si passa alla centrale (B5)
+export const FLASH_UP = 19.2, FLASH_FULL = 19.95, CUT = 20.6, FLASH_DOWN = 21.6;
 // la mascotte saluta ed esce
-export const EXIT = 47.9;
+export const EXIT = 53.9;

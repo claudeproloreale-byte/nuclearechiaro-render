@@ -1,9 +1,9 @@
-// Puntata 6 — B5, zona B "bomba" (intorno a x = 0, 5,0–20,25): 167 nuclei fitti, 9 su 10 U-235.
+// Puntata 6 — B3-B4, zona B "bomba" (intorno a x = 0, 8,55–20,6): 167 nuclei fitti, 9 su 10 U-235.
 // Un neutrone entra da sinistra e spacca il primo nucleo; la catena si allarga velocissima e finisce nel lampo bianco.
 import { V, hash, xy, dirTo, smooth, ramp } from '/comune/base.js';
 import { FLASH_UP, FLASH_FULL, CUT, FLASH_DOWN } from '../tempi.js';
 
-export const B_IN = 14.6, B_HIT = 15.5, B_LAST = 18.75;   // il neutrone entra e spacca il primo nucleo; nessuna fissione dopo B_LAST
+export const B_IN = 15.1, B_HIT = 16.0, B_LAST = 19.25;   // il neutrone entra e spacca il primo nucleo; nessuna fissione dopo B_LAST
 const VB = 4.2;                                            // velocità dei neutroni (unità al secondo)
 export const START = V(0, 0.3, 0), FROM = V(-9, 0.8, 0);   // primo nucleo, punto di partenza del primo neutrone
 
@@ -32,5 +32,5 @@ export function costruisci(at, n0) {
   }
 }
 
-// lampo bianco a tutto schermo, davanti anche alla mascotte: sale da 18,7 a 19,45, resta pieno, scende da 20,35 a 21,3
+// lampo bianco a tutto schermo, davanti anche alla mascotte: sale da 19,2 a 19,95, resta pieno, scende da 20,7 a 21,6 (sotto c'è già la centrale)
 export const lampo = t => smooth(ramp(t, FLASH_UP, FLASH_FULL)) * (1 - smooth(ramp(t, CUT + 0.1, FLASH_DOWN)));

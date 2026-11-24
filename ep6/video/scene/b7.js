@@ -1,9 +1,9 @@
-// Puntata 6 — B7 (zona R): un neutrone lento arriva dal basso e spacca A a 26,6;
+// Puntata 6 — B7 (zona R, dentro la barra C): un neutrone lento arriva dal basso e spacca A a 30,6;
 // due neutroni finiscono assorbiti da U-238 (piccolo lampo e sobbalzo), uno esce.
 import { V, xy, dirTo } from '/comune/base.js';
 import { XR, YR, PR } from './zonaR.js';
 
-export const A_IN = 24.0, A_HIT = 26.6;
+export const A_IN = 28.4, A_HIT = 30.6;
 export const A = PR(-0.9, 1.7), A_FROM = PR(-0.55, -6.6);
 export const caps = [[A_FROM, A]];
 
@@ -21,5 +21,6 @@ export function costruisci(at, nA) {
     const nn = at.neutron(at.seg(A.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), A_HIT + 0.05 + used.length * 0.12, 2.4), 'abs', { trail: 8 }); nn.host = n;
   }
   console.log('B7: neutroni assorbiti', used.length);
-  at.emitOthers(nA, A_HIT, 1, 3.2, used, false, 8);
+  // il terzo esce dall'inquadratura verso sinistra (lontano dall'acqua della barra C, dove nella B8 e B9 si guarda)
+  at.emitOthers(nA, A_HIT, 1, 3.2, [...used, V(1, 0, 0), V(0.7, 0.7, 0).normalize(), V(0.7, -0.7, 0).normalize()], false, 8);
 }

@@ -15,3 +15,14 @@
 - `render.js` comune: serve anche `/comune/`; con `FMT=png` salva fotogrammi senza compressione per i confronti.
 - Verifica: 20 fotogrammi a metà risoluzione (da 0,1 a 48,5 s, uno per ogni scena e passaggio) e 3 a piena risoluzione identici pixel per pixel alla versione precedente; stessi conteggi di nuclei, fissioni, neutroni e molecole.
 - Caricati nel repository `nuclearechiaro-render`, ramo `fase0-ep6` (24/11/2026, dopo che l'autore ha reso pubblico il repository); provati dalla cartella del repository: identici. Da fare: unire il ramo in `main` e lanciare il workflow (la chiave `gh` della sessione non funzionava).
+
+## 24/11/2026 (sera) — v2 dalla scaletta dell'app di produzione
+- Richiesta `p6-mwv1olwv` (dalla v1): tolto il saluto; nuove B1-B2 (bomba), B5 (ritorno alla centrale), B6 e B8 (barre come nella puntata 5); cambiati B3, B4 (7 s), B9, B10 (6 s).
+- Prima, per errore, era stato rifatto il rendering della v1 senza leggere l'app: da ora ogni "rigenera" parte da `richieste` e `scalette/p6` dell'app.
+- Nuova scena `scene/bomba3d.js`: bomba stilizzata su terra marrone, 4 carri armati che avanzano lentamente, 3 pezzi d'artiglieria, cielo velato. L'involucro diventa trasparente (5,4–6,4): guscio, cavi, scatola dei comandi, palla di uranio con l'alone giallo; dentro la palla si passa agli atomi (8,55). Solo forme generiche.
+- Zona B: stessa catena, spostata di 0,5 s (neutrone 15,1, prima fissione 16,0, fine 19,25; 112 fissioni). Sotto il lampo bianco si passa direttamente alla centrale (20,6).
+- Centrale: campo largo nella B5, zoom nel nocciolo 23,3–25,5, poi lampo e barre viste da lontano.
+- Zona R rifatta come barre di uranio (larghe 14) con l'acqua in mezzo (larga 8), pastiglie color rame che diventano trasparenti 27,0–28,4 entrando al centro di una pastiglia della barra C. Nuclei solo nelle barre (174, di cui 6 U-235), 1038 molecole solo nell'acqua.
+- B8: inquadratura sul bordo della pastiglia; il neutrone esce dalla barra, rimbalza 5 volte nell'acqua e spacca BB (37,4); i suoi due neutroni sono assorbiti da U-238 della barra.
+- B9: inquadratura sull'acqua fra la barra C e la barra R; le molecole si allontanano dal percorso del neutrone in verticale (molte escono dall'inquadratura); il neutrone veloce attraversa l'acqua senza rimbalzare, entra nella barra R e passa accanto a C9 senza spaccarlo.
+- Mascotte: niente saluto, compare nell'angolo a 0,2; indica i commenti 51,9–52,8, esce a 53,9. Durata 55,4 s.
