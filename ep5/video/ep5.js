@@ -267,16 +267,16 @@ const dirTo = (a, b) => V(b.x - a.x, b.y - a.y, 0).normalize();
 // i nuclei stanno solo dentro le barre, le molecole d'acqua solo fra le barre. Un neutrone esce da una barra, rallenta nell'acqua
 // rimbalzando sugli idrogeni e rientra in un'altra barra, dove fa fissione (prima l'acqua era mescolata ai nuclei: non realistico).
 // Barra 0 = C (centro X2), barra 1 = R, barra -1 = L.
-// voce 3 (richiesta dell'autore): acqua fra le barre più larga, GAP da 3,6 a 6. X2 spostato di 2,4 perché la barra L resti dov'era
+// voce 3 (richiesta dell'autore): acqua fra le barre più larga, GAP da 3,6 a 6, poi 8 (voce 4). X2 spostato di 4,4 perché la barra L resti dov'era
 // (lontana dalla zona 1); i punti nell'acqua sono scalati con la larghezza (wX) e le camere sull'acqua stanno più indietro (WZ).
-const X2 = 42.4, RW = 14, GAP = 6, PITCH = RW + GAP, RODK = [-1, 0, 1, 2];   // bozza 10: barre molto più larghe (erano 3,6), con molti più atomi dentro
-const WZ = 8;                                                                  // camere sull'acqua: +8 di distanza (si vedono ancora i bordi delle due barre)
+const X2 = 44.4, RW = 14, GAP = 8, PITCH = RW + GAP, RODK = [-1, 0, 1, 2];   // bozza 10: barre molto più larghe (erano 3,6), con molti più atomi dentro
+const WZ = 14;                                                                 // camere sull'acqua: +8 di distanza (si vedono ancora i bordi delle due barre)
 const P2 = (dx, y) => V(X2 + dx, y, 0);
 const rodC = k => X2 + PITCH * k;
 const gapL = k => rodC(k) + RW / 2, gapR = k => rodC(k) + RW / 2 + GAP;     // acqua fra la barra k e la k+1
 const rodOf = x => Math.round((x - X2) / PITCH);
 const G0 = gapL(0) + GAP / 2;                                                  // centro dell'acqua fra la barra C e la barra R
-const CX1 = gapL(1) + GAP / 2, TUBE = 0.85;                                  // centro e mezza larghezza del tubo guida della barra di controllo
+const CX1 = gapL(1) + GAP / 2, TUBE = 1.8;   // voce 4: barra di controllo più spessa (era 0,85)                                  // centro e mezza larghezza del tubo guida della barra di controllo
 const inWater = (x, m = 0) => { const k = Math.floor((x - X2 - RW / 2) / PITCH); return x > gapL(k) + m && x < gapR(k) - m; };
 const S0 = V(0, 2, 0);
 // B4: S (dentro la barra C) viene colpito da un neutrone lento che arriva dal basso; i frammenti schizzano via lungo la barra
@@ -558,7 +558,7 @@ const pelLight = new THREE.DirectionalLight(0xffffff, 0); pelLight.position.set(
 // barra di controllo fatta di atomi neri (B10): scende dall'alto nel tubo guida
 // bozza 12: la barra di controllo scende nell'acqua fra la barra C e la barra R, nel momento in cui la catena è al massimo (B9)
 const CRX = G0;
-const CTRL = []; for (let j = 0; j < 30; j++) CTRL.push(V(CRX + (j % 2 ? 0.4 : -0.4), 14.5 + j * 0.95, 0.05 * (hash(j) - 0.5)));
+const CTRL = []; for (let j = 0; j < 90; j++) { const col = j % 3, row = Math.floor(j / 3); CTRL.push(V(CRX + (col - 1) * 1.05, 14.5 + row * 0.95 + (col === 1 ? 0.47 : 0), 0.05 * (hash(j) - 0.5))); }   // voce 4: tre colonne di atomi neri
 // targhetta "Barra di Uranio" sulla barra C vista da lontano (voce 2): con lo zoom esce dall'inquadratura (circa 13,6) e poi svanisce
 const rodLabel = (() => {
   const text = 'Barra di Uranio', font = '700 84px Poppins', c = document.createElement('canvas'), g0 = c.getContext('2d'); g0.font = font;
@@ -623,7 +623,7 @@ nT7.forEach((e, i) => { fragments(e, T7_HIT[i], VERT(i + 7)); FISS.push(e); cons
 { const usedJ = new Set(); let idx = 0;
   nT8.forEach((e, i) => { fragments(e, T8_HIT[i], VERT(i + 9)); FISS.push(e);
     [-1.3, 0, 1.3].forEach((d, k) => {
-      const want = e.c.y + d; const j = CTRL.map((c, jj) => [Math.abs(c.y - want) + (jj % 2 ? 0 : 0.6), jj]).filter(([, jj]) => !usedJ.has(jj)).sort((p, q2) => p[0] - q2[0])[0][1]; usedJ.add(j);   // atomo nero libero più vicino (meglio la colonna di destra)
+      const want = e.c.y + d; const j = CTRL.map((c, jj) => [Math.abs(c.y - want) + (jj % 3 === 2 ? 0 : jj % 3 === 1 ? 0.6 : 1.2), jj]).filter(([, jj]) => !usedJ.has(jj)).sort((p, q2) => p[0] - q2[0])[0][1]; usedJ.add(j);   // atomo nero libero più vicino (meglio la colonna di destra, verso la barra R)
       const c = CTRL[j], h = V(gapR(0) - 0.47, lerp(e.c.y, c.y, 0.55) + 0.25 * (hash(i * 3 + k) - 0.5), 0);
       const st = e.c.clone().addScaledVector(dirTo(e.c, h), 0.32), end = c.clone().addScaledVector(dirTo(c, h), 0.3);
       zigNeutron([st, h, end], T8_HIT[i] + 0.08, { t1: 46.85 + 0.1 * idx++, K: 0.5, end: 'abs', avoidPush: true });
@@ -866,7 +866,7 @@ function atomCamAt(tn) {
   const Z1 = [fwarp(10.0), fwarp(11.0)];
   if (tn > Z1[0] && tn < Z1[1]) { const u = ein(ramp(tn, Z1[0], Z1[1])), v = ATOM_TRACK(Z1[0]); return [v[0], v[1], logZ(v[2], 52, u), v[3], v[4]]; }   // bozza 11: non oltre 52, altrimenti si vedono i bordi della zona piena di atomi
   const A1 = [fwarp(49.0), fwarp(49.3)];
-  if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 48, u), v[3], v[4]]; }
+  if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 54, u), v[3], v[4]]; }
   return ATOM_TRACK(tn);
 }
 // mascotte
