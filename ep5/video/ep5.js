@@ -1,4 +1,4 @@
-// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, bozza 13)
+// Puntata 5 — "Chi tiene il volante della reazione?" (animazione di prova sui tempi della scaletta, versione con la voce (dalla bozza 13))
 // Parte da ep4.js: stessa mascotte, stessa centrale, stesse barrette, stessi nuclei. Tre mondi disegnati uno alla volta
 // sotto il primo piano, con un breve lampo chiaro a ogni passaggio:
 //  - CENTRALE (apertura e chiusura);
@@ -11,6 +11,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import LIP5 from './lip5.js';
 
 await document.fonts.load('700 64px Poppins');
 const q = new URLSearchParams(location.search);
@@ -784,7 +785,7 @@ const SPEECH = [[0.2, 0.8], [1.3, 5.3], [5.8, 10.3], [14.6, 15.9], [16.05, 20.4]
   [36.5, 38.7], [38.85, 42.9], [43.4, 45.4], [45.55, 47.9], [48.4, 52.1], [52.25, 56.3], [56.8, 58.3], [58.45, 60.6], [61.1, 63.9], [64.05, 69.1],
   [71.5, 73.9]];
 const speechEnv = t => { let e = 0; for (const [a, b] of SPEECH) e = Math.max(e, Math.min(ramp(t, a, a + 0.07), 1 - ramp(t, b - 0.09, b))); return e; };
-let LIP = null;   // quando arriva la voce: { open, narrow, env } a 30 fps
+const LIP = LIP5;   // labiale dalla voce reale (audio/voice_ep5.py), 30 fps
 function lip(tn, t) {
   if (LIP) { const fi = Math.min(LIP.open.length - 1, Math.max(0, Math.round(tn * 30))); return { open: LIP.open[fi], narrow: LIP.narrow[fi], env: LIP.env[fi] }; }
   const env = speechEnv(t), syl = Math.floor(t * 5.5), u = t * 5.5 - syl;
@@ -792,7 +793,9 @@ function lip(tn, t) {
 }
 const END = 76.9;
 const BLINKS = []; for (let b = 3.1; b < END - 2; b += 3.3 + hash(b) * 0.8) BLINKS.push(b);
-const WARP = [[0, 0], [END, END]];
+// tempi della scaletta -> tempi reali della voce (audio/warp5.json). Il video parte da 1,0 di scaletta: niente saluto (B1),
+// si comincia con lo zoom nella centrale (B2).
+const WARP = [[1.0, 0.0], [1.3, 0.4], [4.36, 3.46], [5.8, 4.9], [9.91, 9.01], [14.6, 13.7], [15.3, 14.4], [16.05, 15.15], [20.4, 20.13], [20.9, 20.63], [24.87, 24.6], [25.4, 25.13], [28.57, 28.3], [29.55, 29.28], [32.95, 32.68], [33.5, 33.23], [34.7, 37.54], [36.5, 38.95], [37.4, 39.85], [38.85, 41.3], [42.9, 47.58], [43.4, 48.08], [45.4, 50.21], [45.55, 50.56], [47.75, 52.76], [48.4, 53.86], [50.85, 56.31], [52.25, 57.71], [56.3, 62.34], [56.8, 62.84], [58.3, 64.92], [58.45, 65.27], [59.85, 66.67], [61.1, 67.92], [63.9, 70.77], [64.05, 71.12], [68.86, 75.93], [71.5, 78.57], [73.75, 80.82], [76.9, 83.82]];
 function unwarp(tn) { for (let i = 0; i < WARP.length - 1; i++) { const [o0, n0] = WARP[i], [o1, n1] = WARP[i + 1]; if (tn <= n1) return o0 + (o1 - o0) * (tn - n0) / (n1 - n0); } return END; }
 function fwarp(t) { for (let i = 0; i < WARP.length - 1; i++) { const [o0, n0] = WARP[i], [o1, n1] = WARP[i + 1]; if (t <= o1) return n0 + (n1 - n0) * (t - o0) / (o1 - o0); } return WARP[WARP.length - 1][1]; }
 const rt = keys => keys.map(([k, v]) => [fwarp(k), v]);
@@ -852,11 +855,11 @@ function atomCamAt(tn) {
 const CORNER = [0.82, -0.99, 0.17];
 const R0 = [1.2, -0.3, 0.35], WAVE = [1.32, 0.8, 0.3], POINT = [1.62, 0.32, 0.3];
 const T_ = {
-  pos: track([[0, [0, 0.2, 0.8]], [0.92, [0, 0.2, 0.8]], [1.45, CORNER]]),
+  pos: track([[0, CORNER], [END, CORNER]]),   // senza saluto: la mascotte compare già nell'angolo
   smile: track([[0, 1], [1.4, 0.95], [5, 0.8], [6.8, 0.8], [7.3, 0.3], [10.3, 0.3], [14.6, 0.8], [64.1, 0.8], [64.4, 0.5], [65.9, 0.5], [66.4, 0.85], [70.3, 0.85], [70.8, 1], [END, 1]]),
   browY: track([[0, 0.1], [1.4, 0.07], [6.8, 0.07], [7.3, 0.14], [10.3, 0.14], [14.6, 0.07], [64.1, 0.07], [64.4, 0.13], [65.9, 0.13], [66.4, 0.07], [70.3, 0.07], [70.8, 0.11], [END, 0.09]]),
   gaze: track([[0, [0, 0]], [1.3, [0, 0]], [1.8, [-0.6, 0.6]], [71.1, [-0.6, 0.6]], [71.5, [0, 0]], [72.3, [0, 0]], [72.6, [0.85, 0.25]], [73.8, [0.85, 0.25]], [74.1, [0, 0]], [END, [0, 0]]]),
-  handR: track([[0, R0], [0.12, WAVE], [0.9, WAVE], [1.35, R0], [72.2, R0], [72.6, POINT], [73.7, POINT], [74, R0], [74.3, WAVE], [END, WAVE]]),
+  handR: track([[0, R0], [72.2, R0], [72.6, POINT], [73.7, POINT], [74, R0], [74.3, WAVE], [END, WAVE]]),
 };
 const EXIT = 75.2;
 window.renderFrame = function (tn) {
@@ -957,7 +960,7 @@ window.renderFrame = function (tn) {
   showIcon(icThermo, pop(t, 43.5, 48.4)); thermo.set(0.45 + 0.45 * smooth(ramp(t, 43.7, 44.8)) - 0.75 * smooth(ramp(t, 45.8, 47)));
   // ---------------- mascotte: grande al centro per il saluto, poi piccola in basso a destra
   let [mx, my, ms] = T_.pos(t);
-  ms *= backOut(ramp(t, 0.0, 0.35)) * (1 - smooth(ramp(t, EXIT - 0.25, EXIT)));
+  ms *= backOut(ramp(t, 1.15, 1.6)) * (1 - smooth(ramp(t, EXIT - 0.25, EXIT)));
   const bob = Math.sin(tn * 1.9) * 0.07 * ms;
   mascot.position.set(mx, my + bob + smooth(ramp(t, EXIT - 0.4, EXIT)) * 0.08, 0); mascot.scale.setScalar(Math.max(0.001, ms)); mascot.visible = ms > 0.001 && t < EXIT;
   const L = lip(tn, t), env = L.env;
