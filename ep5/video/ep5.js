@@ -267,7 +267,10 @@ const dirTo = (a, b) => V(b.x - a.x, b.y - a.y, 0).normalize();
 // i nuclei stanno solo dentro le barre, le molecole d'acqua solo fra le barre. Un neutrone esce da una barra, rallenta nell'acqua
 // rimbalzando sugli idrogeni e rientra in un'altra barra, dove fa fissione (prima l'acqua era mescolata ai nuclei: non realistico).
 // Barra 0 = C (centro X2), barra 1 = R, barra -1 = L.
-const X2 = 40, RW = 14, GAP = 3.6, PITCH = RW + GAP, RODK = [-1, 0, 1, 2];   // bozza 10: barre molto più larghe (erano 3,6), con molti più atomi dentro
+// voce 3 (richiesta dell'autore): acqua fra le barre più larga, GAP da 3,6 a 6. X2 spostato di 2,4 perché la barra L resti dov'era
+// (lontana dalla zona 1); i punti nell'acqua sono scalati con la larghezza (wX) e le camere sull'acqua stanno più indietro (WZ).
+const X2 = 42.4, RW = 14, GAP = 6, PITCH = RW + GAP, RODK = [-1, 0, 1, 2];   // bozza 10: barre molto più larghe (erano 3,6), con molti più atomi dentro
+const WZ = 8;                                                                  // camere sull'acqua: +8 di distanza (si vedono ancora i bordi delle due barre)
 const P2 = (dx, y) => V(X2 + dx, y, 0);
 const rodC = k => X2 + PITCH * k;
 const gapL = k => rodC(k) + RW / 2, gapR = k => rodC(k) + RW / 2 + GAP;     // acqua fra la barra k e la k+1
@@ -285,7 +288,8 @@ const U1 = along5(-1.8).addScaledVector(perp5, 0.5), U2 = along5(1.2).addScaledV
 // B6: un neutrone veloce esce dalla barra C, rimbalza sugli idrogeni dell'acqua fra C e R (sempre più lento), entra nella barra R e spacca T (B7)
 // percorso irregolare (bozza 7): 5 urti sparsi nell'acqua invece di 9 urti regolari sui bordi
 const E6 = V(gapL(0) - 1.2, 1.4, 0);
-const WP = [[3.9, 3.3], [2.6, 4.1], [4.4, 4.9], [3.0, 6.0], [4.7, 6.8]].map(([dx, y]) => V(gapL(0) - 1.8 + dx, y, 0));   // posizioni rispetto al bordo destro della barra C
+const wX = off => gapL(0) + off * GAP / 3.6;                                   // punto nell'acqua: off misurato sulla larghezza di prima (3,6)
+const WP = [[3.9, 3.3], [2.6, 4.1], [4.4, 4.9], [3.0, 6.0], [4.7, 6.8]].map(([dx, y]) => V(wX(dx - 1.8), y, 0));   // posizioni rispetto al bordo destro della barra C
 const T = V(gapR(0) + 0.8, 7.7, 0);
 // B8-B9: catena che passa da una barra all'altra (C ↔ R) attraverso l'acqua, poi due rami (di più) che ne spaccano quattro, poi si spegne
 const inC = (dx, y) => V(gapL(0) - 1.8 + dx, y, 0), inR = (dx, y) => V(gapR(0) + dx, y, 0);
@@ -440,7 +444,7 @@ const MOLS = [];
 const OH = 0.19, HA = 52 * Math.PI / 180;
 function addMol(c, a, extra = {}) { MOLS.push({ c: c.clone(), a, ph: hash(MOLS.length * 1.7) * 6.28, hits: [], ...extra }); }
 { const sv = seed; seed = 99;
-  for (let k = 0; k < 40000; k++) {
+  for (let k = 0; k < 70000; k++) {
     const c = V(lerp(rodC(-1) - PITCH / 2, rodC(3), rnd()), lerp(-46, 44, rnd()), 0);
     if (!inWater(c.x, 0.33)) continue;
     if (MOLS.some(m => Math.abs(m.c.y - c.y) < 0.95 && xy(m.c, c) < 0.95)) continue;
@@ -849,9 +853,9 @@ const view = (x, y, z) => [x, y, z, x, y];
 const ATOM_TRACK = track(rt([[4.75, view(0, 1.2, 24)], [5.9, view(0, 1.0, 14)], [7.0, view(0, 1.5, 14)], [9.4, view(0.5, 2.5, 46)], [10.0, view(0.6, 2.5, 47)],
   // dalla pastiglia (zona 1) alle barre con l'acqua (zona 2): zoom all'indietro, lampo, barre viste da lontano, poi dentro la barra C
   [14.6, view(X2, -3.6, 14)], [20.4, view(X2, -3.6, 14)], [21.3, view(X2, -1.4, 16)], [25.0, view(X2, -1.4, 16)],
-  [26.4, view(G0, 4.4, 19)], [33.7, view(G0 + 0.1, 5.4, 19)], [34.7, view(G0 + 1.6, 7.4, 12)],
-  [36.4, view(G0, 10.6, 22)], [38.3, view(G0, 13.2, 22)], [40.1, view(G0, 16.0, 22)], [41.9, view(G0, 18.8, 23)],
-  [43.4, view(G0 - 0.2, 22.2, 27)], [45.0, view(G0 - 0.2, 25.2, 30)], [49.0, view(G0 - 0.2, 25.4, 30)]]));
+  [26.4, view(G0, 4.4, 19 + WZ)], [33.7, view(G0 + 0.1, 5.4, 19 + WZ)], [34.7, view(T.x - 1.0, 7.4, 12)],
+  [36.4, view(G0, 10.6, 22 + WZ)], [38.3, view(G0, 13.2, 22 + WZ)], [40.1, view(G0, 16.0, 22 + WZ)], [41.9, view(G0, 18.8, 23 + WZ)],
+  [43.4, view(G0 - 0.2, 22.2, 27 + WZ)], [45.0, view(G0 - 0.2, 25.2, 30 + WZ)], [49.0, view(G0 - 0.2, 25.4, 30 + WZ)]]));
 function atomCamAt(tn) {
   // bozza 10: dopo il lampo le barre si vedono da molto lontano, poi zoom lento (scala logaritmica) fino al centro della barra C
   const Z2 = [fwarp(11.0), fwarp(12.2), fwarp(14.6)];
@@ -862,7 +866,7 @@ function atomCamAt(tn) {
   const Z1 = [fwarp(10.0), fwarp(11.0)];
   if (tn > Z1[0] && tn < Z1[1]) { const u = ein(ramp(tn, Z1[0], Z1[1])), v = ATOM_TRACK(Z1[0]); return [v[0], v[1], logZ(v[2], 52, u), v[3], v[4]]; }   // bozza 11: non oltre 52, altrimenti si vedono i bordi della zona piena di atomi
   const A1 = [fwarp(49.0), fwarp(49.3)];
-  if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 44, u), v[3], v[4]]; }
+  if (tn > A1[0]) { const u = ein(ramp(tn, A1[0], A1[1])); const v = ATOM_TRACK(A1[0]); return [v[0], v[1], logZ(v[2], 48, u), v[3], v[4]]; }
   return ATOM_TRACK(tn);
 }
 // mascotte
