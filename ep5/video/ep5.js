@@ -632,6 +632,8 @@ const molH = new THREE.InstancedMesh(new THREE.SphereGeometry(0.085, 14, 10), st
 atomScene.add(molO, molH);
 
 console.log('molecole', MOLS.length, 'spinte dalla barra', MOLS.filter(m => m.push).length);
+// tempi degli eventi (scaletta) per gli effetti sonori: node print_events.js -> ../audio/events5.json
+console.log('EVENTI ' + JSON.stringify({ fiss: FISS.map(e => +e.hit.toFixed(3)).sort((p, q) => p - q), abs: NEUT.filter(n => n.end === 'abs').map(n => +n.keys[n.keys.length - 1][1].toFixed(3)).sort((p, q) => p - q), mol: MOLS.flatMap(m => m.hits.map(h => +h.t.toFixed(3))).sort((p, q) => p - q) }));
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3();
 function placeMols(t, tn) {
   MOLS.forEach((m, i) => {

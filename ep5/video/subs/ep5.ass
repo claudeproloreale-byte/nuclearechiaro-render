@@ -1,0 +1,80 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: S,Poppins,112,&H00FFFFFF,&H00FFFFFF,&H004A1C0C,&H804A1C0C,-1,0,0,0,100,100,0,0,1,9,3,5,40,40,40,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.35,0:00:00.92,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Nell'uranio
+Dialogue: 0,0:00:00.92,0:00:01.66,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di una centrale
+Dialogue: 0,0:00:01.66,0:00:02.43,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nucleare avviene
+Dialogue: 0,0:00:02.43,0:00:03.71,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}una reazione a catena
+Dialogue: 0,0:00:04.85,0:00:05.98,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ma se ogni fissione
+Dialogue: 0,0:00:05.98,0:00:07.21,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}libera 2 o 3 neutroni
+Dialogue: 0,0:00:07.21,0:00:07.98,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}chi la tiene
+Dialogue: 0,0:00:07.98,0:00:09.26,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sotto controllo?
+Dialogue: 0,0:00:13.65,0:00:14.65,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Primo segreto
+Dialogue: 0,0:00:15.10,0:00:15.86,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}i neutroni
+Dialogue: 0,0:00:15.86,0:00:16.68,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}appena nati
+Dialogue: 0,0:00:16.68,0:00:17.80,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sono velocissimi
+Dialogue: 0,0:00:17.80,0:00:18.67,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}circa 20 000
+Dialogue: 0,0:00:18.67,0:00:20.38,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}chilometri al secondo
+Dialogue: 0,0:00:20.58,0:00:21.62,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Così veloci
+Dialogue: 0,0:00:21.70,0:00:22.99,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}che l'uranio 235
+Dialogue: 0,0:00:22.99,0:00:24.85,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}quasi non li cattura
+Dialogue: 0,0:00:25.08,0:00:25.72,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Per questo
+Dialogue: 0,0:00:25.72,0:00:26.47,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nel reattore
+Dialogue: 0,0:00:26.47,0:00:27.16,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}c'è l'acqua
+Dialogue: 0,0:00:27.16,0:00:28.55,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}che è un moderatore
+Dialogue: 0,0:00:29.23,0:00:30.13,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dopo una ventina
+Dialogue: 0,0:00:30.13,0:00:30.60,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di urti
+Dialogue: 0,0:00:30.60,0:00:31.54,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}contro l'idrogeno
+Dialogue: 0,0:00:31.54,0:00:32.93,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}il neutrone rallenta
+Dialogue: 0,0:00:33.18,0:00:34.09,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}A questa velocità
+Dialogue: 0,0:00:34.09,0:00:34.72,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}il neutrone
+Dialogue: 0,0:00:34.72,0:00:35.35,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ha il tempo
+Dialogue: 0,0:00:35.35,0:00:36.08,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di interagire
+Dialogue: 0,0:00:36.08,0:00:37.10,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}con il nucleo
+Dialogue: 0,0:00:37.19,0:00:38.20,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}che si spacca
+Dialogue: 0,0:00:38.90,0:00:40.10,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Secondo segreto
+Dialogue: 0,0:00:41.25,0:00:42.36,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}affinché la reazione
+Dialogue: 0,0:00:42.36,0:00:43.33,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sia in equilibrio
+Dialogue: 0,0:00:43.33,0:00:44.39,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di tutti i neutroni
+Dialogue: 0,0:00:44.39,0:00:44.92,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}prodotti
+Dialogue: 0,0:00:44.92,0:00:45.79,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}da una fissione
+Dialogue: 0,0:00:45.79,0:00:46.56,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}uno solo deve
+Dialogue: 0,0:00:46.56,0:00:47.83,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}causarne un'altra
+Dialogue: 0,0:00:48.03,0:00:49.16,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Se sono di più
+Dialogue: 0,0:00:49.21,0:00:50.46,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}la potenza sale
+Dialogue: 0,0:00:50.51,0:00:51.56,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Se sono di meno
+Dialogue: 0,0:00:51.69,0:00:53.01,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}la reazione si spegne
+Dialogue: 0,0:00:53.81,0:00:54.69,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ed ecco il freno
+Dialogue: 0,0:00:54.69,0:00:55.47,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e acceleratore
+Dialogue: 0,0:00:55.47,0:00:56.56,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}della reazione
+Dialogue: 0,0:00:57.66,0:00:59.05,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}le barre di controllo
+Dialogue: 0,0:00:59.43,0:01:00.35,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}piene di materiali
+Dialogue: 0,0:01:00.35,0:01:01.06,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}che assorbono
+Dialogue: 0,0:01:01.06,0:01:01.63,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}i neutroni
+Dialogue: 0,0:01:01.63,0:01:02.59,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}come il boro
+Dialogue: 0,0:01:02.79,0:01:03.47,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Le abbassi
+Dialogue: 0,0:01:03.47,0:01:04.30,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e la reazione
+Dialogue: 0,0:01:04.30,0:01:05.17,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}rallenta
+Dialogue: 0,0:01:05.22,0:01:05.83,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Le alzi
+Dialogue: 0,0:01:05.83,0:01:06.92,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e accelera
+Dialogue: 0,0:01:07.87,0:01:08.52,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Le barre
+Dialogue: 0,0:01:08.52,0:01:09.53,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sono tenute su
+Dialogue: 0,0:01:09.53,0:01:11.02,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}da elettromagneti
+Dialogue: 0,0:01:11.07,0:01:12.04,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}se dovesse mancare
+Dialogue: 0,0:01:12.04,0:01:12.69,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}la corrente
+Dialogue: 0,0:01:12.69,0:01:13.47,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}cadono da sole
+Dialogue: 0,0:01:13.47,0:01:14.58,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}in un paio di secondi
+Dialogue: 0,0:01:14.58,0:01:15.32,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e la centrale
+Dialogue: 0,0:01:15.32,0:01:16.18,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si spegne
+Dialogue: 0,0:01:18.52,0:01:19.61,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Hai qualche domanda?
+Dialogue: 0,0:01:19.78,0:01:21.07,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Fammela nei commenti
