@@ -1,15 +1,17 @@
 // Puntata 6 — tempi comuni a tutto il video (secondi "di scaletta", v2 dalla scaletta dell'app di produzione, 24/11/2026).
 // I tempi dei singoli eventi stanno nel file della scena che li usa (scene/*.js).
 import { creaWarp } from '/comune/base.js';
+import LIP6 from './lip6.js';
 
 export const END = 55.4;
 // battute (niente saluto): B1 0,5–4,0 · B2 4,5–8,0 · B3 8,5–12,8 · B4 13,3–20,3 · B5 20,8–23,8 · B6 24,3–28,9 · B7 29,4–33,3
 // B8 33,8–37,9 · B9 38,4–43,9 · B10 44,4–50,4 · B11 50,9–53,3 · paesaggio pulito da 53,9 a 55,4
 export const SPEECH = [[0.5, 4.0], [4.5, 4.9], [5.1, 8.0], [8.5, 12.8], [13.3, 15.3], [15.45, 17.0], [17.15, 20.3], [20.8, 23.8], [24.3, 28.9],
   [29.4, 33.3], [33.8, 37.9], [38.4, 40.9], [41.05, 43.9], [44.4, 47.1], [47.25, 50.4], [50.9, 52.0], [52.15, 53.3]];
-export const LIP = null;   // quando arriva la voce: { open, narrow, env } a 30 fps
-// tabella WARP [[t scaletta, t video], ...]: per ora è l'identità (niente voce ancora)
-export const WARP = [[0, 0], [END, END]];
+export const LIP = LIP6;   // labiale dalla voce vera (audio/voice_ep6.py), a 30 fps, letto con il tempo del video
+// tabella WARP [[t scaletta, t video], ...] dalla voce dell'autore (26/11/2026, audio/voice_ep6.py -> audio/warp6.json)
+export const WARP = [[0.0, 0.0], [0.5, 0.5], [4.0, 4.0], [4.5, 4.49], [8.0, 8.55], [8.5, 9.05], [12.8, 15.41], [13.3, 15.91], [16.0, 19.96], [19.95, 23.91], [20.3, 24.45], [20.8, 24.95], [23.8, 28.02], [24.3, 28.52], [28.9, 35.21], [29.4, 35.71], [30.6, 38.52], [33.3, 41.22], [33.8, 41.72], [34.6, 42.83], [36.22, 45.77], [37.4, 50.54], [37.9, 51.14], [38.4, 52.28], [39.1, 53.05], [39.9, 54.41], [40.8, 55.95], [42.7, 57.78], [43.9, 59.43], [44.4, 59.93], [50.4, 66.91], [50.9, 67.41], [51.9, 68.79], [52.8, 69.77], [53.9, 70.77], [55.4, 72.27]];
+export const VIDEO_END = WARP[WARP.length - 1][1];   // durata del video con la voce: 72.27 s (2168 fotogrammi)
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
 // passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:

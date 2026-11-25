@@ -2,7 +2,7 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
 
-**Stato:** v8 (25/11/2026, cattura del neutrone lento più marcata, nota dell'autore sulla v7): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v8.
+**Stato:** v9 (26/11/2026) con la voce dell'autore, musica, effetti e sottotitoli: 72,3 s. Prossimo passo: l'autore guarda la v9 (eventuali correzioni di tempi o di audio).
 Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge
@@ -18,14 +18,21 @@ Storico: `STORICO.md` · Regole: `regole.md`.
 | Neutrone lento catturato dall'alone di un U-235 (curva; B7 e B8) | `video/cattura.js` |
 | Effetto "supersonico" dei neutroni veloci (scia) | `video/supersonico.js` |
 | Mascotte (espressioni, gesti) | `video/mascotte6.js` |
-| Tempi comuni, battute, passaggi fra i mondi, WARP | `video/tempi.js` |
+| Tempi comuni, battute, passaggi fra i mondi, WARP, labiale | `video/tempi.js` (WARP e `lip6.js` escono da `audio/voice_ep6.py`) |
+| Montaggio della voce, eventi agganciati alle parole | `audio/voice_ep6.py` |
+| Musica ed effetti sonori | `audio/music6.py` (tempi degli eventi: `audio/events6.json`, da `video/print_events.js`) |
+| Mix e volume | `audio/mix6.py` |
+| Sottotitoli | `video/make_subs6.py` |
 | Camera degli atomi, ordine di montaggio, molecole che spariscono dietro la mascotte | `video/ep6.js` |
 
 ## Tempi (scaletta v2)
-B1 0,5–4,0 · B2 4,5–8,0 · B3 8,5–12,8 · B4 13,3–20,3 · B5 20,8–23,8 · B6 24,3–28,9 · B7 29,4–33,3 · B8 33,8–37,9 · B9 38,4–43,9 · B10 44,4–50,4 · B11 50,9–53,3 · paesaggio pulito 53,9–55,4. `WARP` = identità.
+B1 0,5–4,0 · B2 4,5–8,0 · B3 8,5–12,8 · B4 13,3–20,3 · B5 20,8–23,8 · B6 24,3–28,9 · B7 29,4–33,3 · B8 33,8–37,9 · B9 38,4–43,9 · B10 44,4–50,4 · B11 50,9–53,3 · paesaggio pulito 53,9–55,4 (tempi di scaletta).
+Con la voce (`WARP`, 26/11/2026) il video dura 72,3 s; eventi sulle parole: fissione nella bomba su "spaccare" (19,96), lampo pieno su "energia" (23,91), A si spacca dopo "uranio 238" (38,52), ultimo rimbalzo a fine "che rallenta i neutroni" (45,77), BB catturato e spaccato su "interagire" (50,54), termometro su "si scalda" (53,05), acqua che si dilata (54,41), neutrone veloce su "e frena meno" (55,95), termometro che scende su "la reazione rallenta da sola" (57,78), la mascotte indica i commenti su "fammela" (68,79) ed esce a 70,77; paesaggio pulito fino a 72,27.
 Mondi: bomba 0–8,55 · atomi zona B 8,55–20,6 (lampo bianco 19,2–21,6) · centrale 20,6–25,5 · atomi zona R 25,5–44,5 · centrale 44,5–55,4.
 
-## Rendering
-GitHub, workflow `Rendering`: `dir` = `ep6/video`, `page` = `ep6.html`, `seconds` = `55.4` (serve `comune/` nel repository).
-In locale: `PAGE=ep6.html VW=1080 VH=1920 node render.js seg 0 1662 ep6.mp4` (circa 0,6 s per fotogramma, due processi in parallelo).
+## Rendering e montaggio
+1. Audio: `audio/build_audio.sh` (registrazione in `sorgenti/`; Whisper per il controllo del testo: `audio/transcribe6.py`).
+2. Video muto: GitHub, workflow `Rendering`: `dir` = `ep6/video`, `page` = `ep6.html`, `seconds` = `72.27` (serve `comune/` nel repository).
+   In locale: `PAGE=ep6.html VW=1080 VH=1920 node render.js seg 0 2168 ep6_muto.mp4` (circa 0,5 s per fotogramma; due processi in parallelo sulle due metà).
+3. `video/assemble.sh ep6_muto.mp4`: `nuclearechiaro_ep6.mp4` (senza sottotitoli) e `nuclearechiaro_ep6_sottotitoli.mp4` (da pubblicare).
 Prova a metà risoluzione: `PAGE='ep6.html?w=540&h=960' VW=540 VH=960 node render.js still 1,10,26,35,41.7`.

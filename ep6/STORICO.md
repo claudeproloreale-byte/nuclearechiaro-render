@@ -60,3 +60,9 @@
 
 ## 25/11/2026 — v8, nota dell'autore sulla v7 ("accentuare un po' di più" la cattura del neutrone lento)
 - `cattura.js`: il neutrone passerebbe a 0,85 dal centro (prima 0,6), la curva comincia a 1,1 (prima 0,95) ed è più stretta; nella curva accelera fino a 1,7 volte, come tirato dal nucleo; l'alone dell'U-235 si illumina e si allarga mentre il neutrone ci è dentro (`alonePulsa`, B7 su A e B8 su BB).
+
+## 26/11/2026 — v9, voce dell'autore, musica, effetti, sottotitoli
+- Voce: `Voce_6-mejorada-v2.wav` (Adobe Podcast, 96,1 s, 27 frasi). Rispetto alla scaletta: "Ma una centrale…", "Nella pastiglia di una centrale infatti…" e una frase nuova nella B8: "E i neutroni più sono lenti, più probabilità hanno di interagire con l'uranio 235", che cade sulla cattura del neutrone lento.
+- Montaggio come la puntata 5 (pause fra frasi 0,7 s al massimo, fra battute da 0,35 a 1,0 s; 0,9 s prima di "No."), più eventi agganciati alle parole (vedi README). Nella B8 il tratto dopo l'ultimo rimbalzo dura 4,8 s: il neutrone lento si vede andare piano mentre la voce dice che è lento. Durata 72,3 s.
+- Musica kalimba 100 bpm come le puntate precedenti; si ferma sotto il lampo bianco e riprende con la centrale. Effetti: carri armati lontani, zoom, lampi di passaggio, pioggia di fissioni nella bomba che sale verso il lampo, colpo morbido e scintillio sul lampo (niente esplosione), fissioni A e BB, neutroni assorbiti, gocce sugli urti in acqua, "tiro" dell'alone nella cattura, termometro, molecole che si allontanano, neutrone veloce, cupola che si richiude, mascotte.
+- Mix: musica a −5 dB, −14,5 LUFS, picco −1,4 dBFS. Sottotitoli: 63 righe, al massimo 22 caratteri.

@@ -55,6 +55,11 @@ b8.molecole(at, acqua);
 b9.dilata(acqua);
 acqua.completa();
 console.log('molecole', acqua.MOLS.length);
+// tempi degli eventi (di scaletta) per gli effetti sonori: letti da print_events.js -> ../audio/events6.json
+const r3 = x => Math.round(x * 1000) / 1000;
+console.log('EVENTI ' + JSON.stringify({ fiss: at.FISS.map(n => r3(n.hit)).sort((a, b) => a - b),
+  abs: at.NEUT.filter(n => n.end === 'abs').map(n => r3(at.tEnd(n))).sort((a, b) => a - b),
+  mol: acqua.MOLS.filter(m => m.hitT !== undefined).map(m => r3(m.hitT)).sort((a, b) => a - b) }));
 at.segnaAssorbiti();
 const SUPER = creaSupersonico(at);   // v4: scia e cono d'urto sui neutroni veloci
 
