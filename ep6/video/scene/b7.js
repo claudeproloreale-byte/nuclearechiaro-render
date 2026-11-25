@@ -5,6 +5,7 @@
 // (posizioni indicate dall'autore sul fotogramma a 30,75 della v3); due finiscono assorbiti da altri U-238; uno esce a sinistra.
 import { V, xy, dirTo } from '/comune/base.js';
 import { XR, YR, PR } from './zonaR.js';
+import { curvaCattura } from '../cattura.js';
 
 export const A_IN = 28.0, A_HIT = 30.6;
 // v6: il neutrone lento arriva dal basso a destra (freccia dell'autore sul fotogramma a 29,1 della v5), da fuori campo;
@@ -16,11 +17,20 @@ export const T7 = PR(1.1, -4.1);
 const dAT = T7.clone().sub(A).normalize();
 export const A2 = A.clone().addScaledVector(T7.clone().sub(A), 0.652).addScaledVector(V(dAT.y, -dAT.x, 0), 0.6);   // a sinistra del percorso (lontano dalla mascotte)
 const FRAG_AX = V(-0.6, 0.8, 0).normalize();               // i due frammenti: in alto a sinistra e in basso a destra (lungo il corridoio del neutrone in arrivo), fuori campo
+// v7 (nota dell'autore a 30,5 della v6): l'U-235 a sinistra a metà altezza dell'inquadratura diventa U-238 (senza alone)
+export const U238_NOTA = PR(-0.95, -0.45);
+export function ritocca(at) {
+  const n = at.NUCS.filter(n => n.zone === 'R' && n.u).map(n => [xy(n.c, U238_NOTA), n]).sort((p, q) => p[0] - q[0])[0];
+  if (n && n[0] < 0.8) n[1].u = false;
+  console.log('B7: U-235 diventato U-238 a', n && n[0].toFixed(2), 'dal punto indicato');
+}
 export const caps = [[A_FROM, A], [A, T7], [A.clone().addScaledVector(FRAG_AX, -4), A.clone().addScaledVector(FRAG_AX, 4)]];
 const V_VELOCE = 9;
 
 export function costruisci(at, nA, nA2, nT7) {
-  at.neutron([[A_FROM.clone().setZ(0.15), A_IN], [A.clone().addScaledVector(dirTo(A_FROM, A), -0.25).setZ(0.15), A_HIT]], 'hit');
+  // v7 (idea dell'autore sulla v6, nota a 30,5): il neutrone lento non punta dritto ad A, passerebbe alla sua destra;
+  // entrato nell'alone giallo la traiettoria si piega e A lo cattura (cattura.js)
+  at.neutron(curvaCattura(A_FROM, A, 1, A_IN, A_HIT).chiavi, 'hit');
   nA.hitAt = A_HIT; at.fission(nA, A_HIT, FRAG_AX, 6, 1.3, 0.3);
   // il neutrone che passa accanto ad A2 e si attacca a T7
   const dP = dirTo(A, T7); at.absorbed.add(nT7);

@@ -39,6 +39,7 @@ const nB0 = at.special(bomba.START, true, 'B');
 const nA = at.special(b7.A, true, 'R'), nBB = at.special(b8.BB, true, 'R'), nC9 = at.special(b9.C9, true, 'R');
 const nA2 = at.special(b7.A2, true, 'R'), nT7 = at.special(b7.T7, false, 'R');   // v3: U-235 "saltato" e U-238 che assorbe
 at.sparsi(6060, [bomba.zona(nB0), ...zonaR.zona([...b7.caps, ...b8.caps, ...b9.caps])]);
+b7.ritocca(at);   // v7: un U-235 della B7 diventa U-238 (nota dell'autore)
 at.completa();
 zonaR.creaBarre(at.scene);
 const N = at.NUCS;
@@ -81,7 +82,8 @@ function atomCamAt(tn) {
 const [MSX, MSY] = zonaR.MASCOTTE_SCHERMO;
 function dietroMascotte(m, p) {
   const c = at.cam.position, d = c.z - p.z, mx = c.x + MSX * d, my = c.y + MSY * d;
-  const r = Math.hypot(p.x - mx, p.y - my), r0 = 0.012 * d, r1 = 0.026 * d + 0.4;
+  // v7 (nota dell'autore a 37,2 della v6): spariscono del tutto prima di arrivare sotto il bordo della mascotte (niente molecole minuscole accanto a lei)
+  const r = Math.hypot(p.x - mx, p.y - my), r0 = 0.016 * d - 0.05, r1 = 0.016 * d + 0.2;   // raggio della mascotte misurato: circa 0,016 × distanza
   return smooth(clamp01((r - r0) / (r1 - r0)));
 }
 

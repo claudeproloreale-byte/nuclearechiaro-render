@@ -2,7 +2,7 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
 
-**Stato:** v6 (25/11/2026, revisione della nota sulla v5): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v6 e conferma o riapre le note nell'app.
+**Stato:** v7 (25/11/2026, revisione delle 4 note sulla v6): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v7 e conferma o riapre le note nell'app.
 Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge
@@ -15,6 +15,7 @@ Storico: `STORICO.md` · Regole: `regole.md`.
 | B7 dentro la pastiglia: neutrone lento, U-235 "saltato" (A2), U-238 che assorbono | `video/scene/b7.js` |
 | B8 bordo della pastiglia: rimbalzi nell'acqua; molecole d'acqua | `video/scene/b8.js` |
 | B9 acqua che si dilata, neutrone veloce nella barra R, termometro | `video/scene/b9.js` |
+| Neutrone lento catturato dall'alone di un U-235 (curva; B7 e B8) | `video/cattura.js` |
 | Effetto "supersonico" dei neutroni veloci (scia) | `video/supersonico.js` |
 | Mascotte (espressioni, gesti) | `video/mascotte6.js` |
 | Tempi comuni, battute, passaggi fra i mondi, WARP | `video/tempi.js` |

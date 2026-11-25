@@ -152,7 +152,8 @@ export function creaBomba3d() {
   [[0.18, 0.18, cableM], [-0.18, 0.15, cable2], [0.1, -0.2, cableM], [-0.12, -0.18, cable2]].forEach(([y, z, m]) => {
     const c = new THREE.CatmullRomCurve3([V(-1.2, y, z), V(-1.0, y * 1.6, z * 1.8), V(-0.7, y * 1.3, z * 1.4)]); mesh(new THREE.TubeGeometry(c, 20, 0.025, 8), m, inner); });
   // la palla di uranio: grigio metallico caldo, con un alone giallo come gli U-235 degli atomi
-  const coreM = std(0x8b8378, { roughness: 0.35, metalness: 0.6, emissive: 0xffa040, emissiveIntensity: 0.0 });
+  // (v7, nota dell'autore a 7,2 della v6: riflesso ridotto, superficie meno lucida)
+  const coreM = std(0x8b8378, { roughness: 0.48, metalness: 0.55, emissive: 0xffa040, emissiveIntensity: 0.0 });
   const core = mesh(new THREE.SphereGeometry(0.36, 48, 32), coreM, inner); core.renderOrder = 3;
   const coreGlow = glow(0xffd23a, inner, 1.6); coreGlow.material.fog = false;
   inner.visible = false;

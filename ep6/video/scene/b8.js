@@ -5,6 +5,7 @@
 // v4: neutroni nati e frammenti veloci ("supersonici"); i frammenti escono dall'inquadratura in verticale, dentro la barra.
 import { V, xy, dirTo, polySegs, segDist, setSeed, rnd } from '/comune/base.js';
 import { YR, PE, E, gapL, gapR, behindMascot } from './zonaR.js';
+import { puntiCattura, lunghezza } from '../cattura.js';
 
 export const W_IN = 34.6, B8_HIT = 37.4;
 export const BB = PE(-1.1, -1.6);
@@ -12,9 +13,18 @@ export const W_FROM = PE(-2.4, 6.5);
 // punti di rimbalzo, tutti nell'acqua
 export const W_PTS = [PE(2.2, 3.6), PE(0.9, 2.5), PE(2.8, 1.6), PE(1.1, 0.5), PE(2.4, -0.5)];
 export const caps = [...polySegs([W_FROM, ...W_PTS, BB]), [PE(-1.1, -7), PE(-1.1, 5)]];
+// v7: ultimo tratto curvo (cattura da parte di BB), anche lui libero dalle molecole
+const CURVA = puntiCattura(W_PTS[W_PTS.length - 1], BB, -1).pts;
 
 export function costruisci(at, acqua, nBB) {
-  acqua.zigNeutron([W_FROM, ...W_PTS, BB.clone().addScaledVector(dirTo(W_PTS[W_PTS.length - 1], BB), -0.25)], W_IN, { t1: B8_HIT, K: 0.74, trail: 10 });
+  // v7 (idea dell'autore sulla v6, nota a 37,2): dopo l'ultimo rimbalzo il neutrone lento non punta dritto a BB, passerebbe
+  // sotto; entrato nell'alone giallo la traiettoria si piega verso BB, che lo cattura (cattura.js). Stessa velocità dell'ultimo tratto.
+  const K = 0.74, P = [W_FROM, ...W_PTS], curva = CURVA;
+  const tratti = P.slice(1).map((p, i) => P[i].distanceTo(p) / Math.pow(K, i));
+  const v0 = (tratti.reduce((a, b) => a + b, 0) + lunghezza(curva) / Math.pow(K, P.length - 1)) / (B8_HIT - W_IN);
+  const nz = acqua.zigNeutron([...P, curva[1]], W_IN, { v0, K, trail: 10 }), vF = v0 * Math.pow(K, P.length - 1);
+  let tk = nz.keys[nz.keys.length - 1][1];
+  for (let i = 2; i < curva.length; i++) { tk += curva[i].distanceTo(curva[i - 1]) / vF; nz.keys.push([curva[i].clone().setZ(0.15), tk]); }
   nBB.hitAt = B8_HIT; at.fission(nBB, B8_HIT, V(0, 1, 0), 6.5, 1.3, 0.3);
   // i due neutroni nati: verso l'interno della barra, assorbiti dai U-238 più vicini (direzioni diverse, lontani dalla mascotte)
   const used = [dirTo(BB, W_PTS[W_PTS.length - 1]), V(0, 1, 0), V(0, -1, 0)];
@@ -37,7 +47,7 @@ export function costruisci(at, acqua, nBB) {
 // non si tolgono più qui: si rimpiccioliscono mentre le passano dietro (ep6.js, dietroMascotte).
 export function molecole(at, acqua) {
   const strisce = [[gapL(-1) + 0.35, gapR(-1) - 0.35], [gapL(0) + 0.35, gapR(0) - 0.35]], Y0 = YR - 46, Y1 = YR + 50;
-  const lane = [...polySegs([W_FROM, ...W_PTS, BB])];
+  const lane = [...polySegs([W_FROM, ...W_PTS, BB]), ...polySegs(CURVA)];
   const area = strisce.reduce((s, [a, b]) => s + (b - a), 0) * (Y1 - Y0), N = Math.round(area / 1.3);
   setSeed(99);
   const cell = 2, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);

@@ -51,3 +51,9 @@
 ## 25/11/2026 — v6, revisione della nota sulla v5
 - B7 (29,1 s): il neutrone lento arriva dal basso a destra, da fuori campo, verso A (freccia dell'autore). Passa dove di solito sta la mascotte, che si sposta in alto a destra (80% della larghezza, 40% dell'altezza, sopra la colonna dei pulsanti) da 27,4 a 30,2 e poi torna nell'angolo.
 - Frammenti di A ora in alto a sinistra e in basso a destra (lungo il corridoio del neutrone in arrivo), così resta posto per un U-238 che assorbe: nati da A 3 neutroni (uno su T7 accanto ad A2, uno assorbito, uno esce).
+
+## 25/11/2026 — v7, revisione delle 4 note sulla v6
+- 7,2 s: riflesso sulla palla di uranio ridotto (superficie meno lucida: roughness 0,48, metalness 0,55; prima 0,35 e 0,6).
+- 30,5 s (B7): l'U-235 a sinistra a metà altezza diventa U-238 (`b7.ritocca`, dopo `at.sparsi`: le posizioni casuali non cambiano).
+- Idea dell'autore: il neutrone lento non punta dritto all'U-235, passerebbe di lato (0,6 dal centro); entrato nell'alone (0,95) la traiettoria si piega e il nucleo lo cattura. Nuovo `video/cattura.js`, usato nella B7 (A, passa a destra) e nella B8 (BB, passa sotto, stessa velocità dell'ultimo tratto; corridoio senza molecole anche lungo la curva). I neutroni veloci attraversano l'alone dritti senza essere catturati (A2 nella B7, C9 nella B9), come prima. Fisica: sezione d'urto di fissione dell'U-235 circa 585 barn per i neutroni lenti, circa 1 per i veloci (effetto quantistico, non un'attrazione: nella voce evitare "attira").
+- 37,2 s: molecole dietro la mascotte: niente più molecole minuscole visibili. Il raggio della mascotte era stimato 0,026 × distanza, misurato è circa 0,016 × distanza; ora si rimpiccioliscono solo a ridosso del bordo (da 0,2 fuori a 0,05 dentro) e spariscono sotto di lei.
