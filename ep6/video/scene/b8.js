@@ -5,7 +5,7 @@
 // v4: neutroni nati e frammenti veloci ("supersonici"); i frammenti escono dall'inquadratura in verticale, dentro la barra.
 import { V, xy, dirTo, polySegs, segDist, setSeed, rnd } from '/comune/base.js';
 import { YR, PE, E, gapL, gapR, behindMascot } from './zonaR.js';
-import { puntiCattura, lunghezza } from '../cattura.js';
+import { puntiCattura, lunghezzaCurva, fattore, alonePulsa } from '../cattura.js';
 
 export const W_IN = 34.6, B8_HIT = 37.4;
 export const BB = PE(-1.1, -1.6);
@@ -21,10 +21,11 @@ export function costruisci(at, acqua, nBB) {
   // sotto; entrato nell'alone giallo la traiettoria si piega verso BB, che lo cattura (cattura.js). Stessa velocità dell'ultimo tratto.
   const K = 0.74, P = [W_FROM, ...W_PTS], curva = CURVA;
   const tratti = P.slice(1).map((p, i) => P[i].distanceTo(p) / Math.pow(K, i));
-  const v0 = (tratti.reduce((a, b) => a + b, 0) + lunghezza(curva) / Math.pow(K, P.length - 1)) / (B8_HIT - W_IN);
+  const v0 = (tratti.reduce((a, b) => a + b, 0) + (curva[1].distanceTo(P[P.length - 1]) + lunghezzaCurva(curva)) / Math.pow(K, P.length - 1)) / (B8_HIT - W_IN);
   const nz = acqua.zigNeutron([...P, curva[1]], W_IN, { v0, K, trail: 10 }), vF = v0 * Math.pow(K, P.length - 1);
   let tk = nz.keys[nz.keys.length - 1][1];
-  for (let i = 2; i < curva.length; i++) { tk += curva[i].distanceTo(curva[i - 1]) / vF; nz.keys.push([curva[i].clone().setZ(0.15), tk]); }
+  for (let i = 2; i < curva.length; i++) { tk += curva[i].distanceTo(curva[i - 1]) / (vF * fattore(i - 1, curva.length - 2)); nz.keys.push([curva[i].clone().setZ(0.15), tk]); }
+  alonePulsa(at, nBB, nz);
   nBB.hitAt = B8_HIT; at.fission(nBB, B8_HIT, V(0, 1, 0), 6.5, 1.3, 0.3);
   // i due neutroni nati: verso l'interno della barra, assorbiti dai U-238 più vicini (direzioni diverse, lontani dalla mascotte)
   const used = [dirTo(BB, W_PTS[W_PTS.length - 1]), V(0, 1, 0), V(0, -1, 0)];

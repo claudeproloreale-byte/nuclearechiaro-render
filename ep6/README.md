@@ -2,7 +2,7 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
 
-**Stato:** v7 (25/11/2026, revisione delle 4 note sulla v6): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v7 e conferma o riapre le note nell'app.
+**Stato:** v8 (25/11/2026, cattura del neutrone lento più marcata, nota dell'autore sulla v7): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v8.
 Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge

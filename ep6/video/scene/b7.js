@@ -5,7 +5,7 @@
 // (posizioni indicate dall'autore sul fotogramma a 30,75 della v3); due finiscono assorbiti da altri U-238; uno esce a sinistra.
 import { V, xy, dirTo } from '/comune/base.js';
 import { XR, YR, PR } from './zonaR.js';
-import { curvaCattura } from '../cattura.js';
+import { curvaCattura, alonePulsa } from '../cattura.js';
 
 export const A_IN = 28.0, A_HIT = 30.6;
 // v6: il neutrone lento arriva dal basso a destra (freccia dell'autore sul fotogramma a 29,1 della v5), da fuori campo;
@@ -30,7 +30,8 @@ const V_VELOCE = 9;
 export function costruisci(at, nA, nA2, nT7) {
   // v7 (idea dell'autore sulla v6, nota a 30,5): il neutrone lento non punta dritto ad A, passerebbe alla sua destra;
   // entrato nell'alone giallo la traiettoria si piega e A lo cattura (cattura.js)
-  at.neutron(curvaCattura(A_FROM, A, 1, A_IN, A_HIT).chiavi, 'hit');
+  const nLento = at.neutron(curvaCattura(A_FROM, A, 1, A_IN, A_HIT).chiavi, 'hit');
+  alonePulsa(at, nA, nLento);
   nA.hitAt = A_HIT; at.fission(nA, A_HIT, FRAG_AX, 6, 1.3, 0.3);
   // il neutrone che passa accanto ad A2 e si attacca a T7
   const dP = dirTo(A, T7); at.absorbed.add(nT7);
