@@ -39,7 +39,7 @@ export function costruisci(at, nA, nA2, nT7) {
     used.push(dir); at.absorbed.add(n);
     const nn = at.neutron(at.seg(A.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), A_HIT + 0.05, V_VELOCE), 'abs', { trail: 8 }); nn.host = n;
   }
-  console.log('B7: neutroni assorbiti', used.length - 3, '+ quello che salta A2; candidati', cands.map(([d, n]) => [d.toFixed(2), (n.c.x - XR).toFixed(2), (n.c.y - YR).toFixed(2)].join(' ')).join(' | '));
+  console.log('B7: neutroni assorbiti', used.length - 3, '+ quello che salta A2');
   // l'ultimo esce dall'inquadratura verso sinistra (lontano dall'acqua della barra C, dove nella B8 e B9 si guarda)
   at.emitOthers(nA, A_HIT, 1, V_VELOCE, [...used, V(1, 0, 0), V(0.7, 0.7, 0).normalize(), V(0.7, -0.7, 0).normalize()], false, 8);
 }
