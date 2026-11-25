@@ -23,6 +23,7 @@ import * as b7 from './scene/b7.js';
 import * as b8 from './scene/b8.js';
 import * as b9 from './scene/b9.js';
 import { posa } from './mascotte6.js';
+import { creaSupersonico } from './supersonico.js';
 
 await document.fonts.load('700 64px Poppins');
 const renderer = creaRenderer();
@@ -54,6 +55,7 @@ b9.dilata(acqua);
 acqua.completa();
 console.log('molecole', acqua.MOLS.length);
 at.segnaAssorbiti();
+const SUPER = creaSupersonico(at);   // v4: scia e cono d'urto sui neutroni veloci
 
 // ---------------- camera degli atomi
 // zona B (8,55–20,6): da lontano dentro la palla di uranio, poi da vicino; zona R: le barre viste da lontano (25,5),
@@ -72,6 +74,15 @@ function atomCamAt(tn) {
   if (tn < Z[1]) { const u = ramp(tn, Z[0], Z[1]); return view(lerp(E - 2, E - 4, u), lerp(1, 0, u), lerp(150, 140, u)); }
   if (tn < Z[2]) { const u = smooth(ramp(tn, Z[1], Z[2])); return view(lerp(E - 4, CAM_B7[0], u), lerp(0, CAM_B7[1], u), logZ(140, CAM_B7[2], u)); }
   return ATOM_R(tn);
+}
+
+// molecole che passano dietro la mascotte in angolo: si rimpiccioliscono fino a sparire mentre le sono dietro
+// (v4: al posto dei "buchi" fissi nell'acqua, che si vedevano nelle altre inquadrature)
+const [MSX, MSY] = zonaR.MASCOTTE_SCHERMO;
+function dietroMascotte(m, p) {
+  const c = at.cam.position, d = c.z - p.z, mx = c.x + MSX * d, my = c.y + MSY * d;
+  const r = Math.hypot(p.x - mx, p.y - my), r0 = 0.012 * d, r1 = 0.026 * d + 0.4;
+  return smooth(clamp01((r - r0) / (r1 - r0)));
 }
 
 // ---------------- primo piano: mascotte e icone
@@ -97,9 +108,10 @@ window.renderFrame = function (tn) {
     const zone = t < CUT ? 'B' : 'R';
     at.hideZone(zone === 'B' ? 'R' : 'B'); at.placeNucs(zone, t, tn, zoomK);
     zonaR.aggiornaBarre(t, tn, zone === 'R');
-    acqua.visible(zone === 'R'); if (zone === 'R') acqua.place(t, tn, { E: b9.expand(t), appearAt: b8.appare });
+    acqua.visible(zone === 'R'); if (zone === 'R') acqua.place(t, tn, { E: b9.expand(t), appearAt: b8.appare, scaleAt: dietroMascotte });
     // neutroni liberi: con la camera lontana si ingrandiscono poco (nota 19 s della v2: erano enormi)
-    at.placeNeutrons(t, Math.min(1 + (zoomK - 1) * 0.3, 1.35));
+    const nK = Math.min(1 + (zoomK - 1) * 0.3, 1.35);
+    at.placeNeutrons(t, nK); SUPER.aggiorna(t, nK);
     at.scaldaFondo(b9.expand(t));   // B9: il fondo si scalda un po' mentre l'acqua si dilata
   }
   termo.aggiorna(t);

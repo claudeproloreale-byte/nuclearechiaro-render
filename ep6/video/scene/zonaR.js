@@ -14,8 +14,10 @@ export const inWater = (p, m = 0.35) => RODK.some(k => p.x > gapL(k) + m && p.x 
 
 // inquadrature ferme della zona [x, y, distanza]: B7 dentro la barra C, B8 sul bordo della pastiglia, B9 sull'acqua fra C e R
 export const CAM_B7 = [XR, YR - 0.8, 16.5], CAM_B8 = [E + 0.5, YR - 1, 20], CAM_B9 = [E + 5, YR + 1, 38];
-// nessun nucleo né molecola dietro la mascotte in angolo, in nessuna delle tre inquadrature (si confonde con lei)
-const hole = ([x, y, z]) => [V(x + 0.074 * z, y - 0.107 * z, 0), 0.07 * z];
+// nessun nucleo dietro la mascotte in angolo, in nessuna delle tre inquadrature (si confonde con lei); per le molecole vedi ep6.js
+// (v4: raggio quasi uguale a quello della mascotte vista con quella camera, così non resta un buco visibile intorno a lei)
+const hole = ([x, y, z]) => [V(x + 0.074 * z, y - 0.107 * z, 0), 0.026 * z + 0.45];
+export const MASCOTTE_SCHERMO = [0.074, -0.107];   // centro della mascotte rispetto al centro dell'inquadratura, in unità di distanza della camera
 const HOLES = [CAM_B7, CAM_B8, CAM_B9].map(hole);
 export const behindMascot = p => HOLES.some(([c, r]) => xy(p, c) < r);
 

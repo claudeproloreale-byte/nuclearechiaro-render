@@ -3,8 +3,11 @@
 import { V, hash, xy, dirTo, smooth, ramp } from '/comune/base.js';
 import { FLASH_UP, FLASH_FULL, CUT, FLASH_DOWN } from '../tempi.js';
 
-export const B_IN = 15.1, B_HIT = 16.0, B_LAST = 19.25;   // il neutrone entra e spacca il primo nucleo; nessuna fissione dopo B_LAST
-const VB = 4.2;                                            // velocità dei neutroni (unità al secondo)
+export const B_HIT = 16.0, B_LAST = 19.25;                 // il primo nucleo si spacca; nessuna fissione dopo B_LAST
+// v4 (nota dell'autore: neutroni "supersonici"): i neutroni volano velocissimi (VB) e partono un attimo dopo la fissione (RIT),
+// così la catena si allarga con gli stessi tempi di prima (prima: 4,2 unità/s, partenza dopo 0,05 s)
+const VB = 14, RIT = 0.33;
+export const B_IN = B_HIT - 9 / VB;
 export const START = V(0, 0.3, 0), FROM = V(-9, 0.8, 0);   // primo nucleo, punto di partenza del primo neutrone
 
 // zona dei nuclei sparsi: distanza minima 1,3, corridoio libero per il primo neutrone
@@ -24,11 +27,11 @@ export function costruisci(at, n0) {
     for (const [d, n] of cands) {
       if (links >= k) break;
       const dir = dirTo(e.c, n.c); if (used.some(u => u.dot(dir) > 0.6)) continue;
-      const t1 = t + 0.05 + d / VB; if (t1 > B_LAST) continue;
+      const t1 = t + RIT + d / VB; if (t1 > B_LAST) continue;
       n.hitAt = t1; queue.push(n); used.push(dir); links++;
-      at.neutron([[e.c.clone().addScaledVector(dir, 0.32).setZ(0.15), t + 0.05], [n.c.clone().addScaledVector(dir, -0.25).setZ(0.15), t1]], 'hit', { trail: 4 });
+      at.neutron([[e.c.clone().addScaledVector(dir, 0.32).setZ(0.15), t + RIT], [n.c.clone().addScaledVector(dir, -0.25).setZ(0.15), t1]], 'hit', { trail: 4 });
     }
-    if (links < k) at.emitOthers(e, t, k - links, VB, used, false, 4);
+    if (links < k) at.emitOthers(e, t + RIT - 0.05, k - links, VB, used, false, 4);
   }
 }
 

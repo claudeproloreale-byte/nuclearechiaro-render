@@ -34,3 +34,10 @@
 - 27 s: colore dell'acqua fra le barre uguale alla puntata 5; l'autore lo lascia così.
 - 30,8 s (B7): frammenti e neutroni più lenti (1,3 unità/s); nuovo U-235 A2 vicino al percorso di un neutrone, che gli passa accanto (l'alone sobbalza) e si attacca all'U-238 T7.
 - 41,2 s (B9): le molecole si diradano in modo uniforme (fattore 2,5 in verticale dal centro dell'inquadratura), niente più zone vuote; quelle sul percorso del neutrone si scostano appena.
+
+## 25/11/2026 — v4, revisione delle note sulla v3
+- 1,6 s: jeep con parafanghi piatti (quelli a mezzo cilindro sembravano ruote sballate); ombre morbide a terra sotto la bomba e i mezzi (prima la bomba sembrava galleggiare); mezzi ancora più lontani (z da −42 a −68); bomba più a destra nell'inquadratura.
+- 18,7 s: neutroni della catena "supersonici": 14 unità/s invece di 4,2, partono 0,33 s dopo la fissione così la catena ha gli stessi tempi (121 fissioni). Nuovo `video/supersonico.js`: scia luminosa e cono d'urto a V su ogni neutrone più veloce di 6 unità/s (quelli rallentati dall'acqua non ce l'hanno).
+- 30,75 s (B7): A2 e T7 dove indicato dall'autore (T7 resta nella fascia bassa dei sottotitoli, scelta dell'autore); neutroni nati a 9 unità/s; frammenti che escono subito dall'inquadratura (6 unità in 1,3 s) e svaniscono fuori campo.
+- 37,98 s (B8): stessi cambi per i neutroni e i frammenti nati da BB (frammenti in verticale, dentro la barra).
+- 39,9 s (B9): molecole messe con il metodo "miglior candidato" (distribuzione uniforme); tolti i buchi fissi dietro la mascotte delle tre inquadrature: le molecole si rimpiccioliscono mentre le passano dietro (`scaleAt`, nuova opzione facoltativa di `comune/acqua.js`, che non cambia nulla se non usata); buchi dei nuclei ridotti alla grandezza della mascotte.

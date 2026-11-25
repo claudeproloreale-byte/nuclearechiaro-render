@@ -50,8 +50,13 @@ export function creaBomba3d() {
     mesh(new THREE.CylinderGeometry(r, r, w, 24), m, g).rotation.x = Math.PI / 2;
     const hb = mesh(new THREE.CylinderGeometry(r * 0.5, r * 0.5, w + 0.02, 12), hub, g); hb.rotation.x = Math.PI / 2;
     mesh(new THREE.BoxGeometry(r * 1.2, r * 0.18, w + 0.03), hub, g); return g; };
+  // ombra morbida a terra (senza ombre la bomba e i mezzi sembrano galleggiare)
+  const shTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g2 = c.getContext('2d'), r = g2.createRadialGradient(64, 64, 4, 64, 64, 64);
+    r.addColorStop(0, 'rgba(0,0,0,0.75)'); r.addColorStop(0.55, 'rgba(0,0,0,0.45)'); r.addColorStop(1, 'rgba(0,0,0,0)'); g2.fillStyle = r; g2.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+  const ombra = (parent, x, z, sx, sz, op = 0.6) => { const m = mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false, opacity: op }), parent, V(x, 0.015, z));
+    m.rotation.x = -Math.PI / 2; m.scale.set(sx, sz, 1); m.renderOrder = 1; return m; };
   const VEH = [];
-  function veicolo(x, z, ry, v) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); const o = { g, wheels: [], x0: x, ry, v }; VEH.push(o); return o; }
+  function veicolo(x, z, ry, v) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); ombra(g, 0, 0, 5.2, 3.0, 0.5); const o = { g, wheels: [], x0: x, ry, v }; VEH.push(o); return o; }
 
   function carro(x, z, ry, v) {
     const o = veicolo(x, z, ry, v), g = o.g;
@@ -84,8 +89,8 @@ export function creaBomba3d() {
     rbox(0.08, 0.3, 1.0, 0.03, trackM, g, V(1.3, 0.75, 0));                                                 // griglia
     [-0.42, 0.42].forEach(zz => mesh(new THREE.SphereGeometry(0.07, 10, 8), basic(0xfff2c0), g, V(1.33, 0.9, zz)));
     [[0.85, 1], [-0.85, 1], [0.85, -1], [-0.85, -1]].forEach(([xx, sd]) => {
-      o.wheels.push(wheel(0.34, 0.26, tyreM, g, V(xx, 0.34, sd * 0.62), oliveD));
-      const f = mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.32, 20, 1, true, 0, Math.PI), olive, g, V(xx, 0.38, sd * 0.62)); f.rotation.set(Math.PI / 2, 0, Math.PI / 2); f.material.side = THREE.DoubleSide;
+      o.wheels.push(wheel(0.34, 0.26, tyreM, g, V(xx, 0.34, sd * 0.6), oliveD));
+      rbox(0.82, 0.06, 0.36, 0.025, olive, g, V(xx, 0.74, sd * 0.6));                                     // parafango piatto sopra la ruota
     });
     // parabrezza con telaio
     [-0.6, 0.6].forEach(zz => bar(V(0.35, 1.0, zz), V(0.25, 1.55, zz), 0.03, oliveD, g)); bar(V(0.25, 1.55, -0.6), V(0.25, 1.55, 0.6), 0.03, oliveD, g);
@@ -113,11 +118,13 @@ export function creaBomba3d() {
     return o;
   }
   // in fondo, oltre la bomba; velocità in unità al secondo
-  carro(-4.5, -27, -0.08, 0.32); carro(4.0, -40, 0.06, 0.28);
-  jeep(3.0, -22, 0.05, 0.6); camionetta(-8.5, -35, -0.04, 0.42);
+  // v4: ancora più lontani (nota dell'autore)
+  carro(-7.5, -50, -0.08, 0.32); carro(5.5, -68, 0.06, 0.28);
+  jeep(2.5, -42, 0.05, 0.6); camionetta(-12, -60, -0.04, 0.42);
 
   // ---------------- la bomba: involucro (diventa trasparente), dentro guscio, scatola dei comandi, cavi e palla di uranio
   const B = new THREE.Group(); B.position.set(0, 1.15, 0); B.rotation.y = -0.6; scene.add(B);
+  { const o = ombra(scene, -0.3, 0.1, 6.4, 2.9, 0.7); o.rotation.z = 0.6; }
   const caseM = std(0x5c6650, { roughness: 0.55, metalness: 0.15, transparent: true, opacity: 1 });
   const bandM = std(0xe8c33a, { roughness: 0.6, transparent: true, opacity: 1 });
   const body = mesh(new THREE.CapsuleGeometry(1.0, 2.2, 16, 48), caseM, B); body.rotation.z = Math.PI / 2; body.renderOrder = 5;
@@ -152,7 +159,7 @@ export function creaBomba3d() {
 
   // ---------------- camera e tempi
   // B1: leggero avvicinamento; poi lo zoom unico verso il centro della palla (CORE)
-  const CAM1 = track(rt([[0, [-0.8, 5.0, 20.5, 0.05, 2.4, 0]], [4.4, [-0.5, 4.5, 18.0, 0.05, 2.2, 0]]]));
+  const CAM1 = track(rt([[0, [-1.4, 5.0, 20.5, -0.6, 2.4, 0]], [4.4, [-1.1, 4.5, 18.0, -0.55, 2.2, 0]]]));   // v4: bomba un po' più a destra
   const CORE = V(0, 1.15, 0), Z0 = 4.4, Z1 = 8.6, DEND = 0.42;   // finisce appena fuori dalla superficie della palla (raggio 0,36): la palla riempie lo schermo
   function camAt(tn) {
     const c = CAM1(tn), t = tn;   // WARP = identità: tempi di scaletta
