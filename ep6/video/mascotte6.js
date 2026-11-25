@@ -6,8 +6,11 @@ import { track, backOut, smooth, ramp, win } from '/comune/base.js';
 import { CORNER, R0, WAVE, POINT, creaLabiale, creaBlink } from '/comune/mascotte.js';
 import { END, EXIT, SPEECH, LIP } from './tempi.js';
 
+// posto per la mascotte mentre si sposta (schermo: 80% della larghezza, 40% dell'altezza; sopra la colonna dei pulsanti, in uno spazio libero)
+const LATO = [0.99, 0.79, CORNER[2]];
 const T_ = {
-  pos: track([[0, CORNER], [END, CORNER]]),
+  // v6: nella B7 si sposta in alto a destra mentre il neutrone lento le passa dove sta di solito, poi torna nell'angolo
+  pos: track([[0, CORNER], [27.4, CORNER], [27.9, LATO], [29.7, LATO], [30.2, CORNER], [END, CORNER]]),
   smile: track([[0, 0.7], [4.2, 0.7], [4.4, 0.5], [8.0, 0.5], [8.5, 0.8], [19.0, 0.8], [19.4, 0.2], [21.2, 0.2], [21.8, 0.85], [40.0, 0.85], [40.4, 0.45], [42.8, 0.45], [43.4, 0.9], [END, 1]]),
   browY: track([[0, 0.09], [4.2, 0.09], [4.4, 0.15], [8.0, 0.15], [8.5, 0.07], [19.0, 0.07], [19.4, 0.16], [21.2, 0.16], [21.8, 0.07], [40.0, 0.07], [40.4, 0.13], [42.8, 0.13], [43.4, 0.08], [END, 0.09]]),
   gaze: track([[0, [-0.6, 0.6]], [38.6, [-0.6, 0.6]], [39.0, [-0.85, 0.9]], [40.4, [-0.85, 0.9]], [40.8, [-0.6, 0.6]], [51.0, [-0.6, 0.6]], [51.4, [0, 0]], [51.6, [0, 0]], [51.9, [0.85, 0.25]], [52.8, [0.85, 0.25]], [53.1, [0, 0]], [END, [0, 0]]]),

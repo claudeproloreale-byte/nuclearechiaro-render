@@ -47,3 +47,7 @@
 - Bagliori dei frammenti di fissione staccati dai frammenti: in `comune/atomi.js` il bagliore seguiva il punto d'arrivo del frammento, mentre i nucleoni ci arrivano in 0,45 s; ora sta sul centro del frammento come lo si vede (con i frammenti lenti delle versioni precedenti la differenza non si notava).
 - B7: tutti i neutroni nati da A partono insieme (prima a 0,06 s l'uno dall'altro); anche nella B8.
 - B7: l'autore ha scelto altri due nuclei: U-238 che cattura in basso a destra (T7), U-235 mancato al centro, vicino alla mascotte (A2, spostato di 0,45 a sinistra perché il neutrone gli passi accanto senza colpirlo).
+
+## 25/11/2026 — v6, revisione della nota sulla v5
+- B7 (29,1 s): il neutrone lento arriva dal basso a destra, da fuori campo, verso A (freccia dell'autore). Passa dove di solito sta la mascotte, che si sposta in alto a destra (80% della larghezza, 40% dell'altezza, sopra la colonna dei pulsanti) da 27,4 a 30,2 e poi torna nell'angolo.
+- Frammenti di A ora in alto a sinistra e in basso a destra (lungo il corridoio del neutrone in arrivo), così resta posto per un U-238 che assorbe: nati da A 3 neutroni (uno su T7 accanto ad A2, uno assorbito, uno esce).
