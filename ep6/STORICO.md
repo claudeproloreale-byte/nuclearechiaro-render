@@ -41,3 +41,9 @@
 - 30,75 s (B7): A2 e T7 dove indicato dall'autore (T7 resta nella fascia bassa dei sottotitoli, scelta dell'autore); neutroni nati a 9 unità/s; frammenti che escono subito dall'inquadratura (6 unità in 1,3 s) e svaniscono fuori campo.
 - 37,98 s (B8): stessi cambi per i neutroni e i frammenti nati da BB (frammenti in verticale, dentro la barra).
 - 39,9 s (B9): molecole messe con il metodo "miglior candidato" (distribuzione uniforme); tolti i buchi fissi dietro la mascotte delle tre inquadrature: le molecole si rimpiccioliscono mentre le passano dietro (`scaleAt`, nuova opzione facoltativa di `comune/acqua.js`, che non cambia nulla se non usata); buchi dei nuclei ridotti alla grandezza della mascotte.
+
+## 25/11/2026 — v5, revisione delle note sulla v4
+- 16,4 s, 30,8 s, 37,6 s: tolto il "cono d'urto" a V davanti ai neutroni veloci; resta la scia.
+- Bagliori dei frammenti di fissione staccati dai frammenti: in `comune/atomi.js` il bagliore seguiva il punto d'arrivo del frammento, mentre i nucleoni ci arrivano in 0,45 s; ora sta sul centro del frammento come lo si vede (con i frammenti lenti delle versioni precedenti la differenza non si notava).
+- B7: tutti i neutroni nati da A partono insieme (prima a 0,06 s l'uno dall'altro); anche nella B8.
+- B7: l'autore ha scelto altri due nuclei: U-238 che cattura in basso a destra (T7), U-235 mancato al centro, vicino alla mascotte (A2, spostato di 0,45 a sinistra perché il neutrone gli passi accanto senza colpirlo).

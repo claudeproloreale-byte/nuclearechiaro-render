@@ -2,7 +2,7 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
 
-**Stato:** v4 (25/11/2026, revisione delle note sulla v3): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v4 e conferma o riapre le note nell'app.
+**Stato:** v5 (25/11/2026, revisione delle note sulla v4): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v5 e conferma o riapre le note nell'app.
 Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge
@@ -15,7 +15,7 @@ Storico: `STORICO.md` · Regole: `regole.md`.
 | B7 dentro la pastiglia: neutrone lento, U-235 "saltato" (A2), U-238 che assorbono | `video/scene/b7.js` |
 | B8 bordo della pastiglia: rimbalzi nell'acqua; molecole d'acqua | `video/scene/b8.js` |
 | B9 acqua che si dilata, neutrone veloce nella barra R, termometro | `video/scene/b9.js` |
-| Effetto "supersonico" dei neutroni veloci (scia e cono d'urto) | `video/supersonico.js` |
+| Effetto "supersonico" dei neutroni veloci (scia) | `video/supersonico.js` |
 | Mascotte (espressioni, gesti) | `video/mascotte6.js` |
 | Tempi comuni, battute, passaggi fra i mondi, WARP | `video/tempi.js` |
 | Camera degli atomi, ordine di montaggio, molecole che spariscono dietro la mascotte | `video/ep6.js` |

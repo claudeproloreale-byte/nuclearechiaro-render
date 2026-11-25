@@ -25,7 +25,7 @@ export function costruisci(at, acqua, nBB) {
     if (k >= 2) break;
     const dir = dirTo(BB, n.c); if (used.some(u => u.dot(dir) > 0.8)) continue;
     used.push(dir); at.absorbed.add(n); k++;
-    const nn = at.neutron(at.seg(BB.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), B8_HIT + 0.05 + k * 0.06, 9), 'abs', { trail: 8 }); nn.host = n;
+    const nn = at.neutron(at.seg(BB.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), B8_HIT + 0.05, 9), 'abs', { trail: 8 }); nn.host = n;
   }
   console.log('B8: neutroni assorbiti', k);
 }

@@ -1,15 +1,18 @@
 // Puntata 6 — B7 (v4, zona R, dentro la barra C): un neutrone lento (moderato) arriva dal basso e spacca A a 30,6.
 // Neutroni nati e frammenti sono VELOCI ("supersonici", nota dell'autore sulla v3): i frammenti escono subito dall'inquadratura
 // (rallentano e svaniscono solo fuori campo), i neutroni volano a V_VELOCE.
-// Dei neutroni nati da A: uno scende, passa accanto all'U-235 A2 senza spaccarlo (l'alone sobbalza) e si attacca all'U-238 T7
+// Tutti i neutroni nati da A partono insieme (v5). Uno scende, passa accanto all'U-235 A2 senza spaccarlo (l'alone sobbalza) e si attacca all'U-238 T7
 // (posizioni indicate dall'autore sul fotogramma a 30,75 della v3); due finiscono assorbiti da altri U-238; uno esce a sinistra.
 import { V, xy, dirTo } from '/comune/base.js';
 import { XR, YR, PR } from './zonaR.js';
 
 export const A_IN = 28.0, A_HIT = 30.6;
 export const A = PR(-0.9, 1.7), A_FROM = PR(0.0, -6.6);
-export const T7 = PR(-1.18, -4.19);                       // U-238 che cattura (freccia bianca)
-export const A2 = PR(-1.8, -2.8);                         // U-235 "saltato" (freccia rossa), 0,6 di lato dal percorso A → T7
+// v5: posizioni cambiate dall'autore sul fotogramma a 30,8 della v4 (cerchio bianco = U-238 che cattura, giallo = U-235 mancato);
+// A2 è spostato di poco (0,45 a sinistra) perché il neutrone gli passi a 0,6 di lato e non lo colpisca
+export const T7 = PR(1.1, -4.1);
+const dAT = T7.clone().sub(A).normalize();
+export const A2 = A.clone().addScaledVector(T7.clone().sub(A), 0.652).addScaledVector(V(dAT.y, -dAT.x, 0), 0.6);   // a sinistra del percorso (lontano dalla mascotte)
 const FRAG_AX = V(1, 0.6, 0).normalize();                 // i due frammenti: in alto a destra e in basso a sinistra, fuori campo
 export const caps = [[A_FROM, A], [A, T7], [A.clone().addScaledVector(FRAG_AX, -4), A.clone().addScaledVector(FRAG_AX, 4)]];
 const V_VELOCE = 9;
@@ -19,7 +22,7 @@ export function costruisci(at, nA, nA2, nT7) {
   nA.hitAt = A_HIT; at.fission(nA, A_HIT, FRAG_AX, 6, 1.3, 0.3);
   // il neutrone che passa accanto ad A2 e si attacca a T7
   const dP = dirTo(A, T7); at.absorbed.add(nT7);
-  const np = at.neutron(at.seg(A.clone().addScaledVector(dP, 0.32).setZ(0.15), T7.clone().addScaledVector(dP, -0.3).setZ(0.15), A_HIT + 0.06, V_VELOCE), 'abs', { trail: 8 }); np.host = nT7;
+  const np = at.neutron(at.seg(A.clone().addScaledVector(dP, 0.32).setZ(0.15), T7.clone().addScaledVector(dP, -0.3).setZ(0.15), A_HIT + 0.05, V_VELOCE), 'abs', { trail: 8 }); np.host = nT7;
   // l'alone di A2 sobbalza quando il neutrone passa, e si calma piano (il neutrone è velocissimo)
   const prev = at.haloNear;
   at.haloNear = (n, t) => { if (n !== nA2) return prev ? prev(n, t) : 0;
@@ -32,7 +35,7 @@ export function costruisci(at, nA, nA2, nT7) {
     if (used.length >= 5) break;
     const dir = dirTo(A, n.c); if (used.some(u => u.dot(dir) > 0.8)) continue;
     used.push(dir); at.absorbed.add(n);
-    const nn = at.neutron(at.seg(A.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), A_HIT + 0.05 + used.length * 0.06, V_VELOCE), 'abs', { trail: 8 }); nn.host = n;
+    const nn = at.neutron(at.seg(A.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), A_HIT + 0.05, V_VELOCE), 'abs', { trail: 8 }); nn.host = n;
   }
   console.log('B7: neutroni assorbiti', used.length - 3, '+ quello che salta A2; candidati', cands.length);
   // l'ultimo esce dall'inquadratura verso sinistra (lontano dall'acqua della barra C, dove nella B8 e B9 si guarda)
