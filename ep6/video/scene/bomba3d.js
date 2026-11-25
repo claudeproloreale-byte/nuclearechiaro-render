@@ -1,11 +1,12 @@
-// Puntata 6 — APERTURA (v2): una bomba atomica stilizzata, "giocattolo", appoggiata su un pavimento di terra marrone;
-// sullo sfondo carri armati che avanzano lentamente e qualche pezzo d'artiglieria. Cielo velato: né azzurro né cupo.
-// B1 (0–4,4): campo largo, la camera si avvicina appena. B2 (4,5–8,0): zoom sulla bomba, l'involucro diventa trasparente
-// (5,4–6,4) e mostra dentro: guscio, cavi, scatola dei comandi e la palla di uranio al centro; poi ci si avvicina alla palla.
-// B3: a 8,0 si entra nella palla e a 8,55, con il lampo chiaro, si passa agli atomi (zona B).
+// Puntata 6 — APERTURA (v3): una bomba atomica stilizzata, "giocattolo", appoggiata su un pavimento di terra marrone;
+// sullo sfondo, lontani, 2 carri armati, una jeep e una camionetta militari che avanzano lentamente. Cielo velato: né azzurro né cupo.
+// B1 (0–4,4): campo largo, la camera si avvicina appena. Da 4,4 a 8,6 UN SOLO ZOOM continuo (distanza in scala logaritmica,
+// così la velocità sembra uguale da lontano e da vicino): l'involucro diventa trasparente (5,4–6,4) e mostra dentro guscio,
+// cavi, scatola dei comandi e la palla di uranio; la camera entra nella palla e a 8,55, con il lampo chiaro, si passa agli atomi.
 // Solo forme semplici e generiche: nessun dettaglio tecnico reale dell'arma.
-import { THREE, W, H, V, std, basic, mesh, bar, glow, gradientBg, lights, addFade, setSeed, rnd, track, smooth, ramp } from '/comune/base.js';
+import { THREE, W, H, V, std, basic, mesh, bar, glow, gradientBg, lights, addFade, setSeed, rnd, track, smooth, ramp, clamp01, lerp } from '/comune/base.js';
 import { rt } from '../tempi.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 export function creaBomba3d() {
   setSeed(606);
@@ -29,37 +30,91 @@ export function creaBomba3d() {
   for (let i = 0; i < 6; i++) { const g = new THREE.Group(); g.position.set(-45 + i * 18 + rnd() * 6, 24 + rnd() * 10, -90 - rnd() * 20); scene.add(g);
     for (let j = 0; j < 5; j++) mesh(new THREE.SphereGeometry(2.2 + rnd() * 1.8, 20, 14), cloudM, g, V(j * 2.6 - 5, rnd() * 1.2, rnd())); g.userData.x = g.position.x; }
 
-  // ---------------- carri armati (avanzano lentamente verso destra) e artiglieria (ferma)
-  const olive = std(0x66704a, { roughness: 0.8 }), oliveD = std(0x4b5336, { roughness: 0.85 }), trackM = std(0x2e2f2c, { roughness: 0.9 }), metal = std(0x3b3d3a, { roughness: 0.5, metalness: 0.3 });
-  const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.12, 20);
-  function tank(x, z, sc, ry) {
-    const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(sc); g.rotation.y = ry; scene.add(g);
-    const wheels = [];
+  // ---------------- veicoli militari sullo sfondo (avanzano lentamente verso destra): 2 carri armati, una jeep, una camionetta.
+  // Forme arrotondate e un po' di dettagli (cingoli con le ruote, parafanghi, torretta sfaccettata, botola, antenna, telone),
+  // così non sembrano fatti di blocchi. Nessuna insegna.
+  const olive = std(0x66704a, { roughness: 0.75 }), oliveD = std(0x4d5537, { roughness: 0.8 }), oliveL = std(0x7c8458, { roughness: 0.8 });
+  const khaki = std(0x8d8a5e, { roughness: 0.95 }), trackM = std(0x2b2c29, { roughness: 0.9 }), metal = std(0x50534f, { roughness: 0.45, metalness: 0.4 });
+  const tyreM = std(0x222322, { roughness: 0.95 }), glassM = std(0x8fb4c8, { roughness: 0.15, metalness: 0.2, transparent: true, opacity: 0.55 });
+  const rbox = (w, h, d, r, m, parent, pos) => mesh(new RoundedBoxGeometry(w, h, d, 3, r), m, parent, pos);
+  const extr = (pts, depth, m, parent, z, bev = 0.04) => {
+    const sh = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y)));
+    const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 2, curveSegments: 16 });
+    g.translate(0, 0, -depth / 2); return mesh(g, m, parent, V(0, 0, z));
+  };
+  const stadium = (L, h) => { const r = h / 2, pts = [];
+    for (let i = 0; i <= 12; i++) { const a = -Math.PI / 2 + Math.PI * i / 12; pts.push([L / 2 - r + r * Math.cos(a), r + r * Math.sin(a)]); }
+    for (let i = 0; i <= 12; i++) { const a = Math.PI / 2 + Math.PI * i / 12; pts.push([-L / 2 + r + r * Math.cos(a), r + r * Math.sin(a)]); }
+    return pts; };
+  const wheel = (r, w, m, parent, pos, hub = metal) => { const g = new THREE.Group(); g.position.copy(pos); parent.add(g);
+    mesh(new THREE.CylinderGeometry(r, r, w, 24), m, g).rotation.x = Math.PI / 2;
+    const hb = mesh(new THREE.CylinderGeometry(r * 0.5, r * 0.5, w + 0.02, 12), hub, g); hb.rotation.x = Math.PI / 2;
+    mesh(new THREE.BoxGeometry(r * 1.2, r * 0.18, w + 0.03), hub, g); return g; };
+  const VEH = [];
+  function veicolo(x, z, ry, v) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); const o = { g, wheels: [], x0: x, ry, v }; VEH.push(o); return o; }
+
+  function carro(x, z, ry, v) {
+    const o = veicolo(x, z, ry, v), g = o.g;
     [-1, 1].forEach(sd => {
-      mesh(new THREE.BoxGeometry(3.4, 0.72, 0.5), trackM, g, V(0, 0.42, sd * 0.85));
-      for (let i = 0; i < 5; i++) { const w = mesh(wheelGeo, metal, g, V(-1.3 + i * 0.65, 0.4, sd * 1.12)); w.rotation.x = Math.PI / 2; wheels.push(w); }
+      extr(stadium(3.9, 0.78), 0.46, trackM, g, sd * 0.98, 0.03).position.y = 0.06;                     // cingolo
+      for (let i = 0; i < 6; i++) o.wheels.push(wheel(0.25, 0.12, oliveD, g, V(-1.45 + i * 0.58, 0.42, sd * 1.24)));
+      [-1, 1].forEach(e => o.wheels.push(wheel(0.3, 0.12, metal, g, V(e * 1.62, 0.5, sd * 1.24), oliveD)));
+      for (let i = 0; i < 3; i++) mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.1, 10), metal, g, V(-0.9 + i * 0.9, 0.76, sd * 1.24)).rotation.x = Math.PI / 2;
+      rbox(4.0, 0.06, 0.58, 0.02, olive, g, V(0.05, 0.9, sd * 0.98));                                       // parafango
+      rbox(0.5, 0.22, 0.4, 0.05, oliveD, g, V(-1.1, 1.02, sd * 0.98));                                       // cassetta
     });
-    mesh(new THREE.BoxGeometry(3.0, 0.6, 1.5), olive, g, V(0, 0.95, 0));
-    mesh(new THREE.BoxGeometry(0.6, 0.35, 1.5), olive, g, V(1.55, 0.85, 0)).rotation.z = -0.5;
-    const tur = new THREE.Group(); tur.position.set(-0.2, 1.25, 0); g.add(tur);
-    mesh(new THREE.CylinderGeometry(0.62, 0.7, 0.5, 24), oliveD, tur, V(0, 0.15, 0));
-    bar(V(0.4, 0.2, 0), V(2.5, 0.28, 0), 0.08, metal, tur);
-    mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.18, 12), oliveD, tur, V(-0.15, 0.48, 0.25));
-    return { g, wheels, x0: x, tur };
+    extr([[-1.85, 0.55], [1.55, 0.55], [2.0, 0.82], [1.35, 1.12], [-1.75, 1.12], [-1.9, 0.9]], 1.5, olive, g, 0);   // scafo inclinato
+    [-0.45, 0.45].forEach(zz => mesh(new THREE.SphereGeometry(0.06, 10, 8), basic(0xfff2c0), g, V(1.85, 0.9, zz)));   // fari
+    const tur = new THREE.Group(); tur.position.set(-0.25, 1.15, 0); g.add(tur); o.tur = tur;
+    const tb = mesh(new THREE.CylinderGeometry(0.72, 0.95, 0.5, 7), oliveL, tur, V(0, 0.25, 0)); tb.scale.set(1.35, 1, 1);
+    rbox(0.6, 0.3, 0.8, 0.06, oliveD, tur, V(-1.2, 0.25, 0));                                              // cesta posteriore
+    rbox(0.35, 0.36, 0.55, 0.06, olive, tur, V(1.05, 0.24, 0));                                            // mantelletto
+    bar(V(1.2, 0.24, 0), V(3.6, 0.3, 0), 0.075, metal, tur);                                                // cannone
+    mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.28, 14), metal, tur, V(3.5, 0.3, 0)).rotation.z = Math.PI / 2;
+    mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.2, 16), oliveD, tur, V(-0.25, 0.58, 0.3));                 // cupola del capocarro
+    mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.04, 16), olive, tur, V(-0.35, 0.72, 0.3)).rotation.z = 0.5;   // botola aperta
+    bar(V(-0.2, 0.68, 0.3), V(0.35, 0.72, 0.3), 0.025, metal, tur);                                         // mitragliatrice
+    bar(V(-0.8, 0.5, -0.45), V(-0.95, 1.9, -0.5), 0.012, metal, tur);                                       // antenna
+    return o;
   }
-  // tre carri a profondità diverse, un po' di traverso; velocità in unità al secondo
-  const TANKS = [[-3.5, -18, 1.0, -0.1, 0.4], [2.2, -26, 1.0, 0.06, 0.34], [-6.5, -34, 1.0, -0.05, 0.3], [4.5, -44, 1.0, 0.1, 0.28]].map(([x, z, s, ry, v]) => ({ ...tank(x, z, s, ry), v, ry }));
-  function cannon(x, z, ry, el) {
-    const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
-    [-1, 1].forEach(sd => { const w = mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.18, 24), trackM, g, V(0, 0.55, sd * 0.7)); w.rotation.x = Math.PI / 2; });
-    mesh(new THREE.BoxGeometry(0.9, 0.35, 1.2), oliveD, g, V(0, 0.75, 0));
-    mesh(new THREE.BoxGeometry(0.08, 0.9, 1.5), olive, g, V(0.45, 1.25, 0));                        // scudo
-    bar(V(-0.2, 0.95, -0.3), V(-2.4, 0.08, -0.9), 0.08, oliveD, g); bar(V(-0.2, 0.95, 0.3), V(-2.4, 0.08, 0.9), 0.08, oliveD, g);   // code
-    const b = new THREE.Group(); b.position.set(0, 1.0, 0); b.rotation.z = el; g.add(b);
-    bar(V(-0.6, 0, 0), V(3.0, 0, 0), 0.11, metal, b); mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.5, 16), metal, b, V(-0.4, 0, 0)).rotation.z = Math.PI / 2;
-    return g;
+  function jeep(x, z, ry, v) {
+    const o = veicolo(x, z, ry, v), g = o.g;
+    rbox(2.5, 0.5, 1.35, 0.08, olive, g, V(0, 0.72, 0));
+    rbox(0.9, 0.28, 1.25, 0.08, olive, g, V(0.85, 1.05, 0));                                                // cofano
+    rbox(0.08, 0.3, 1.0, 0.03, trackM, g, V(1.3, 0.75, 0));                                                 // griglia
+    [-0.42, 0.42].forEach(zz => mesh(new THREE.SphereGeometry(0.07, 10, 8), basic(0xfff2c0), g, V(1.33, 0.9, zz)));
+    [[0.85, 1], [-0.85, 1], [0.85, -1], [-0.85, -1]].forEach(([xx, sd]) => {
+      o.wheels.push(wheel(0.34, 0.26, tyreM, g, V(xx, 0.34, sd * 0.62), oliveD));
+      const f = mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.32, 20, 1, true, 0, Math.PI), olive, g, V(xx, 0.38, sd * 0.62)); f.rotation.set(Math.PI / 2, 0, Math.PI / 2); f.material.side = THREE.DoubleSide;
+    });
+    // parabrezza con telaio
+    [-0.6, 0.6].forEach(zz => bar(V(0.35, 1.0, zz), V(0.25, 1.55, zz), 0.03, oliveD, g)); bar(V(0.25, 1.55, -0.6), V(0.25, 1.55, 0.6), 0.03, oliveD, g);
+    const gl = mesh(new THREE.PlaneGeometry(1.15, 0.5), glassM, g, V(0.3, 1.28, 0)); gl.rotation.set(0, Math.PI / 2, 0.18);
+    [0.15, -0.6].forEach(xx => [-0.33, 0.33].forEach(zz => rbox(0.38, 0.32, 0.4, 0.06, oliveD, g, V(xx - 0.1, 1.08, zz))));   // sedili
+    const sw = mesh(new THREE.TorusGeometry(0.13, 0.02, 8, 20), trackM, g, V(0.05, 1.25, 0.33)); sw.rotation.y = Math.PI / 2 + 0.4;
+    const sp = wheel(0.3, 0.2, tyreM, g, V(-1.33, 0.95, 0), oliveD); sp.rotation.y = Math.PI / 2;            // ruota di scorta
+    bar(V(-0.9, 0.98, -0.55), V(-1.0, 2.1, -0.6), 0.012, metal, g);                                         // antenna
+    return o;
   }
-  cannon(4.0, -20, -2.6, 0.35); cannon(-7.0, -27, -0.4, 0.42); cannon(7.5, -36, -2.9, 0.3);
+  function camionetta(x, z, ry, v) {
+    const o = veicolo(x, z, ry, v), g = o.g;
+    rbox(4.2, 0.25, 1.4, 0.04, trackM, g, V(0, 0.62, 0));                                                   // telaio
+    rbox(1.3, 1.05, 1.7, 0.12, olive, g, V(1.05, 1.25, 0));                                                // cabina
+    rbox(0.75, 0.55, 1.6, 0.1, olive, g, V(1.95, 0.98, 0));                                                // muso
+    rbox(0.06, 0.38, 1.3, 0.02, trackM, g, V(2.33, 0.98, 0));
+    const ws = mesh(new THREE.PlaneGeometry(1.4, 0.42), glassM, g, V(1.72, 1.52, 0)); ws.rotation.set(0, Math.PI / 2, 0.12);
+    [-1, 1].forEach(sd => { const w = mesh(new THREE.PlaneGeometry(0.6, 0.38), glassM, g, V(1.05, 1.5, sd * 0.86)); if (sd < 0) w.rotation.y = Math.PI; });
+    [-0.6, 0.6].forEach(zz => mesh(new THREE.SphereGeometry(0.08, 10, 8), basic(0xfff2c0), g, V(2.35, 1.1, zz)));
+    rbox(2.7, 0.4, 1.85, 0.05, oliveD, g, V(-0.95, 0.95, 0));                                              // cassone
+    const tel = mesh(new THREE.CylinderGeometry(0.92, 0.92, 2.7, 28, 1, false, 0, Math.PI), khaki, g, V(-0.95, 1.15, 0)); tel.rotation.set(0, 0, Math.PI / 2); tel.rotation.order = 'ZXY'; tel.rotation.x = -Math.PI / 2;   // telone
+    for (let i = 0; i < 4; i++) { const r = mesh(new THREE.TorusGeometry(0.93, 0.025, 6, 24, Math.PI), oliveD, g, V(-2.15 + i * 0.8, 1.15, 0)); r.rotation.y = Math.PI / 2; }
+    [[1.55, 0], [-0.55, 0], [-1.45, 0]].forEach(([xx]) => [-1, 1].forEach(sd => {
+      o.wheels.push(wheel(0.4, 0.3, tyreM, g, V(xx, 0.4, sd * 0.78), oliveD)); }));
+    return o;
+  }
+  // in fondo, oltre la bomba; velocità in unità al secondo
+  carro(-4.5, -27, -0.08, 0.32); carro(4.0, -40, 0.06, 0.28);
+  jeep(3.0, -22, 0.05, 0.6); camionetta(-8.5, -35, -0.04, 0.42);
 
   // ---------------- la bomba: involucro (diventa trasparente), dentro guscio, scatola dei comandi, cavi e palla di uranio
   const B = new THREE.Group(); B.position.set(0, 1.15, 0); B.rotation.y = -0.6; scene.add(B);
@@ -96,13 +151,23 @@ export function creaBomba3d() {
   inner.visible = false;
 
   // ---------------- camera e tempi
-  const CAM = track(rt([[0, [-0.8, 5.0, 20.5, 0.05, 2.4, 0]], [4.4, [-0.5, 4.5, 18.0, 0.05, 2.2, 0]],
-    [6.0, [0.4, 1.9, 6.6, 0.1, 1.15, 0]], [7.0, [0.25, 1.45, 3.6, 0.0, 1.15, 0]], [8.0, [0.08, 1.2, 1.7, 0.0, 1.15, 0]], [8.6, [0.0, 1.15, 0.55, 0.0, 1.15, 0]]]));
+  // B1: leggero avvicinamento; poi lo zoom unico verso il centro della palla (CORE)
+  const CAM1 = track(rt([[0, [-0.8, 5.0, 20.5, 0.05, 2.4, 0]], [4.4, [-0.5, 4.5, 18.0, 0.05, 2.2, 0]]]));
+  const CORE = V(0, 1.15, 0), Z0 = 4.4, Z1 = 8.6, DEND = 0.42;   // finisce appena fuori dalla superficie della palla (raggio 0,36): la palla riempie lo schermo
+  function camAt(tn) {
+    const c = CAM1(tn), t = tn;   // WARP = identità: tempi di scaletta
+    if (t <= Z0) return c;
+    const u = Math.pow(ramp(t, Z0, Z1), 1.5);   // parte piano e accelera fino a tuffarsi nella palla (niente frenata finale)
+    const p0 = V(c[0], c[1], c[2]), d0 = p0.distanceTo(CORE), dir0 = p0.clone().sub(CORE).normalize(), dir1 = V(0.12, 0.08, 1).normalize();
+    const d = d0 * Math.pow(DEND / d0, u), dir = dir0.clone().lerp(dir1, smooth(clamp01(u * 1.4))).normalize();
+    const p = CORE.clone().addScaledVector(dir, d), k = smooth(clamp01(u * 2));
+    return [p.x, p.y, p.z, lerp(c[3], CORE.x, k), lerp(c[4], CORE.y, k), lerp(c[5], CORE.z, k)];
+  }
   const OPEN = [5.4, 6.4];
   function aggiorna(t, tn) {
-    const c = CAM(tn);
-    camera.position.set(c[0] + Math.sin(tn * 0.21) * 0.06, c[1] + Math.sin(tn * 0.17) * 0.03, c[2]); camera.lookAt(c[3], c[4], c[5]);
-    TANKS.forEach(k => { const dx = k.v * tn; k.g.position.x = k.x0 + dx * Math.cos(k.ry); k.g.position.z = k.g.position.z; k.wheels.forEach(w => { w.rotation.y = -dx / 0.28; }); k.tur.rotation.y = 0.08 * Math.sin(tn * 0.4 + k.x0); });
+    const c = camAt(tn), sw = 1 - ramp(tn, Z0, Z0 + 1);   // l'ondeggiamento si spegne durante lo zoom
+    camera.position.set(c[0] + Math.sin(tn * 0.21) * 0.06 * sw, c[1] + Math.sin(tn * 0.17) * 0.03 * sw, c[2]); camera.lookAt(c[3], c[4], c[5]);
+    VEH.forEach(k => { const dx = k.v * tn; k.g.position.x = k.x0 + dx * Math.cos(k.ry); k.wheels.forEach(w => { w.rotation.z = -dx / 0.32; }); if (k.tur) k.tur.rotation.y = 0.08 * Math.sin(tn * 0.4 + k.x0); });
     scene.children.forEach(o => { if (o.userData.x !== undefined) o.position.x = o.userData.x + tn * 0.15; });
     const tr = smooth(ramp(t, OPEN[0], OPEN[1]));
     caseM.opacity = 1 - 0.85 * tr; bandM.opacity = 1 - 0.85 * tr; cradleM.opacity = 1 - 0.8 * tr; cradleM.depthWrite = tr < 0.01; caseM.depthWrite = bandM.depthWrite = tr < 0.01;

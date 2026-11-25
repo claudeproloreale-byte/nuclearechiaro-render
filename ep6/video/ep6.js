@@ -36,6 +36,7 @@ const at = creaAtomi(), acqua = creaAcqua(at, { free: p => zonaR.inWater(p) && b
 // nuclei scritti a mano, in quest'ordine
 const nB0 = at.special(bomba.START, true, 'B');
 const nA = at.special(b7.A, true, 'R'), nBB = at.special(b8.BB, true, 'R'), nC9 = at.special(b9.C9, true, 'R');
+const nA2 = at.special(b7.A2, true, 'R'), nT7 = at.special(b7.T7, false, 'R');   // v3: U-235 "saltato" e U-238 che assorbe
 at.sparsi(6060, [bomba.zona(nB0), ...zonaR.zona([...b7.caps, ...b8.caps, ...b9.caps])]);
 at.completa();
 zonaR.creaBarre(at.scene);
@@ -44,7 +45,7 @@ console.log('nuclei zona B', N.filter(n => n.zone === 'B').length, 'di cui U-235
   '· zona R', N.filter(n => n.zone === 'R').length, 'di cui U-235', N.filter(n => n.zone === 'R' && n.u).length);
 bomba.costruisci(at, nB0);
 console.log('fissioni nella zona B', at.FISS.length);
-b7.costruisci(at, nA);
+b7.costruisci(at, nA, nA2, nT7);
 b8.costruisci(at, acqua, nBB);
 b9.costruisci(at, nC9);
 console.log('neutroni', at.NEUT.length);
@@ -97,7 +98,8 @@ window.renderFrame = function (tn) {
     at.hideZone(zone === 'B' ? 'R' : 'B'); at.placeNucs(zone, t, tn, zoomK);
     zonaR.aggiornaBarre(t, tn, zone === 'R');
     acqua.visible(zone === 'R'); if (zone === 'R') acqua.place(t, tn, { E: b9.expand(t), appearAt: b8.appare });
-    at.placeNeutrons(t, zoomK);
+    // neutroni liberi: con la camera lontana si ingrandiscono poco (nota 19 s della v2: erano enormi)
+    at.placeNeutrons(t, Math.min(1 + (zoomK - 1) * 0.3, 1.35));
     at.scaldaFondo(b9.expand(t));   // B9: il fondo si scalda un po' mentre l'acqua si dilata
   }
   termo.aggiorna(t);

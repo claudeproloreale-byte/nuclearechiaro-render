@@ -2,17 +2,17 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
 
-**Stato:** v2 (24/11/2026, richiesta `p6-mwv1olwv`): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v2 e lascia le note nell'app.
+**Stato:** v3 (25/11/2026, revisione delle note sulla v2): 55,4 s, labiale simulato, senza audio. Prossimo passo: l'autore guarda la v3 e conferma o riapre le note nell'app.
 Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge
 | Cosa | File |
 |---|---|
-| B1-B2: bomba, carri armati, artiglieria, involucro trasparente, palla di uranio | `video/scene/bomba3d.js` |
+| B1-B2: bomba, veicoli militari sullo sfondo, zoom unico, involucro trasparente, palla di uranio | `video/scene/bomba3d.js` |
 | B3-B4: zona B "bomba" (atomi), catena e lampo bianco | `video/scene/bomba.js` |
 | B5, zoom nel nocciolo (B6), B10 e chiusura | `video/scene/centrale.js` |
 | Barre di uranio con l'acqua, pastiglie viste da lontano, inquadrature della zona R, niente dietro la mascotte | `video/scene/zonaR.js` |
-| B7 dentro la pastiglia: neutrone lento, U-238 che assorbono | `video/scene/b7.js` |
+| B7 dentro la pastiglia: neutrone lento, U-235 "saltato" (A2), U-238 che assorbono | `video/scene/b7.js` |
 | B8 bordo della pastiglia: rimbalzi nell'acqua; molecole d'acqua | `video/scene/b8.js` |
 | B9 acqua che si dilata, neutrone veloce nella barra R, termometro | `video/scene/b9.js` |
 | Mascotte (espressioni, gesti) | `video/mascotte6.js` |

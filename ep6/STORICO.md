@@ -26,3 +26,11 @@
 - B8: inquadratura sul bordo della pastiglia; il neutrone esce dalla barra, rimbalza 5 volte nell'acqua e spacca BB (37,4); i suoi due neutroni sono assorbiti da U-238 della barra.
 - B9: inquadratura sull'acqua fra la barra C e la barra R; le molecole si allontanano dal percorso del neutrone in verticale (molte escono dall'inquadratura); il neutrone veloce attraversa l'acqua senza rimbalzare, entra nella barra R e passa accanto a C9 senza spaccarlo.
 - Mascotte: niente saluto, compare nell'angolo a 0,2; indica i commenti 51,9–52,8, esce a 53,9. Durata 55,4 s.
+
+## 25/11/2026 — v3, revisione delle note sulla v2
+- 1,7 s: tolta l'artiglieria; sullo sfondo 2 carri armati, una jeep e una camionetta, più dettagliati (forme arrotondate, cingoli con ruote, parafanghi, torretta sfaccettata, telone).
+- 7,1 s: lo zoom sulla bomba era fatto di 4 tratti, ognuno con la sua frenata: ora è un solo movimento 4,4–8,6, distanza in scala logaritmica, che parte piano e accelera fino a entrare nella palla.
+- 19 s: neutroni liberi più piccoli quando la camera è lontana (ingrandimento ridotto in `ep6.js`, la libreria resta com'è).
+- 27 s: colore dell'acqua fra le barre uguale alla puntata 5; l'autore lo lascia così.
+- 30,8 s (B7): frammenti e neutroni più lenti (1,3 unità/s); nuovo U-235 A2 vicino al percorso di un neutrone, che gli passa accanto (l'alone sobbalza) e si attacca all'U-238 T7.
+- 41,2 s (B9): le molecole si diradano in modo uniforme (fattore 2,5 in verticale dal centro dell'inquadratura), niente più zone vuote; quelle sul percorso del neutrone si scostano appena.
