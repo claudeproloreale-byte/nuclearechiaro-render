@@ -65,7 +65,7 @@ export function creaNuclei(scene) {
   function livello(n, t) {
     let L = n.lev0;
     for (const d of n.decays) { if (t < d.t) { L = Math.max(L, (n.preRise && n.preRise(t, d)) || 0); break; } L = lerp(L, d.after, smooth(ramp(t, d.t, d.t + 0.6))); }
-    return L;
+    return n.mod ? n.mod(t, L) : L;   // n.mod: correzione a mano del livello (es. si calma senza emettere)
   }
   const V_ = { alfa: 1.5, beta: 3.6, gamma: 4.6 };
   // posizione della particella emessa al tempo t (null prima dell'emissione o fuori dal percorso)

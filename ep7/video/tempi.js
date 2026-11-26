@@ -12,9 +12,11 @@ export const EXIT = 92.9, END = 94.4;
 // labiale simulato: la B1 (v2) è corta, «La radioattività ti fa paura?» dura circa 1,9 s
 export const SPEECH = Object.values(B).map((b, i) => (i === 0 ? [0.5, 2.4] : b));
 export const LIP = null;   // finché non c'è la voce il labiale è simulato
-// senza voce la tabella WARP è l'identità (arriverà con la registrazione)
-export const WARP = [[0, 0], [END, END]];
-export const VIDEO_END = END;
+// Senza voce la WARP serve solo ad allungare due battute diventate più lunghe nella v3 (le altre restano sui tempi di scaletta):
+// B7 «…o una radiazione elettromagnetica…» 7 → 7,5 s; B11 «…, l'unità di misura delle radiazioni» 5 → 6,5 s. Video 96,4 s.
+// Con la registrazione la tabella si rifà sui tempi reali della voce.
+export const WARP = [[0, 0], [31.0, 31.0], [38.0, 38.5], [60.0, 60.5], [65.0, 67.0], [END, END + 2]];
+export const VIDEO_END = END + 2;
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
 // passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:
