@@ -98,3 +98,6 @@
 ## 26/11/2026 — v15, ultime note dell'autore
 - Fungo più lungo: 4,4 s (prima 3,6).
 - B10: i due cerchi del confronto (bomba/centrale) non erano chiari. Ora un solo cerchio con un piccolo fungo atomico (lampo su "esplosione") e, su "fisicamente impossibile", una croce rossa spessa e piena sopra il cerchio, con un colpo secco. Le barre di controllo restano. Durata 82,0 s.
+
+## 26/11/2026 — v15 approvata dall'autore (la pubblica); copertina
+- Copertina `video/copertina_ep6.jpg`: modalità `?cover=1` in `ep6.js` (scena della centrale con la bomba della B1 spostata in primo piano sulla collina, senza mascotte né icone) e titolo con `make_cover6.py` (come la puntata 5).

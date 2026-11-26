@@ -261,5 +261,5 @@ export function creaBomba3d() {
     coreGlow.material.opacity = tr * (0.45 + 0.35 * smooth(ramp(t, 6.4, 8.2)) + 0.08 * Math.sin(tn * 4));
     leds.forEach((l, i) => { l.visible = Math.sin(tn * 3 + i * 2) > -0.3; });
   }
-  return { scene, camera, aggiorna };
+  return { scene, camera, aggiorna, bomba: B };   // bomba: per la copertina (?cover=1)
 }

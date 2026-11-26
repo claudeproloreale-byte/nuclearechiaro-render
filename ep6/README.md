@@ -38,3 +38,11 @@ Mondi: bomba 0–8,55 · atomi zona B 8,55–20,6 (lampo bianco 19,2–21,0) · 
    In locale: `PAGE=ep6.html VW=1080 VH=1920 node render.js seg 0 2460 ep6_muto.mp4` (circa 0,5 s per fotogramma; due processi in parallelo sulle due metà).
 3. `video/assemble.sh ep6_muto.mp4`: `nuclearechiaro_ep6.mp4` (senza sottotitoli) e `nuclearechiaro_ep6_sottotitoli.mp4` (da pubblicare).
 Prova a metà risoluzione: `PAGE='ep6.html?w=540&h=960' VW=540 VH=960 node render.js still 1,10,26,35,41.7`.
+
+## Copertina
+`video/copertina_ep6.jpg` (1080×1920): la bomba della B1 in primo piano sulla collina, dietro la centrale; titolo "CENTRALE" (bianco) / "o BOMBA" (giallo) nello stile del canale, dentro la fascia visibile nella griglia 3:4 del profilo.
+```
+PAGE='ep6.html?cover=1' VW=1080 VH=1920 PREFIX=sfondo node render.js still 30     # -> copertina_sfondo.jpg
+python3 make_cover6.py copertina_sfondo.jpg copertina_ep6.jpg "CENTRALE" "o BOMBA"
+```
+La posa della copertina è in `ep6.js` (blocco `?cover=1`); per le prove si cambia dall'URL (`cx cy cz lx ly lz`, `bx bz bs by br`).

@@ -7,7 +7,7 @@
 //    B8 sul bordo della pastiglia con l'acqua (scene/b8.js), B9 acqua che si dilata e termometro (scene/b9.js)
 //  - mascotte: mascotte6.js; tempi comuni: tempi.js
 // Per correggere una scena si cambia solo il suo file. L'ordine delle costruzioni qui sotto conta (decide forme e posizioni casuali).
-import { clamp01, ramp, track, fadeMat, lerp, smooth } from '/comune/base.js';
+import { THREE, clamp01, ramp, track, fadeMat, lerp, smooth } from '/comune/base.js';
 import { creaCentrale } from '/comune/centrale.js';
 import { creaAtomi } from '/comune/atomi.js';
 import { creaAcqua } from '/comune/acqua.js';
@@ -131,6 +131,25 @@ window.renderFrame = function (tn) {
   P.inizio.opacity = 1 - ramp(t, 0, 0.3);
   P.render();
 };
+// ---------------- copertina (?cover=1, 26/11/2026): la bomba della B1 in primo piano sulla collina, dietro la centrale;
+// niente mascotte né icone. Il titolo si aggiunge dopo con make_cover6.py. Parametri della posa nell'URL (per le prove).
+if (new URLSearchParams(location.search).get('cover') === '1') {
+  const q = new URLSearchParams(location.search), n = (k, d) => (q.has(k) ? +q.get(k) : d);
+  B3.aggiorna(0, 0);                                   // bomba com'è all'inizio (involucro pieno)
+  const bomba = B3.bomba; C.scene.add(bomba);
+  const cam = [n('cx', -1), n('cy', 3.8), n('cz', 11), n('lx', -1), n('ly', 3.9), n('lz', -40)];   // inquadratura larga, un po' più alta per il titolo
+  const bx = n('bx', -0.6), bz = n('bz', -20), bs = n('bs', 1.6), rot = n('br', -0.55);
+  bomba.scale.setScalar(bs); bomba.rotation.set(0, rot, 0);
+  bomba.position.set(bx, C.hillY(bx, bz) + n('by', 1.78), bz);
+  { const o = new THREE.Mesh(new THREE.CircleGeometry(1, 48), new THREE.MeshBasicMaterial({ color: 0x1f4a1f, transparent: true, opacity: 0.35, depthWrite: false }));
+    o.rotation.x = -Math.PI / 2; o.scale.set(3.2 * bs, 1.3 * bs, 1); o.position.set(bx - 0.2, C.hillY(bx, bz) + 0.03, bz); C.scene.add(o); }   // ombra sotto la bomba
+  hud.visible = false;
+  window.renderFrame = function (tn) {
+    P.mondo(C.scene, C.camera); centrale.aggiorna(C, tn, 0, barre);
+    C.camera.position.set(cam[0], cam[1], cam[2]); C.camera.lookAt(cam[3], cam[4], cam[5]);
+    fadeMat.opacity = 0; P.lampo.opacity = 0; P.inizio.opacity = 0; P.render();
+  };
+}
 window.DURATION = WARP[WARP.length - 1][1];
 window.renderFrame(0);
 window.ready = true;
