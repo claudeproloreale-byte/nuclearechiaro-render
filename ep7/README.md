@@ -2,12 +2,12 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p7`; richieste in `richieste`, versioni in `versioni/p7-v<k>`). Come si lavora: `piano app/app.md` nel progetto.
 
-**Stato:** v1 (26/11/2026), bozza 1 senza audio, labiale simulato, 540×960, 94,4 s. Regole: `regole.md`.
+**Stato:** v2 (26/11/2026): B1 nuova («La radioattività ti fa paura?»), senza saluto. v1: bozza 1 senza audio, labiale simulato, 540×960, 94,4 s. Regole: `regole.md`.
 
 ## Dove si corregge
 | Cosa | File |
 |---|---|
-| B1 spazio (stelle, nucleo in alto a destra) | `video/scene/spazio.js` |
+| B1 spazio (stelle, nucleo in alto a destra; senza saluto dalla v2) | `video/scene/spazio.js` |
 | Collina: lato natura (B2–B4, B10–B12), passaggio alla centrale (B13), cupola e barriere che si illuminano (B14–B15) | `video/scene/collina.js` (centrale: `comune/centrale.js`) |
 | B5–B9 atomi: campo di nuclei, U1–U3 e i loro decadimenti, 16 nuclei del dimezzamento, camera | `video/scene/atomi.js` |
 | Aspetto dei nuclei instabili (alone rosa, tremolio) e delle radiazioni alfa, beta, gamma | `video/nuclei7.js` |

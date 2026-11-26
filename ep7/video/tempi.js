@@ -9,7 +9,8 @@ export const B = {
 };
 // paesaggio pulito da EXIT alla fine
 export const EXIT = 92.9, END = 94.4;
-export const SPEECH = Object.values(B);
+// labiale simulato: la B1 (v2) è corta, «La radioattività ti fa paura?» dura circa 1,9 s
+export const SPEECH = Object.values(B).map((b, i) => (i === 0 ? [0.5, 2.4] : b));
 export const LIP = null;   // finché non c'è la voce il labiale è simulato
 // senza voce la tabella WARP è l'identità (arriverà con la registrazione)
 export const WARP = [[0, 0], [END, END]];
@@ -17,7 +18,7 @@ export const VIDEO_END = END;
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
 // passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:
-// spazio (saluto) → collina (natura) → atomi dentro un puntino del corpo → collina (bilancia, aereo, centrale)
+// spazio (B1, senza saluto dalla v2) → collina (natura) → atomi dentro un puntino del corpo → collina (bilancia, aereo, centrale)
 export const ATOM_IN = 23.3, ATOM_OUT = 55.1;
 export const SWITCH = [[4.25, 'world', 1, 0.3], [ATOM_IN, 'atom', 1, 0.3], [ATOM_OUT, 'world', 1, 0.3]];
 export const START_WORLD = 'spazio';
