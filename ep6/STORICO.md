@@ -94,3 +94,7 @@
 - B10 (prima non succedeva niente): resta sulla vista del vessel; compare il termometro e sale ("anche se molto, molto improbabile"); su "può succedere" scendono 6 barre di controllo scure fra le barre di uranio, il nocciolo si spegne quasi del tutto e il termometro scende. Su "ma un'esplosione atomica è fisicamente impossibile" campo largo, cupola che si richiude e due icone: a sinistra un grappolo di 19 nuclei quasi tutti gialli (bomba) con un lampo su "esplosione", a destra un grappolo con un solo giallo (centrale) con la spunta verde su "impossibile". `comune/centrale.js`: `update(..., potenza)` e `nocciolo` (compatibile con le puntate precedenti). Effetti sonori nuovi in `music6.py`.
 - Targhette "Uranio 235" (su A) e "Uranio 238" (sul nucleo diventato U-238 nella v7), circa 2 s a 0:40 (`etichette.js`, stesso disegno della puntata 4). Regole aggiornate (eccezioni alle scritte).
 - Jet ancora più veloce: attraversa il cielo in 3,4 s.
+
+## 26/11/2026 — v15, ultime note dell'autore
+- Fungo più lungo: 4,4 s (prima 3,6).
+- B10: i due cerchi del confronto (bomba/centrale) non erano chiari. Ora un solo cerchio con un piccolo fungo atomico (lampo su "esplosione") e, su "fisicamente impossibile", una croce rossa spessa e piena sopra il cerchio, con un colpo secco. Le barre di controllo restano. Durata 82,0 s.

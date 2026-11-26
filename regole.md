@@ -32,7 +32,7 @@ Versione corta e operativa. Identità, piano editoriale, pubblicazione e storia 
 - Acqua: ossigeno azzurro, due idrogeni bianchi; spiegata la moderazione, i neutroni continuano a rimbalzare sull'acqua. Densità delle molecole uguale ovunque (più neutroni possono urtare la stessa molecola).
 - Barre di combustibile viste da vicino (puntata 5): l'acqua sta **fra** le barre, mai mescolata con l'uranio, larga circa metà barra. Stesso aspetto delle barrette 3D: pastiglie color rame basse (circa metà del diametro), guaina lucida con riflesso verticale, bagliori arancioni; entrando nella barra le pastiglie diventano trasparenti e compaiono i nuclei.
 - Dissolvenze lente e uniformi, senza scatti di luce. Quando si allarga una zona, controllare che non entri nell'inquadratura di un'altra (puntata 5: striscia d'acqua comparsa nella zona della pastiglia).
-- Bomba (puntata 6): lampo bianco a tutto schermo, poi un'inquadratura breve (circa 3,5 s) del fungo nel deserto, in stile giocattolo, senza distruzione visibile (richiesta dell'autore del 26/11/2026).
+- Bomba (puntata 6): lampo bianco a tutto schermo, poi un'inquadratura breve (circa 4,5 s) del fungo nel deserto, in stile giocattolo, senza distruzione visibile (richiesta dell'autore del 26/11/2026).
 
 ## Tempi e codice
 - Tempi "di scaletta" in tutto il codice; con la voce arriva la tabella `WARP`: serve **solo per gli eventi** (comparse, espressioni) e per le chiavi delle camere (`rt`). Ciò che si muove di continuo usa il tempo del video.

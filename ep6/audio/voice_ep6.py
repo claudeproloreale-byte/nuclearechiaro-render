@@ -37,7 +37,7 @@ BLK = [
   (13.3, 20.3, [8, 9, 10], [(16.0, 9, 27.6),                                   # il primo nucleo della bomba si spacca su "spaccare"
                             (19.95, 10, 31.55),                                # lampo bianco pieno su "energia"
                             (20.6, 10, 32.45),                                 # v10: sotto il bianco si passa al fungo nel deserto
-                            (21.6, 10, 36.05)]),                               #   il fungo sale per 3,6 s (v11, prima 2,4), poi lampo chiaro e centrale
+                            (21.6, 10, 36.85)]),                               #   il fungo sale per 4,4 s (v15; v11: 3,6; v10: 2,4), poi lampo chiaro e centrale
   (21.8, 23.8, [11, 12], []),                                                  # v10: la voce riparte 0,5 s dopo l'arrivo sulla centrale
   (24.3, 28.9, [13], []),
   (29.4, 33.3, [14, 15, 16], [(30.6, 15, 52.7)]),                              # A si spacca subito dopo "uranio 238"

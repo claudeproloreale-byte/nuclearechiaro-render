@@ -204,9 +204,9 @@ put(sfx, w(45.0), pop(420, 1050), 0.13, pan=0.6); sweep(w(45.4), w(46.8) - w(45.
 put(sfx, w(47.0), whoosh(w(47.6) - w(47.0), 900, 300), 0.06)                                                          # le barre scendono
 put(sfx, w(47.6), lp(noise(0.35), 500) * np.exp(-tt(0.35) * 16), 0.3); put(sfx, w(47.6), chime(midi(55), 0.6), 0.05)   # tonfo metallico morbido
 sweep(w(47.4), w(48.3) - w(47.4), 900, 420, 0.035, pan=0.6); put(sfx, w(48.45) - 0.15, pop(1050, 420), 0.09, pan=0.6)    # il termometro scende e sparisce
-put(sfx, w(48.35), pop(400, 1000), 0.13, pan=-0.3); put(sfx, w(48.47), pop(450, 1100), 0.13, pan=0.3)                  # le due icone
-put(sfx, w(48.6), lp(noise(0.8), 300) * np.exp(-tt(0.8) * 5), 0.18, pan=-0.3); put(sfx, w(48.6), chime(midi(88), 0.8), 0.03, pan=-0.3)   # lampo della bomba
-for i, m in enumerate([84, 91]): put(sfx, w(49.75) + i * 0.09, chime(midi(m), 1.0), 0.07, pan=0.3)                   # spunta verde
+put(sfx, w(48.35), pop(420, 1050), 0.14)                                                                             # v15: il cerchio con il fungo
+put(sfx, w(48.6), lp(noise(0.8), 300) * np.exp(-tt(0.8) * 5), 0.18); put(sfx, w(48.6), chime(midi(88), 0.8), 0.03)   # lampo del fungo
+put(sfx, w(49.45) + 0.05, lp(noise(0.25), 900) * np.exp(-tt(0.25) * 18), 0.35); put(sfx, w(49.45) + 0.05, kick(), 0.3)   # v15: la croce rossa, colpo secco e pieno
 put(sfx, w(50.55) - 0.2, pop(1000, 400), 0.08)                                                                        # le icone spariscono
 put(sfx, w(51.9), pop(700, 1400, 0.08), 0.1, pan=0.6)                                                   # la mascotte indica i commenti
 put(sfx, w(53.9) - 0.2, pop(950, 320, 0.16), 0.2, pan=0.6)                                              # la mascotte esce
