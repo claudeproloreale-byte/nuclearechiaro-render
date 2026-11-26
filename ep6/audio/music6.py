@@ -107,36 +107,40 @@ def rise(t0, ch, amp=0.32, c=(0.6, 1.1)):  # battuta che sale (zoom, attesa)
 
 
 B = lambda k: k * BAR
-# ---------------- la bomba fra i carri armati, la domanda (0 – 4.8): sospesa, un po' seria
-still(B(0), 'Am', 0.18); still(B(1), 'F', 0.18)
-# ---------------- "No." e zoom dentro la bomba fino alla palla di uranio (4.8 – 9.6)
-rise(B(2), 'Dm', 0.26, (0.5, 0.8)); rise(B(3), 'G', 0.28, (0.7, 1.0))
-# ---------------- atomi della bomba: uranio 235 quasi puro (9.6 – 16.8)
-calm(B(4), 'Am', 0.26); calm(B(5), 'F', 0.26); rise(B(6), 'G', 0.28, (0.6, 0.9))
-# ---------------- il neutrone entra; la catena velocissima fino al lampo bianco (16.8 – 24.0)
-rise(B(7), 'Am', 0.3, (0.8, 1.2))
-TFL = w(19.95)                                   # lampo pieno: la musica si ferma qui
-groove(B(8), 'F', mel=False, drums=0.9); groove(B(9), 'G', mel=True, drums=1.0)
-# ---------------- la centrale sulla collina: "completamente diverso" (24.0 – 28.8): fresca, aperta
-calm(B(10), 'C', 0.3); calm(B(11), 'G', 0.3)
-# ---------------- zoom nel nocciolo, barre e pastiglia: 3-5 su 100 (28.8 – 36.0)
-rise(B(12), 'Am', 0.28, (0.6, 0.9)); still(B(13), 'F', 0.2); still(B(14), 'C', 0.2)
-# ---------------- un U-235 si spacca, gli U-238 assorbono (36.0 – 40.8)
-groove(B(15), 'Am', mel=False, drums=0.5); groove(B(16), 'F', mel=True, drums=0.5)
-# ---------------- l'acqua rallenta il neutrone; il neutrone lento viene catturato (40.8 – 50.4): raccolta, senza batteria
-still(B(17), 'Am'); still(B(18), 'F'); still(B(19), 'Dm'); rise(B(20), 'G', 0.28, (0.5, 0.9))
-# ---------------- la fissione di BB, poi il nocciolo si scalda (50.4 – 60.0)
-calm(B(21), 'C', 0.3); rise(B(22), 'Am', 0.28, (0.7, 1.0)); rise(B(23), 'F', 0.3, (0.8, 1.1)); still(B(24), 'Dm', 0.2)
-# ---------------- ritorno alla centrale: esplosione atomica impossibile (60.0 – 69.6)
-for k, ch in enumerate(['C', 'G', 'Am', 'F']): groove(B(25 + k), ch, mel=k % 2 == 0, drums=0.5)
-# ---------------- la mascotte esce: accordo finale
+# v10: la musica segue le scene sui tempi di scaletta (il video è più lungo per le pause fra le battute e il fungo).
+# Ogni sezione riempie le battute (2,4 s) da dove comincia fino alla sezione dopo, ripetendo i suoi accordi.
+def sezione(k, kind, ch, i):
+    if kind == 'still': still(B(k), ch, 0.2)
+    elif kind == 'calm': calm(B(k), ch, 0.28)
+    elif kind == 'rise': rise(B(k), ch, 0.28, (0.6 + 0.1 * (i % 2), 0.9 + 0.1 * (i % 2)))
+    elif kind == 'groove': groove(B(k), ch, mel=i % 2 == 1, drums=0.5)
+    elif kind == 'chain': groove(B(k), ch, mel=i % 2 == 1, drums=0.9 + 0.1 * (i % 2))
+SEZ = [(0.0, 'still', ['Am', 'F']),                      # la bomba fra i carri armati, la domanda
+       (4.4, 'rise', ['Dm', 'G']),                       # "No." e zoom dentro la bomba
+       (8.55, 'calm', ['Am', 'F', 'Am', 'G']),           # atomi della bomba: quasi tutto uranio 235
+       (15.3, 'rise', ['Am']),                           # il neutrone entra
+       (16.0, 'chain', ['F', 'G', 'F', 'G']),            # catena velocissima fino al lampo (poi silenzio sotto il bianco e il fungo)
+       (21.6, 'calm', ['C', 'G']),                       # la centrale: "completamente diverso"
+       (23.3, 'rise', ['Am']), (25.5, 'still', ['F', 'C', 'Am']),   # zoom nel nocciolo, barre, pastiglia
+       (29.4, 'groove', ['Am', 'F']),                    # un U-235 si spacca, gli U-238 assorbono
+       (33.8, 'still', ['Am', 'F', 'Dm', 'Am']),         # l'acqua rallenta il neutrone, il neutrone lento si avvicina
+       (36.9, 'rise', ['G']),                            # cattura
+       (37.4, 'calm', ['C']),                            # BB si spacca
+       (38.4, 'rise', ['Am', 'F']), (42.7, 'still', ['Dm', 'G']),   # il nocciolo si scalda; la reazione rallenta da sola
+       (44.4, 'groove', ['C', 'G', 'Am', 'F'])]          # ritorno alla centrale fino alla fine
 TF = w(53.9)
+kend = int(TF / BAR)
+for n, (ts, kind, chs) in enumerate(SEZ):
+    k0 = int(round(w(ts) / BAR)); k1 = int(round(w(SEZ[n + 1][0]) / BAR)) if n + 1 < len(SEZ) else kend
+    for i, k in enumerate(range(k0, k1)): sezione(k, kind, chs[i % len(chs)], i)
+TFL = w(19.95)                                   # lampo pieno: la musica si ferma qui
+# ---------------- la mascotte esce: accordo finale
 put(mus, TF, pad([48, 55, 60, 64, 67, 72], 0.5, 0.02, 1.4), 0.36)
 for i, m in enumerate([60, 64, 67, 72, 76, 79, 84]): put(mus, TF + i * 0.035, kal(m, 1.6, 1.2), 0.28, pan=-0.5 + i * 0.16)
 put(mus, TF, bass(36, 1.2), 0.45); put(mus, TF, kick(), 0.36)
 # la musica tace sotto il lampo bianco (da "energia" fino a quando il bianco si dirada) e riprende con la centrale
 tm = np.arange(N) / SR
-mus *= (1 - np.clip((tm - TFL + 0.05) / 0.12, 0, 1) * np.clip((w(21.4) - tm) / 0.5, 0, 1))[:, None]
+mus *= (1 - np.clip((tm - TFL + 0.05) / 0.12, 0, 1) * np.clip((w(21.6) + 0.3 - tm) / 0.5, 0, 1))[:, None]   # v10: tace anche sul fungo
 
 # ---------------- effetti sonori (tempi di scaletta -> reali)
 flash = lambda tg, a=0.05: (put(sfx, w(tg) - 0.05, hp(noise(0.5), 2500) * np.exp(-tt(0.5) * 7), a), put(sfx, w(tg), chime(midi(91), 0.7), 0.6 * a))
@@ -148,7 +152,7 @@ for i in range(int(D0 / 0.19)):
     x = bp(noise(0.04), 1800, 4200) * np.exp(-tt(0.04) * 90); j = int(i * 0.19 * SR + rng.uniform(0, 0.03) * SR); clank[j:j + len(x)] += x[:len(clank) - j] * rng.uniform(0.5, 1)
 put(sfx, 0, clank * np.clip((D0 - tt(D0)) / 1.5, 0, 1), 0.012, pan=-0.3)
 put(sfx, w(4.4), whoosh(w(8.6) - w(4.4), 300, 1500), 0.08)                                              # zoom dentro la bomba fino all'uranio
-for tg, a in ((8.55, 0.05), (25.5, 0.05), (44.5, 0.05)): flash(tg, a)                                    # lampi di passaggio
+for tg, a in ((8.55, 0.05), (21.6, 0.05), (25.5, 0.05), (44.5, 0.05)): flash(tg, a)                                    # lampi di passaggio
 put(sfx, w(8.6), whoosh(w(11.3) - w(8.6), 1200, 500), 0.05)                                             # la camera si avvicina agli atomi
 put(sfx, w(15.36), whoosh(w(16.0) - w(15.36), 2500, 6000, shape='rise'), 0.06, pan=-0.4)               # il neutrone entra velocissimo
 BIG = {16.0, 30.6, 37.4}
@@ -164,6 +168,9 @@ TB = w(19.95)                                                                   
 put(sfx, TB, lp(noise(2.5), 90) * np.exp(-tt(2.5) * 1.6), 0.9); put(sfx, TB, kick(), 0.7)
 put(sfx, TB, hp(noise(3.0), 2500) * np.exp(-tt(3.0) * 1.3), 0.06)
 for i, m in enumerate([72, 79, 84, 88, 91, 96]): put(sfx, TB + 0.05 + i * 0.07, chime(midi(m), 2.5), 0.04, pan=-0.5 + i * 0.2)
+DF = w(21.6) - w(20.6)                                                                                  # v10: il fungo sale: rombo basso e morbido che si allarga e si spegne
+put(sfx, w(20.6), lp(noise(DF + 0.6), 110) * np.minimum(1, tt(DF + 0.6) / 0.3) * np.clip((DF + 0.6 - tt(DF + 0.6)) / 1.0, 0, 1), 0.45)
+put(sfx, w(20.6), whoosh(DF, 180, 600), 0.06)
 for j, ta in enumerate(EV['abs']):                                                                       # neutroni assorbiti
     put(sfx, w(ta), lp(pop(320, 200, 0.12), 1400), 0.03 if ta < 25 else 0.08, pan=float(np.sin(j * 1.3) * 0.5))
 for j, tm_ in enumerate(EV['mol']):                                                                      # urti sulle molecole d'acqua: goccia

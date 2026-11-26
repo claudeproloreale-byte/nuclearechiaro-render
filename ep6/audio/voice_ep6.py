@@ -2,7 +2,7 @@
 # Stesso metodo della puntata 5: ogni battuta della scaletta si appoggia sulla voce. Dove la voce è più lunga della battuta
 # l'animazione rallenta; dove è più corta l'animazione va alla sua velocità e la pausa dopo si allunga (al massimo MAXP).
 # In più alcuni eventi sono agganciati a parole precise (ANC: tempo di scaletta -> istante nella registrazione).
-# Pause fra frasi della stessa battuta: come registrate, 0,7 s al massimo.
+# Pause fra frasi della stessa battuta: come registrate, 0,7 s al massimo; fra battute circa 1 s (PB).
 # Produce: voice_fx.wav, phrases.json (tempi nel video), warp6.json (tabella WARP), ../video/lip6.js (labiale a 30 fps).
 import soundfile as sf, numpy as np, subprocess, json
 from scipy.signal import butter, sosfiltfilt, stft
@@ -25,8 +25,10 @@ BLK = [
   (4.5, 8.0, [1, 2, 3], []),                                                   # "No." apre la battuta (sopracciglia decise)
   (8.5, 12.8, [4, 5, 6, 7], []),
   (13.3, 20.3, [8, 9, 10], [(16.0, 9, 27.6),                                   # il primo nucleo della bomba si spacca su "spaccare"
-                            (19.95, 10, 31.55)]),                              # lampo bianco pieno su "energia"
-  (20.8, 23.8, [11, 12], []),
+                            (19.95, 10, 31.55),                                # lampo bianco pieno su "energia"
+                            (20.6, 10, 32.45),                                 # v10: sotto il bianco si passa al fungo nel deserto
+                            (21.6, 10, 34.85)]),                               #   il fungo sale per 2,4 s, poi lampo chiaro e centrale
+  (21.8, 23.8, [11, 12], []),                                                  # v10: la voce riparte 0,5 s dopo l'arrivo sulla centrale
   (24.3, 28.9, [13], []),
   (29.4, 33.3, [14, 15, 16], [(30.6, 15, 52.7)]),                              # A si spacca subito dopo "uranio 238"
   (33.8, 37.9, [17, 18, 19, 20], [(34.6, 17, 60.4),                            # il neutrone esce dalla barra (dopo "Per andare avanti,")
@@ -42,8 +44,8 @@ BLK = [
 ]
 INTRA = 0.7                       # pausa massima fra frasi della stessa battuta
 INTRA_K = {1: 0.6, 18: 0.6}      # dopo "No."; fra "che rallenta i neutroni" ed "E i neutroni più sono lenti"
-MINP, MAXP = 0.35, 1.0           # pausa fra battute
-PAUSA = {1: 0.9}                  # prima di "No." (pausa voluta)
+PB = 1.0                          # v10 (richiesta dell'autore): piccola pausa fra una battuta e l'altra, circa 1 s (prima 0,35-1,0)
+DOPO_ANCORA = 0.5                 # se la battuta finisce su un evento agganciato, la voce dopo riparte almeno 0,5 s più tardi
 EXIT_DOPO, TAIL = 1.0, 1.5        # la mascotte esce 1,0 s dopo l'ultima parola; poi 1,5 s di paesaggio pulito
 EXIT_S, END_S = 53.9, 55.4
 
@@ -60,20 +62,12 @@ for bi, (ss, se, idx, anc) in enumerate(BLK):
     for (sa, k, raw) in anc: W.append([sa, round(vt(k, raw), 3)])
     s_a, v_a = W[-1]
     if bi + 1 == len(BLK): break
-    gap = BLK[bi + 1][0] - se
-    if s_a < se:
-        v_nat = v_a + (se - s_a)
-        if v_nat <= vend: W.append([se, round(vend, 3)]); r = vend + min(MAXP, max(MINP, gap))
-        else:
-            r = v_nat + gap
-            if r - vend > MAXP:                       # pausa troppo lunga: l'animazione accelera un poco
-                r = vend + MAXP; v_nat = v_a + (r - v_a) * (se - s_a) / (se - s_a + gap)
-            W.append([se, round(v_nat, 3)])
-    else:
-        r = max(v_a + gap * 0.5, vend + MINP)
-        r = min(max(r, v_a + 0.2), max(vend + MAXP, v_a + 0.2))
-    r = max(r, vend + PAUSA.get(bi + 1, 0)) if (bi + 1) in PAUSA else r
-    if (bi + 1) in PAUSA: r = vend + PAUSA[bi + 1]
+    ns = BLK[bi + 1][0]
+    if s_a < se:                                  # l'animazione finisce la battuta alla sua velocità, o rallenta sulla voce
+        v_se = max(vend, v_a + (se - s_a)); W.append([se, round(v_se, 3)])
+        r = max(vend + PB, v_se + 0.3)
+    else:                                         # la battuta finisce su un evento agganciato (lampo, fungo, cattura)
+        r = max(vend + PB, v_a + max(DOPO_ANCORA, ns - s_a))
 last = starts[26] + PH[26][1] - PH[26][0]
 W.append([EXIT_S, round(last + EXIT_DOPO, 3)]); W.append([END_S, round(last + EXIT_DOPO + TAIL, 3)])
 for p, q in zip(W, W[1:]): assert q[0] > p[0] and q[1] > p[1], (p, q)

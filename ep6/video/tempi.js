@@ -9,18 +9,20 @@ export const END = 55.4;
 export const SPEECH = [[0.5, 4.0], [4.5, 4.9], [5.1, 8.0], [8.5, 12.8], [13.3, 15.3], [15.45, 17.0], [17.15, 20.3], [20.8, 23.8], [24.3, 28.9],
   [29.4, 33.3], [33.8, 37.9], [38.4, 40.9], [41.05, 43.9], [44.4, 47.1], [47.25, 50.4], [50.9, 52.0], [52.15, 53.3]];
 export const LIP = LIP6;   // labiale dalla voce vera (audio/voice_ep6.py), a 30 fps, letto con il tempo del video
-// tabella WARP [[t scaletta, t video], ...] dalla voce dell'autore (26/11/2026, audio/voice_ep6.py -> audio/warp6.json)
-export const WARP = [[0.0, 0.0], [0.5, 0.5], [4.0, 4.0], [4.5, 4.49], [8.0, 8.55], [8.5, 9.05], [12.8, 15.41], [13.3, 15.91], [16.0, 19.96], [19.95, 23.91], [20.3, 24.45], [20.8, 24.95], [23.8, 28.02], [24.3, 28.52], [28.9, 35.21], [29.4, 35.71], [30.6, 38.52], [33.3, 41.22], [33.8, 41.72], [34.6, 42.83], [36.22, 45.77], [37.4, 50.54], [37.9, 51.14], [38.4, 52.28], [39.1, 53.05], [39.9, 54.41], [40.8, 55.95], [42.7, 57.78], [43.9, 59.43], [44.4, 59.93], [50.4, 66.91], [50.9, 67.41], [51.9, 68.79], [52.8, 69.77], [53.9, 70.77], [55.4, 72.27]];
-export const VIDEO_END = WARP[WARP.length - 1][1];   // durata del video con la voce: 72.27 s (2168 fotogrammi)
+// tabella WARP [[t scaletta, t video], ...] dalla voce dell'autore (v10, 26/11/2026, audio/voice_ep6.py -> audio/warp6.json)
+export const WARP = [[0.0, 0.0], [0.5, 0.5], [4.0, 4.0], [4.5, 4.59], [8.0, 8.65], [8.5, 9.65], [12.8, 16.01], [13.3, 17.01], [16.0, 21.06], [19.95, 25.01], [20.6, 25.91], [21.6, 28.31], [21.8, 28.81], [23.8, 31.88], [24.3, 32.88], [28.9, 39.57], [29.4, 40.57], [30.6, 43.38], [33.3, 46.08], [33.8, 47.02], [34.6, 48.13], [36.22, 51.07], [37.4, 55.84], [37.9, 56.44], [38.4, 58.23], [39.1, 59.0], [39.9, 60.36], [40.8, 61.9], [42.7, 63.73], [43.9, 65.38], [44.4, 66.38], [50.4, 73.36], [50.9, 74.36], [51.9, 75.74], [52.8, 76.72], [53.9, 77.72], [55.4, 79.22]];
+export const VIDEO_END = WARP[WARP.length - 1][1];   // durata del video con la voce: 79.22 s (2377 fotogrammi)
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
 // passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:
 // bomba 3D → atomi (zona B) dentro la palla di uranio; atomi → centrale sotto il lampo bianco (CUT, senza lampo chiaro);
 // centrale → atomi (barre con l'acqua) dopo lo zoom nel nocciolo; atomi → centrale per la B10
 export const BAR_IN = 25.5, BACK = 44.5;
-export const SWITCH = [[8.55, 'atom', 1, 0.3], [20.6, 'world', 0, 0.3], [BAR_IN, 'atom', 1, 0.3], [BACK, 'world', 0.8, 0.3]];
+// v10: sotto il bianco (CUT) si torna nel deserto per il fungo; a FUNGO_END lampo chiaro e centrale
+export const FUNGO_END = 21.6;
+export const SWITCH = [[8.55, 'atom', 1, 0.3], [20.6, 'bomba', 0, 0.3], [FUNGO_END, 'world', 1, 0.15], [BAR_IN, 'atom', 1, 0.3], [BACK, 'world', 0.8, 0.3]];
 export const START_WORLD = 'bomba';
 // lampo bianco della bomba (B4, su "tutta l'energia"); sotto il bianco, a CUT, si passa alla centrale (B5)
-export const FLASH_UP = 19.2, FLASH_FULL = 19.95, CUT = 20.6, FLASH_DOWN = 21.6;
+export const FLASH_UP = 19.2, FLASH_FULL = 19.95, CUT = 20.6, FLASH_DOWN = 21.0;   // v10: il bianco si dirada prima, sul fungo
 // la mascotte saluta ed esce
 export const EXIT = 53.9;

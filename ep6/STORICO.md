@@ -66,3 +66,11 @@
 - Montaggio come la puntata 5 (pause fra frasi 0,7 s al massimo, fra battute da 0,35 a 1,0 s; 0,9 s prima di "No."), più eventi agganciati alle parole (vedi README). Nella B8 il tratto dopo l'ultimo rimbalzo dura 4,8 s: il neutrone lento si vede andare piano mentre la voce dice che è lento. Durata 72,3 s.
 - Musica kalimba 100 bpm come le puntate precedenti; si ferma sotto il lampo bianco e riprende con la centrale. Effetti: carri armati lontani, zoom, lampi di passaggio, pioggia di fissioni nella bomba che sale verso il lampo, colpo morbido e scintillio sul lampo (niente esplosione), fissioni A e BB, neutroni assorbiti, gocce sugli urti in acqua, "tiro" dell'alone nella cattura, termometro, molecole che si allontanano, neutrone veloce, cupola che si richiude, mascotte.
 - Mix: musica a −5 dB, −14,5 LUFS, picco −1,4 dBFS. Sottotitoli: 63 righe, al massimo 22 caratteri.
+
+## 26/11/2026 — v10, richieste dell'autore sulla v9
+- Regole: durata dei video da 30 a 120 s; fra una battuta e l'altra una piccola pausa di circa 1 s (la v9 era troppo densa); nella puntata 6 il fungo è ammesso.
+- Voce: pause fra battute 1,0 s (`PB` in `voice_ep6.py`, prima 0,35–1,0); dentro le battute come prima (0,7 s al massimo). Durata 79,2 s.
+- Fungo: dopo il lampo bianco su "energia" si torna nel deserto (camera lontana, bomba e mezzi nascosti): il fungo sale e si allarga 2,4 s, arancione e caldo all'inizio, poi color sabbia, con un anello di polvere a terra; lampo chiaro e centrale. Il bianco si dirada prima (`FLASH_DOWN` 21,0). Audio: musica ferma fino alla centrale, rombo basso e morbido sul fungo.
+- Corretto lo zoom nella bomba: usava il tempo del video come se fosse quello della scaletta (`fwarp` in `bomba3d.js`).
+- Musica rifatta per sezioni sui tempi di scaletta (`SEZ` in `music6.py`), così segue le scene qualunque sia la durata.
+- Livelli come le puntate precedenti (stesso mix della puntata 5, musica −5 dB, sottotitoli identici): −14,5 LUFS, picco −1,5 dBFS.

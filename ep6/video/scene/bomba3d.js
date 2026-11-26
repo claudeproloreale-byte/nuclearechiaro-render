@@ -4,8 +4,8 @@
 // così la velocità sembra uguale da lontano e da vicino): l'involucro diventa trasparente (5,4–6,4) e mostra dentro guscio,
 // cavi, scatola dei comandi e la palla di uranio; la camera entra nella palla e a 8,55, con il lampo chiaro, si passa agli atomi.
 // Solo forme semplici e generiche: nessun dettaglio tecnico reale dell'arma.
-import { THREE, W, H, V, std, basic, mesh, bar, glow, gradientBg, lights, addFade, setSeed, rnd, track, smooth, ramp, clamp01, lerp } from '/comune/base.js';
-import { rt } from '../tempi.js';
+import { THREE, W, H, V, std, basic, mesh, bar, glow, gradientBg, lights, addFade, setSeed, rnd, track, smooth, ramp, clamp01, lerp, easeOut } from '/comune/base.js';
+import { rt, fwarp, CUT, FUNGO_END } from '../tempi.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 export function creaBomba3d() {
@@ -124,7 +124,7 @@ export function creaBomba3d() {
 
   // ---------------- la bomba: involucro (diventa trasparente), dentro guscio, scatola dei comandi, cavi e palla di uranio
   const B = new THREE.Group(); B.position.set(0, 1.15, 0); B.rotation.y = -0.6; scene.add(B);
-  { const o = ombra(scene, -0.3, 0.1, 6.4, 2.9, 0.7); o.rotation.z = 0.6; }
+  const ombraB = ombra(scene, -0.3, 0.1, 6.4, 2.9, 0.7); ombraB.rotation.z = 0.6;
   const caseM = std(0x5c6650, { roughness: 0.55, metalness: 0.15, transparent: true, opacity: 1 });
   const bandM = std(0xe8c33a, { roughness: 0.6, transparent: true, opacity: 1 });
   const body = mesh(new THREE.CapsuleGeometry(1.0, 2.2, 16, 48), caseM, B); body.rotation.z = Math.PI / 2; body.renderOrder = 5;
@@ -162,18 +162,49 @@ export function creaBomba3d() {
   // B1: leggero avvicinamento; poi lo zoom unico verso il centro della palla (CORE)
   const CAM1 = track(rt([[0, [-1.4, 5.0, 20.5, -0.6, 2.4, 0]], [4.4, [-1.1, 4.5, 18.0, -0.55, 2.2, 0]]]));   // v4: bomba un po' più a destra
   const CORE = V(0, 1.15, 0), Z0 = 4.4, Z1 = 8.6, DEND = 0.42;   // finisce appena fuori dalla superficie della palla (raggio 0,36): la palla riempie lo schermo
+  const Z0v = fwarp(Z0), Z1v = fwarp(Z1);   // v10: lo zoom segue la voce (prima usava il tempo del video come se fosse quello della scaletta)
   function camAt(tn) {
-    const c = CAM1(tn), t = tn;   // WARP = identità: tempi di scaletta
-    if (t <= Z0) return c;
-    const u = Math.pow(ramp(t, Z0, Z1), 1.5);   // parte piano e accelera fino a tuffarsi nella palla (niente frenata finale)
+    const c = CAM1(tn);
+    if (tn <= Z0v) return c;
+    const u = Math.pow(ramp(tn, Z0v, Z1v), 1.5);   // parte piano e accelera fino a tuffarsi nella palla (niente frenata finale)
     const p0 = V(c[0], c[1], c[2]), d0 = p0.distanceTo(CORE), dir0 = p0.clone().sub(CORE).normalize(), dir1 = V(0.12, 0.08, 1).normalize();
     const d = d0 * Math.pow(DEND / d0, u), dir = dir0.clone().lerp(dir1, smooth(clamp01(u * 1.4))).normalize();
     const p = CORE.clone().addScaledVector(dir, d), k = smooth(clamp01(u * 2));
     return [p.x, p.y, p.z, lerp(c[3], CORE.x, k), lerp(c[4], CORE.y, k), lerp(c[5], CORE.z, k)];
   }
+  // ---------------- v10 (richiesta dell'autore): dopo il lampo bianco, inquadratura breve del fungo nel deserto, in stile giocattolo.
+  // La bomba e i mezzi non si vedono più (niente distruzione visibile); camera lontana, il fungo sale e si allarga mentre il bianco si dirada.
+  const F = new THREE.Group(); F.visible = false; scene.add(F);
+  const hotM = (c) => std(c, { roughness: 1, emissive: 0xff7a2a, emissiveIntensity: 0.8 });
+  const stemM = hotM(0xdcc4a0), capM = hotM(0xe6c79c), dustM = std(0xc9ab82, { roughness: 1 });
+  const stem = mesh(new THREE.CylinderGeometry(1.5, 2.8, 1, 28, 1, true), stemM, F); stem.material.side = THREE.DoubleSide;
+  const cap = new THREE.Group(); F.add(cap);
+  const capParts = [[0, 0, 0, 5.2, 0.62], [0, 2.2, 0, 3.6, 0.8]];
+  for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; capParts.push([Math.cos(a) * 4.6, -0.6 + (i % 2) * 0.5, Math.sin(a) * 4.6, 2.5 + (i % 3) * 0.3, 0.85]); }
+  const capM2 = capParts.map(([x, y, z, r, sy]) => { const m = mesh(new THREE.SphereGeometry(r, 24, 16), capM, cap, V(x, y, z)); m.scale.y = sy; m.userData.s = [1, sy, 1]; return m; });
+  const collar = mesh(new THREE.TorusGeometry(3.4, 1.1, 14, 32), capM, F); collar.rotation.x = Math.PI / 2;
+  const dust = []; for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2 + rnd() * 0.3; const m = mesh(new THREE.SphereGeometry(2.2 + rnd(), 18, 12), dustM, F); m.userData.a = a; m.scale.y = 0.4; dust.push(m); }
+  const fGlow = glow(0xffb060, F, 22); fGlow.material.fog = false;
+  const CAMF = [0, 6, 78, 0, 13.5, 0];
+  function fungo(tn) {
+    const u = clamp01((tn - fwarp(CUT)) / (fwarp(FUNGO_END) - fwarp(CUT))), g = easeOut(0.18 + 0.82 * u, 2.0), H = 25 * g;
+    stem.scale.set(0.55 + 0.45 * g, H, 0.55 + 0.45 * g); stem.position.y = H / 2;
+    cap.position.y = H + 1.5 * g; cap.scale.setScalar(0.35 + 0.65 * g); cap.rotation.y = tn * 0.25;
+    capM2.forEach((m, i) => { const w = 1 + 0.05 * Math.sin(tn * 2.2 + i * 1.7); m.scale.set(w, m.userData.s[1] * w, w); });
+    collar.position.y = H * 0.62; collar.scale.setScalar(0.3 + 0.7 * smooth(ramp(u, 0.25, 1)));
+    dust.forEach(m => { const r = 3 + 11 * easeOut(0.1 + 0.9 * u); m.position.set(Math.cos(m.userData.a) * r, 0.4, Math.sin(m.userData.a) * r * 0.7); m.scale.set(0.6 + 0.6 * u, 0.3 + 0.25 * u, 0.6 + 0.6 * u); });
+    const heat = 1 - smooth(u);   // all'inizio caldo e arancione, poi color sabbia
+    stemM.emissiveIntensity = capM.emissiveIntensity = 0.12 + 0.7 * heat;
+    fGlow.position.set(0, H + 1.5 * g, 3); fGlow.material.opacity = 0.15 + 0.5 * heat;
+    camera.position.set(CAMF[0], CAMF[1], CAMF[2] - 4 * u); camera.lookAt(CAMF[3], CAMF[4] + 1.5 * u, CAMF[5]);
+  }
   const OPEN = [5.4, 6.4];
   function aggiorna(t, tn) {
-    const c = camAt(tn), sw = 1 - ramp(tn, Z0, Z0 + 1);   // l'ondeggiamento si spegne durante lo zoom
+    const dopo = t >= CUT;   // dopo il lampo: il fungo
+    F.visible = dopo; B.visible = !dopo; ombraB.visible = !dopo; VEH.forEach(k => { k.g.visible = !dopo; });
+    scene.fog.near = dopo ? 70 : 28; scene.fog.far = dopo ? 320 : 140;
+    if (dopo) { fungo(tn); return; }
+    const c = camAt(tn), sw = 1 - ramp(tn, Z0v, Z0v + 1);   // l'ondeggiamento si spegne durante lo zoom
     camera.position.set(c[0] + Math.sin(tn * 0.21) * 0.06 * sw, c[1] + Math.sin(tn * 0.17) * 0.03 * sw, c[2]); camera.lookAt(c[3], c[4], c[5]);
     VEH.forEach(k => { const dx = k.v * tn; k.g.position.x = k.x0 + dx * Math.cos(k.ry); k.wheels.forEach(w => { w.rotation.z = -dx / 0.32; }); if (k.tur) k.tur.rotation.y = 0.08 * Math.sin(tn * 0.4 + k.x0); });
     scene.children.forEach(o => { if (o.userData.x !== undefined) o.position.x = o.userData.x + tn * 0.15; });
