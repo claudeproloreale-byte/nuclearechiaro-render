@@ -8,7 +8,8 @@
 //   W.MOLS                              elenco delle molecole (m.c centro, m.push spostamento per la "dilatazione")
 //   W.completa()                        crea le molecole (dopo tutti i rimbalzi e W.sparse)
 //   W.place(t, tn, { E, appearAt })     ogni fotogramma: E = dilatazione 0..1 (si allontanano e tremano di più),
-//                                       appearAt(m) = quando compare la molecola m
+//                                       appearAt(m) = quando compare la molecola m;
+//                                       scaleAt(m, p) facoltativo = fattore 0..1 sulla grandezza (es. 0 dietro la mascotte)
 import { THREE, V, ramp, lerp, hash, backOut, setSeed, rnd, xy, segDist, dirTo, std, glow } from './base.js';
 
 export const OH = 0.19, HA = 52 * Math.PI / 180;   // distanza ossigeno-idrogeno, mezzo angolo fra i due idrogeni
@@ -46,7 +47,7 @@ export function creaAcqua(A, { free = () => true } = {}) {
     A.scene.add(molO, molH);
   }
   const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3();
-  function place(t, tn, { E = 0, appearAt }) {
+  function place(t, tn, { E = 0, appearAt, scaleAt }) {
     MOLS.forEach((m, i) => {
       const d0 = appearAt(m), sc = Math.max(0.001, backOut(ramp(t, d0, d0 + 0.45)));
       _p.copy(m.c).addScaledVector(m.push, E);
@@ -54,6 +55,8 @@ export function creaAcqua(A, { free = () => true } = {}) {
       _p.x += Math.sin(tn * (7 + 6 * E) + m.ph) * jig; _p.y += Math.cos(tn * (6 + 5 * E) + m.ph * 1.3) * jig;
       if (m.hitT !== undefined) { const k = ramp(t, m.hitT, m.hitT + 0.1) * (1 - ramp(t, m.hitT + 0.1, m.hitT + 0.9)); _p.addScaledVector(m.nrm, 0.13 * k); }
       const a = m.a + (m.fixed ? 0 : Math.sin(tn * 0.8 + m.ph) * 0.25) + E * Math.sin(tn * 3 + m.ph) * 0.5;
+      if (scaleAt) { const k = scaleAt(m, _p); if (k < 1) { _s.setScalar(Math.max(0.001, sc * k)); _m4.compose(_p, _q.identity(), _s); molO.setMatrixAt(i, _m4);
+        [-1, 1].forEach((sd, j) => { const b = a + sd * HA; _m4.compose(V(_p.x + Math.cos(b) * OH * sc * k, _p.y + Math.sin(b) * OH * sc * k, _p.z + 0.02), _q, _s); molH.setMatrixAt(2 * i + j, _m4); }); return; } }
       _s.setScalar(sc); _m4.compose(_p, _q.identity(), _s); molO.setMatrixAt(i, _m4);
       [-1, 1].forEach((sd, k) => { const b = a + sd * HA; _m4.compose(V(_p.x + Math.cos(b) * OH * sc, _p.y + Math.sin(b) * OH * sc, _p.z + 0.02), _q, _s); molH.setMatrixAt(2 * i + k, _m4); });
     });

@@ -1,24 +1,48 @@
 # Puntata 6 — Una centrale può esplodere come una bomba?
 
-**Stato:** animazione di prova, bozza 1 (49,4 s, labiale simulato, senza audio). Codice diviso in scene (fase 0 del piano, 24/11/2026), stesso risultato pixel per pixel. Prossimo passo: l'autore guarda la bozza 1 e chiede le correzioni.
-Scaletta (versione di riferimento): https://claude.ai/artifact/AEt2xw9J4XAB6XaextERiZ · Storico: `STORICO.md` · Regole: `regole.md` del canale.
+**Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
+
+**Stato:** v15 (26/11/2026): fungo di 4,4 s; nella B10 un solo cerchio con il fungo e croce rossa su "fisicamente impossibile" (al posto dei due cerchi della v14). Durata 82,0 s.
+Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge
 | Cosa | File |
 |---|---|
-| Centrale, apertura e chiusura | `video/scene/centrale.js` |
-| B5 zona B "bomba" e lampo bianco | `video/scene/bomba.js` |
-| Zona R (posizione, niente dietro la mascotte) | `video/scene/zonaR.js` |
-| B7 neutrone lento, U-238 che assorbono | `video/scene/b7.js` |
-| B8 acqua, rimbalzi | `video/scene/b8.js` |
-| B9 acqua che si dilata, termometro | `video/scene/b9.js` |
+| B1-B2: bomba, veicoli militari sullo sfondo, zoom unico, involucro trasparente, palla di uranio; fungo dopo il lampo (v10) | `video/scene/bomba3d.js` |
+| B3-B4: zona B "bomba" (atomi), catena e lampo bianco | `video/scene/bomba.js` |
+| B5, zoom nel nocciolo (B6), B10 e chiusura | `video/scene/centrale.js` |
+| Barre di uranio con l'acqua, pastiglie viste da lontano, inquadrature della zona R, niente dietro la mascotte | `video/scene/zonaR.js` |
+| B7 dentro la pastiglia: neutrone lento, U-235 "saltato" (A2), U-238 che assorbono | `video/scene/b7.js` |
+| B8 bordo della pastiglia: rimbalzi nell'acqua; molecole d'acqua | `video/scene/b8.js` |
+| B9 acqua che si dilata, neutrone veloce nella barra R, termometro | `video/scene/b9.js` |
+| Neutrone lento catturato dall'alone di un U-235 (curva; B7 e B8) | `video/cattura.js` |
+| B10: barre di controllo, termometro, cerchio con il fungo e croce rossa (v15) | `video/scene/centrale.js` (potenza del nocciolo in `comune/centrale.js`) |
+| Targhette "Uranio 235"/"Uranio 238" (v14) | `video/etichette.js` |
+| Effetto "supersonico" dei neutroni veloci (scia) | `video/supersonico.js` |
 | Mascotte (espressioni, gesti) | `video/mascotte6.js` |
-| Tempi comuni, battute, WARP | `video/tempi.js` |
-| Camera degli atomi, ordine di montaggio | `video/ep6.js` |
+| Tempi comuni, battute, passaggi fra i mondi, WARP, labiale | `video/tempi.js` (WARP e `lip6.js` escono da `audio/voice_ep6.py`) |
+| Montaggio della voce, eventi agganciati alle parole | `audio/voice_ep6.py` |
+| Musica ed effetti sonori | `audio/music6.py` (tempi degli eventi: `audio/events6.json`, da `video/print_events.js`) |
+| Mix e volume | `audio/mix6.py` |
+| Sottotitoli | `video/make_subs6.py` |
+| Camera degli atomi, ordine di montaggio, molecole che spariscono dietro la mascotte | `video/ep6.js` |
 
-## Tempi (scaletta)
-B1 0,2–0,8 · B2 1,3–4,8 · B3 5,3–8,8 · B4 9,3–13,6 · B5 14,1–19,9 · B6 20,4–25,0 · B7 25,5–29,4 · B8 29,9–34,0 · B9 34,5–40,0 · centrale da 40,6 · B10 40,5–44,0 · B11 44,5–46,9 · paesaggio fino a 49,4. `WARP` = identità.
+## Tempi (scaletta v2)
+B1 0,5–4,0 · B2 4,5–8,0 · B3 8,5–12,8 · B4 13,3–20,3 · B5 20,8–23,8 · B6 24,3–28,9 · B7 29,4–33,3 · B8 33,8–37,9 · B9 38,4–43,9 · B10 44,4–50,4 · B11 50,9–53,3 · paesaggio pulito 53,9–55,4 (tempi di scaletta).
+Con la voce (`WARP`, v10 del 26/11/2026) il video dura 82,0 s, con circa 1 s di pausa fra le battute. Eventi sulle parole: fissione nella bomba su "spaccare", lampo pieno su "energia" (25,0), fungo nel deserto 25,9–29,5 (scaletta 20,6–21,6, `FUNGO_END`), centrale e "Per una centrale nucleare" da 30,0; A si spacca dopo "uranio 238", BB catturato su "interagire", B9 sulle parole del termometro e dell'acqua, la mascotte indica su "fammela" ed esce; paesaggio pulito fino alla fine. Tabella completa: `audio/warp6.json` (stampata da `audio/voice_ep6.py` con la velocità di ogni tratto).
+Mondi: bomba 0–8,55 · atomi zona B 8,55–20,6 (lampo bianco 19,2–21,0) · fungo nel deserto 20,6–21,6 · centrale 21,6–25,5 · atomi zona R 25,5–44,5 · centrale 44,5–55,4.
 
-## Rendering
-GitHub, workflow `Rendering`: `dir` = `ep6/video`, `page` = `ep6.html`, `seconds` = `49.4` (serve `comune/` nel repository).
-Prova a metà risoluzione: `PAGE='ep6.html?w=540&h=960' VW=540 VH=960 node render.js still 8,24,37.2`.
+## Rendering e montaggio
+1. Audio: `audio/build_audio.sh` (registrazioni in `sorgenti/`: voce intera + B10 rifatta; Whisper per il controllo del testo: `audio/transcribe6.py`).
+2. Video muto: GitHub, workflow `Rendering`: `dir` = `ep6/video`, `page` = `ep6.html`, `seconds` = `82.0` (serve `comune/` nel repository).
+   In locale: `PAGE=ep6.html VW=1080 VH=1920 node render.js seg 0 2460 ep6_muto.mp4` (circa 0,5 s per fotogramma; due processi in parallelo sulle due metà).
+3. `video/assemble.sh ep6_muto.mp4`: `nuclearechiaro_ep6.mp4` (senza sottotitoli) e `nuclearechiaro_ep6_sottotitoli.mp4` (da pubblicare).
+Prova a metà risoluzione: `PAGE='ep6.html?w=540&h=960' VW=540 VH=960 node render.js still 1,10,26,35,41.7`.
+
+## Copertina
+`video/copertina_ep6.jpg` (1080×1920): la bomba della B1 in primo piano sulla collina, dietro la centrale; titolo "CENTRALE" (bianco) / "o BOMBA" (giallo) nello stile del canale, dentro la fascia visibile nella griglia 3:4 del profilo.
+```
+PAGE='ep6.html?cover=1' VW=1080 VH=1920 PREFIX=sfondo node render.js still 30     # -> copertina_sfondo.jpg
+python3 make_cover6.py copertina_sfondo.jpg copertina_ep6.jpg "CENTRALE" "o BOMBA"
+```
+La posa della copertina è in `ep6.js` (blocco `?cover=1`); per le prove si cambia dall'URL (`cx cy cz lx ly lz`, `bx bz bs by br`).

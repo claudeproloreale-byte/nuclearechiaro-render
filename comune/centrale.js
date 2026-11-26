@@ -2,7 +2,8 @@
 // cupola del reattore con la metà frontale che può diventare trasparente (nocciolo arancione, generatore di vapore,
 // circuito primario con le gocce), sala turbine, tubo del vapore, traliccio con il cavo e le scintille, bandiera italiana.
 //
-// const c = creaCentrale();          → { scene, camera, hillY, update(tn, cam, cupola) }
+// const c = creaCentrale();          → { scene, camera, hillY, update(tn, cam, cupola, potenza = 1), nocciolo: { inside, VX, VY, VZ } }
+//   potenza (puntata 6): 1 = nocciolo acceso, 0 = spento (barre di controllo inserite)
 //   cam = [x, y, z, guardaX, guardaY, guardaZ]  (la camera ondeggia appena da sola)
 //   cupola = opacità della metà frontale della cupola (1 chiusa, 0,1 quasi trasparente)
 // Tutto ciò che si muove di continuo (nuvole, vapore, bandiera, gocce, scintille) usa il tempo del video tn.
@@ -138,7 +139,7 @@ export function creaCentrale() {
     }
   }
 
-  function update(tn, c, dOp) {
+  function update(tn, c, dOp, pot = 1) {
     camera.position.set(c[0] + Math.sin(tn * 0.21) * 0.1, c[1] + Math.sin(tn * 0.17) * 0.05, c[2]); camera.lookAt(c[3], c[4], c[5]);
     clouds.forEach((cl, i) => { cl.position.x = cl.userData.x + Math.sin(tn * 0.05 + i) * 0.8 + tn * 0.02; });
     for (const m of puffs) {
@@ -148,11 +149,11 @@ export function creaCentrale() {
     }
     waveFlag(tn);
     domeFront.opacity = bandFront.opacity = dOp; domeFront.depthWrite = bandFront.depthWrite = dOp > 0.99;
-    coreM.emissiveIntensity = 2.3 * (1 + 0.08 * Math.sin(tn * 7)); coreGlow.material.opacity = 0.38 * (1 - dOp);
+    coreM.emissiveIntensity = 2.3 * (1 + 0.08 * Math.sin(tn * 7)) * (0.12 + 0.88 * pot); coreGlow.material.opacity = 0.38 * (1 - dOp) * (0.15 + 0.85 * pot);
     primDrops.forEach((m, i) => { primLoop.getPointAt((i / primDrops.length + tn * 0.19) % 1, m.position); m.position.z += 0.02; });
     cableDots.forEach((d, i) => { cableCurve.getPointAt((tn * 0.42 + i / cableDots.length) % 1, d.position); });
   }
-  return { scene, camera, hillY, update };
+  return { scene, camera, hillY, update, nocciolo: { inside, VX, VY, VZ } };
 }
 // inquadrature usate più spesso: [x, y, z, guardaX, guardaY, guardaZ]
 export const CAM_WIDE = [-1, 3.8, 11, -1, 3.0, -40], CAM_CORE = [2.95, 2.45, -33.0, 2.95, 2.34, -39.75], CAM_PUSH = [2.95, 2.34, -38.8, 2.95, 2.34, -39.75];

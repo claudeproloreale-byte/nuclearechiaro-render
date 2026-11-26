@@ -154,7 +154,8 @@ export function creaAtomi() {
       }
       if (n.hot) n.hot.forEach((s, f) => {
         s.visible = t > hit && fade > 0.001; if (!s.visible) return;
-        s.position.copy(n.fragFn(f, t)).add(n.c); s.position.z += 0.15;
+        // il bagliore sta sul centro del frammento così come lo si vede (i nucleoni lo raggiungono in 0,45 s: e)
+        s.position.copy(n.cent[f]).lerp(n.fragFn(f, t), e).add(n.c); s.position.z += 0.15;
         s.material.opacity = fade * 0.6; s.scale.setScalar(0.9 * Math.min(zoomK, 2));
       });
       if (n.flash) { n.flash.material.opacity = t > hit ? 0.95 * Math.max(0, 1 - (t - hit) / 0.5) : 0; n.flash.scale.setScalar((2.2 + 2 * ramp(t, hit, hit + 0.5)) * Math.min(zoomK, 2.5)); }
