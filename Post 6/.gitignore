@@ -1,0 +1,20 @@
+# In questa cartella i video finali e la copertina vanno conservati (la regola generale del repository esclude *.mp4 e *.jpg)
+!*.mp4
+!*.jpg
+node_modules/
+video/seg/
+video/cov_*.jpg
+video/c43_*.jpg
+video/prova_*.jpg
+video/ep6_muto.mp4
+video/nuclearechiaro_ep6*.mp4
+audio/voice_edit.wav
+audio/voice_lim.wav
+audio/music6.wav
+audio/sfx4.wav
+audio/mix6_pre.wav
+audio/v16.wav
+audio/voce_in.wav
+audio/music6.wav
+audio/sfx6.wav
+audio/mix6.wav
