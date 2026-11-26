@@ -1,0 +1,8 @@
+{
+  "name": "nuclearechiaro-ep7",
+  "private": true,
+  "dependencies": {
+    "playwright": "1.63.0",
+    "three": "0.187.0"
+  }
+}
