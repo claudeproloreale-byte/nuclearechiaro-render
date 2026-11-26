@@ -1,7 +1,7 @@
 // Puntata 6 — B8 (v2): l'inquadratura va sul bordo della pastiglia (barra C), fuori c'è l'acqua.
 // Un neutrone veloce scende dall'alto ed esce dalla barra, rimbalza 5 volte sugli idrogeni (a ogni urto la velocità
-// si moltiplica per 0,74), rientra nella barra e spacca BB a 37,4. I due neutroni nati da BB vanno verso l'interno
-// della barra e sono assorbiti da due U-238 (così nella B9 nell'acqua passa solo il neutrone veloce).
+// si moltiplica per 0,74), rientra nella barra e spacca BB a 37,4. Dei due neutroni nati da BB (v11) uno esce a sinistra
+// verso il centro della pastiglia, l'altro rimbalza due volte nell'acqua ed esce a destra (nella B9 non si vedono più).
 // v4: neutroni nati e frammenti veloci ("supersonici"); i frammenti escono dall'inquadratura in verticale, dentro la barra.
 import { V, xy, dirTo, polySegs, segDist, setSeed, rnd } from '/comune/base.js';
 import { YR, PE, E, gapL, gapR, behindMascot } from './zonaR.js';
@@ -15,6 +15,8 @@ export const W_PTS = [PE(2.2, 3.6), PE(0.9, 2.5), PE(2.8, 1.6), PE(1.1, 0.5), PE
 export const caps = [...polySegs([W_FROM, ...W_PTS, BB]), [PE(-1.1, -7), PE(-1.1, 5)]];
 // v7: ultimo tratto curvo (cattura da parte di BB), anche lui libero dalle molecole
 const CURVA = puntiCattura(W_PTS[W_PTS.length - 1], BB, -1).pts;
+// v11: percorso del neutrone nato da BB che va nell'acqua: due rimbalzi, poi esce a destra (sopra la mascotte)
+const DESTRA = [PE(1.0, -2.3), PE(2.5, -1.5), PE(4.6, -2.2)];
 
 export function costruisci(at, acqua, nBB) {
   // v7 (idea dell'autore sulla v6, nota a 37,2): dopo l'ultimo rimbalzo il neutrone lento non punta dritto a BB, passerebbe
@@ -27,18 +29,19 @@ export function costruisci(at, acqua, nBB) {
   for (let i = 2; i < curva.length; i++) { tk += curva[i].distanceTo(curva[i - 1]) / (vF * fattore(i - 1, curva.length - 2)); nz.keys.push([curva[i].clone().setZ(0.15), tk]); }
   alonePulsa(at, nBB, nz);
   nBB.hitAt = B8_HIT; at.fission(nBB, B8_HIT, V(0, 1, 0), 6.5, 1.3, 0.3);
-  // i due neutroni nati: verso l'interno della barra, assorbiti dai U-238 più vicini (direzioni diverse, lontani dalla mascotte)
-  const used = [dirTo(BB, W_PTS[W_PTS.length - 1]), V(0, 1, 0), V(0, -1, 0)];
-  const cands = at.NUCS.filter(n => n.zone === 'R' && !n.u && n.c.x < BB.x + 0.3 && !at.absorbed.has(n) && !behindMascot(n.c)).map(n => [xy(n.c, BB), n])
-    .filter(([d, n]) => d > 1.3 && d < 4.5 && at.clearLine(BB, n.c, [nBB, n])).sort((p, q) => p[0] - q[0]);
-  let k = 0;
-  for (const [, n] of cands) {
-    if (k >= 2) break;
-    const dir = dirTo(BB, n.c); if (used.some(u => u.dot(dir) > 0.8)) continue;
-    used.push(dir); at.absorbed.add(n); k++;
-    const nn = at.neutron(at.seg(BB.clone().addScaledVector(dir, 0.32).setZ(0.15), n.c.clone().addScaledVector(dir, -0.3).setZ(0.15), B8_HIT + 0.05, 9), 'abs', { trail: 8 }); nn.host = n;
+  // v11 (nota dell'autore a 0:56 della v10): i due neutroni nati da BB non vengono più assorbiti. Uno va verso il centro
+  // della pastiglia ed esce dall'inquadratura a sinistra (senza mostrare dove finisce); l'altro va nell'acqua, rimbalza su
+  // due molecole ed esce a destra prima che la camera si allarghi sulla B9, poi sparisce.
+  let dirL = null;
+  for (const da of [0, 0.15, -0.15, 0.3, -0.3, 0.45, -0.45]) {
+    const d = V(-Math.cos(da), Math.sin(da), 0), a = BB.clone().addScaledVector(d, 0.32), b = BB.clone().addScaledVector(d, 4.2);
+    if (at.clearLine(a, b, [nBB])) { dirL = d; break; }
   }
-  console.log('B8: neutroni assorbiti', k);
+  dirL = dirL || V(-1, 0, 0);
+  at.neutron(at.seg(BB.clone().addScaledVector(dirL, 0.32).setZ(0.15), BB.clone().addScaledVector(dirL, 4.2).setZ(0.15), B8_HIT + 0.05, 9), 'out', { trail: 8 });
+  const d0 = dirTo(BB, DESTRA[0]);
+  acqua.zigNeutron([BB.clone().addScaledVector(d0, 0.32), ...DESTRA], B8_HIT + 0.05, { v0: 11, K: 0.85, end: 'out', trail: 8 });
+  console.log('B8: neutrone a sinistra verso', dirL.toArray().map(x => x.toFixed(2)).join(','), '; neutrone a destra con 2 rimbalzi');
 }
 
 // le molecole d'acqua (v4, nota dell'autore: distribuzione davvero omogenea, niente spazi vuoti): nelle strisce d'acqua accanto
@@ -48,7 +51,7 @@ export function costruisci(at, acqua, nBB) {
 // non si tolgono più qui: si rimpiccioliscono mentre le passano dietro (ep6.js, dietroMascotte).
 export function molecole(at, acqua) {
   const strisce = [[gapL(-1) + 0.35, gapR(-1) - 0.35], [gapL(0) + 0.35, gapR(0) - 0.35]], Y0 = YR - 46, Y1 = YR + 50;
-  const lane = [...polySegs([W_FROM, ...W_PTS, BB]), ...polySegs(CURVA)];
+  const lane = [...polySegs([W_FROM, ...W_PTS, BB]), ...polySegs(CURVA), ...polySegs([BB, ...DESTRA])];
   const area = strisce.reduce((s, [a, b]) => s + (b - a), 0) * (Y1 - Y0), N = Math.round(area / 1.3);
   setSeed(99);
   const cell = 2, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);

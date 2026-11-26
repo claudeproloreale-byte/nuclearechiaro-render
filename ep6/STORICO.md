@@ -74,3 +74,9 @@
 - Corretto lo zoom nella bomba: usava il tempo del video come se fosse quello della scaletta (`fwarp` in `bomba3d.js`).
 - Musica rifatta per sezioni sui tempi di scaletta (`SEZ` in `music6.py`), così segue le scene qualunque sia la durata.
 - Livelli come le puntate precedenti (stesso mix della puntata 5, musica −5 dB, sottotitoli identici): −14,5 LUFS, picco −1,5 dBFS.
+
+## 26/11/2026 — v11, note dell'autore sulla v10
+- Cielo della scena iniziale meno vuoto: jet militare stilizzato (grigio, senza insegne) che passa da sinistra a destra nei primi 5,6 s con una scia bianca (`bomba3d.js`, `jet`). Le nuvole esistenti stanno sopra il bordo dell'inquadratura.
+- Fungo più lungo: 3,6 s (prima 2,4; ancora in `voice_ep6.py`); esplosione lontana e sorda sul fungo (colpo grave, scoppio filtrato, rombo che rotola, in `music6.py`).
+- 0:42, schivata della mascotte nella B7: ora segue il tempo del video (prima la scaletta, con il passo della WARP), smootherstep e piccolo arco verso sinistra; andata 1,2 s, ritorno 2,0 s (`mascotte6.js`, `posMascotte`).
+- 0:56, neutroni nati da BB: non più assorbiti da due U-238. Uno va a sinistra verso il centro della pastiglia ed esce dall'inquadratura; l'altro va nell'acqua, rimbalza su due molecole ed esce a destra prima che la camera si allarghi sulla B9 (`b8.js`, `DESTRA`).

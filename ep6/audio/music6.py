@@ -171,6 +171,13 @@ for i, m in enumerate([72, 79, 84, 88, 91, 96]): put(sfx, TB + 0.05 + i * 0.07, 
 DF = w(21.6) - w(20.6)                                                                                  # v10: il fungo sale: rombo basso e morbido che si allarga e si spegne
 put(sfx, w(20.6), lp(noise(DF + 0.6), 110) * np.minimum(1, tt(DF + 0.6) / 0.3) * np.clip((DF + 0.6 - tt(DF + 0.6)) / 1.0, 0, 1), 0.45)
 put(sfx, w(20.6), whoosh(DF, 180, 600), 0.06)
+# v11 (richiesta dell'autore): esplosione sul fungo, lontana e sorda (si vede da lontano): colpo grave, scoppio filtrato, coda che rotola
+TX = w(20.6) + 0.35
+L = 3.2; e = tt(L)
+put(sfx, TX, np.sin(2 * np.pi * (38 + 30 * np.exp(-e * 6)) * e) * np.exp(-e * 2.2), 0.55)              # colpo grave
+put(sfx, TX, lp(noise(L), 700) * np.exp(-e * 5) * np.minimum(1, e / 0.01), 0.55)                       # scoppio, già smorzato dalla distanza
+put(sfx, TX + 0.08, lp(noise(L), 220) * np.exp(-e * 1.3) * (0.6 + 0.4 * np.sin(2 * np.pi * 2.5 * e) ** 2), 0.55)   # rombo che rotola
+put(sfx, TX + 0.25, kick(), 0.4)
 for j, ta in enumerate(EV['abs']):                                                                       # neutroni assorbiti
     put(sfx, w(ta), lp(pop(320, 200, 0.12), 1400), 0.03 if ta < 25 else 0.08, pan=float(np.sin(j * 1.3) * 0.5))
 for j, tm_ in enumerate(EV['mol']):                                                                      # urti sulle molecole d'acqua: goccia

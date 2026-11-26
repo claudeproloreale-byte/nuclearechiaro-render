@@ -56,6 +56,33 @@ export function creaBomba3d() {
   const ombra = (parent, x, z, sx, sz, op = 0.6) => { const m = mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false, opacity: op }), parent, V(x, 0.015, z));
     m.rotation.x = -Math.PI / 2; m.scale.set(sx, sz, 1); m.renderOrder = 1; return m; };
   const VEH = [];
+
+  // ---------------- v11 (nota dell'autore: il cielo della scena iniziale era vuoto): un jet militare stilizzato (grigio, senza
+  // insegne) attraversa il cielo da sinistra a destra nei primi secondi, lasciando una scia bianca che si allarga e svanisce.
+  const JET = new THREE.Group(); scene.add(JET);
+  { const jm = std(0x8a929b, { roughness: 0.55, metalness: 0.2 }), jd = std(0x5d646c, { roughness: 0.6 }), cab = std(0x2f3d4d, { roughness: 0.2, metalness: 0.3 });
+    const fus = mesh(new THREE.CapsuleGeometry(0.16, 1.5, 6, 16), jm, JET); fus.rotation.z = Math.PI / 2;
+    const nose = mesh(new THREE.ConeGeometry(0.16, 0.5, 16), jm, JET, V(1.0, 0, 0)); nose.rotation.z = -Math.PI / 2;
+    const c = mesh(new THREE.SphereGeometry(0.14, 16, 10), cab, JET, V(0.45, 0.11, 0)); c.scale.set(1.9, 0.75, 0.8);
+    const wing = (pts, th, z, y = 0) => { const sh = new THREE.Shape(pts.map(([x, q]) => new THREE.Vector2(x, q)));
+      const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 }); g.translate(0, 0, -th / 2);
+      return mesh(g, jd, JET, V(0, y, z)); };
+    const wL = wing([[0.35, 0], [-0.45, 0], [-0.6, 1.0], [-0.35, 1.0]], 0.04, 0); wL.rotation.x = Math.PI / 2;     // ala sinistra e destra (piano orizzontale)
+    const wR = wing([[0.35, 0], [-0.45, 0], [-0.6, -1.0], [-0.35, -1.0]], 0.04, 0); wR.rotation.x = Math.PI / 2;
+    const tL = wing([[-0.55, 0], [-0.85, 0], [-0.95, 0.4], [-0.8, 0.4]], 0.03, 0); tL.rotation.x = Math.PI / 2;
+    const tR = wing([[-0.55, 0], [-0.85, 0], [-0.95, -0.4], [-0.8, -0.4]], 0.03, 0); tR.rotation.x = Math.PI / 2;
+    wing([[-0.45, 0.1], [-0.85, 0.1], [-0.95, 0.55], [-0.75, 0.55]], 0.03, 0);                                        // deriva
+  }
+  JET.scale.setScalar(1.25); JET.rotation.x = 0.35;   // un po' inclinato verso la camera, si vedono le ali
+  const trailM = std(0xffffff, { roughness: 1, transparent: true, opacity: 0.8, depthWrite: false });
+  const puffs = []; for (let i = 0; i < 70; i++) { const m = mesh(new THREE.SphereGeometry(1, 12, 8), trailM.clone(), scene); m.visible = false; puffs.push(m); }
+  const J0 = 0.2, J1 = 5.6, jetAt = tn => { const u = (tn - J0) / (J1 - J0); return V(-12 + 25 * u, 5.3 + 0.6 * u, -26); };
+  function jet(tn, on) {
+    JET.visible = on && tn > J0 - 0.1 && tn < J1 + 0.1; if (JET.visible) JET.position.copy(jetAt(tn));
+    puffs.forEach((m, i) => { const age = i * 0.06, ts = tn - age; m.visible = on && ts > J0 && ts < J1;
+      if (!m.visible) return; const p = jetAt(ts); m.position.set(p.x - 1.15, p.y + 0.02 * Math.sin(i), p.z);
+      const g = 0.07 + 0.05 * age; m.scale.set(g * 1.6, g, g); m.material.opacity = 0.75 * Math.max(0, 1 - age / 4.2) * Math.min(1, age / 0.1 + 0.3); });
+  }
   function veicolo(x, z, ry, v) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); ombra(g, 0, 0, 5.2, 3.0, 0.5); const o = { g, wheels: [], x0: x, ry, v }; VEH.push(o); return o; }
 
   function carro(x, z, ry, v) {
@@ -201,6 +228,7 @@ export function creaBomba3d() {
   const OPEN = [5.4, 6.4];
   function aggiorna(t, tn) {
     const dopo = t >= CUT;   // dopo il lampo: il fungo
+    jet(tn, !dopo);
     F.visible = dopo; B.visible = !dopo; ombraB.visible = !dopo; VEH.forEach(k => { k.g.visible = !dopo; });
     scene.fog.near = dopo ? 70 : 28; scene.fog.far = dopo ? 320 : 140;
     if (dopo) { fungo(tn); return; }
