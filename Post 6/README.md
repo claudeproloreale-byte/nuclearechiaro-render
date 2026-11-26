@@ -3,7 +3,7 @@
 Sesto video del canale **Nucleare chiaro per tutti** (`nuclearechiaro`). Pubblicato il 26/11/2026.
 Verticale 1080×1920, 30 fps, 82,0 s (2460 fotogrammi), voce dell'autore, musica ed effetti originali sintetizzati via codice, sottotitoli impressi.
 
-In questa cartella c'è tutto per ricreare il video da zero: registrazioni, codice dell'animazione, libreria comune, audio, sottotitoli, copertina e descrizione. Come per `Post 5/`, la cartella è autonoma; l'unica differenza è che la puntata 6 usa la libreria `comune/`, qui copiata (`Post 6/comune/`).
+In questa cartella c'è tutto per ricreare il video da zero: registrazioni, codice dell'animazione, audio, sottotitoli, copertina e descrizione. Unica differenza dalle puntate precedenti: la puntata 6 usa la libreria `comune/` che sta nella radice del repository (accanto a `Post 6/`), quindi la cartella va usata dentro il repository.
 Il lavoro di sviluppo (15 versioni) è nel ramo `ep6-v2`, cartella `ep6/`; lo storico completo è in `STORICO.md`.
 
 ## Contenuto
@@ -14,7 +14,6 @@ Il lavoro di sviluppo (15 versioni) è nel ramo `ep6-v2`, cartella `ep6/`; lo st
 | `sorgenti/` | Le due registrazioni dell'autore già passate in Adobe Podcast Enhance: `Voce_6-mejorada-v2.wav` (la voce intera) e `Battuta_rifatta-mejorada-v2.wav` (la penultima battuta, registrata di nuovo) |
 | `audio/` | Script dell'audio e i due risultati già pronti: `voice_fx.wav` (voce montata e trattata) e `mix_final.wav` (traccia finale). `phrases_raw.json` (le frasi nella registrazione), `phrases.json` (le frasi dopo il montaggio), `warp6.json` (tempi della scaletta → tempi reali), `events6.json` (tempi degli eventi dell'animazione per gli effetti sonori) |
 | `video/` | Animazione (`ep6.html` + `ep6.js` + `scene/`, three.js), labiale (`lip6.js`), rendering, sottotitoli, copertina (con lo sfondo usato, `copertina_sfondo.jpg`) |
-| `comune/` | Libreria condivisa dalle puntate (base, palco, centrale, atomi, acqua, mascotte, icone, render); vedi `comune/README.md` |
 | `descrizione.md` | Descrizione con hashtag |
 | `STORICO.md` | Storico di tutte le versioni (bozza 1 → v15) |
 
