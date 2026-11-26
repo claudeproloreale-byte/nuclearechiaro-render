@@ -19,9 +19,10 @@ export const A2 = A.clone().addScaledVector(T7.clone().sub(A), 0.652).addScaledV
 const FRAG_AX = V(-0.6, 0.8, 0).normalize();               // i due frammenti: in alto a sinistra e in basso a destra (lungo il corridoio del neutrone in arrivo), fuori campo
 // v7 (nota dell'autore a 30,5 della v6): l'U-235 a sinistra a metà altezza dell'inquadratura diventa U-238 (senza alone)
 export const U238_NOTA = PR(-0.95, -0.45);
+export let NUC_238 = null;   // v14: per la targhetta "Uranio 238"
 export function ritocca(at) {
   const n = at.NUCS.filter(n => n.zone === 'R' && n.u).map(n => [xy(n.c, U238_NOTA), n]).sort((p, q) => p[0] - q[0])[0];
-  if (n && n[0] < 0.8) n[1].u = false;
+  if (n && n[0] < 0.8) { n[1].u = false; NUC_238 = n[1]; }
   console.log('B7: U-235 diventato U-238 a', n && n[0].toFixed(2), 'dal punto indicato');
 }
 export const caps = [[A_FROM, A], [A, T7], [A.clone().addScaledVector(FRAG_AX, -4), A.clone().addScaledVector(FRAG_AX, 4)]];

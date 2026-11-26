@@ -13,6 +13,7 @@ import { creaAtomi } from '/comune/atomi.js';
 import { creaAcqua } from '/comune/acqua.js';
 import { creaMascotte } from '/comune/mascotte.js';
 import { creaIcone } from '/comune/icone.js';
+import { creaEtichette } from './etichette.js';
 import { creaRenderer, creaPrimoPiano, creaPalco } from '/comune/palco.js';
 import { WARP, unwarp, fwarp, rt, SWITCH, CUT, START_WORLD, BAR_IN } from './tempi.js';
 import * as centrale from './scene/centrale.js';
@@ -96,6 +97,8 @@ function dietroMascotte(m, p) {
 const { hud, hudCam } = creaPrimoPiano();
 const M = creaMascotte(hud);
 const I = creaIcone(hud), termo = b9.creaIcona(I);
+const barre = centrale.creaBarre(C), iconeB10 = centrale.creaIconeB10(I);   // v14: B10
+const ETI = creaEtichette(at.scene, b7);                                       // v14: targhette "Uranio 235" e "Uranio 238" nella B7
 const P = creaPalco(renderer, hud, hudCam, B3.scene, B3.camera);
 
 const worldAt = t => { let w = START_WORLD; for (const [s, n] of SWITCH) if (t >= s) w = n; return w; };
@@ -108,7 +111,7 @@ window.renderFrame = function (tn) {
   fadeMat.opacity = fadeAt(t);
   P.lampo.opacity = bomba.lampo(t);
   if (where === 'bomba') { P.mondo(B3.scene, B3.camera); B3.aggiorna(t, tn); }
-  if (where === 'world') { P.mondo(C.scene, C.camera); centrale.aggiorna(C, tn); }
+  if (where === 'world') { P.mondo(C.scene, C.camera); centrale.aggiorna(C, tn, t, barre); }
   if (where === 'atom') {
     P.mondo(at.scene, at.cam);
     const zoomK = at.camera(tn, atomCamAt(tn));
@@ -119,11 +122,12 @@ window.renderFrame = function (tn) {
     // neutroni liberi: con la camera lontana si ingrandiscono poco (nota 19 s della v2: erano enormi)
     const nK = Math.min(1 + (zoomK - 1) * 0.3, 1.35);
     at.placeNeutrons(t, nK); SUPER.aggiorna(t, nK);
+    ETI.aggiorna(t, zone === 'R');
     at.scaldaFondo(b9.expand(t));   // B9: il fondo si scalda un po' mentre l'acqua si dilata
   }
-  termo.aggiorna(t);
+  termo.aggiorna(t); iconeB10.aggiorna(t);
   M.update(tn, t, posa(tn, t));
-  I.centerIcons([termo.ic]);
+  I.centerIcons([termo.ic, ...iconeB10.icone]);
   P.inizio.opacity = 1 - ramp(t, 0, 0.3);
   P.render();
 };

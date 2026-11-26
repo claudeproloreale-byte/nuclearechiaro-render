@@ -9,7 +9,7 @@ Versione corta e operativa. Identità, piano editoriale, pubblicazione e storia 
 - Apertura calma, un'informazione alla volta; schemi riassuntivi a schermo qualche secondo; zoom lenti, senza scatti.
 
 ## Scritte e sottotitoli
-- Unica scritta nel video: i sottotitoli impressi (eccezioni: targhette "Uranio 235/238", "Plutonio 239" della puntata 4; "Barra di Uranio" della puntata 5, che esce dall'inquadratura con lo zoom e poi svanisce).
+- Unica scritta nel video: i sottotitoli impressi (eccezioni: targhette "Uranio 235/238", "Plutonio 239" della puntata 4; "Barra di Uranio" della puntata 5, che esce dall'inquadratura con lo zoom e poi svanisce; "Uranio 235" e "Uranio 238" della puntata 6, per circa 2 s all'inizio della B7).
 - Testo effettivamente pronunciato. Punteggiatura normale; a fine riga si tolgono `. , : ;`, le «» sempre; restano `?` `!` e la punteggiatura in mezzo alla riga. Numeri in cifre.
 - Poppins grassetto bianco, contorno `#0c1c4a`, una riga di 22 caratteri al massimo, centro al 79,5% dell'altezza. Mascotte grande e icone non scendono sulla riga.
 - Si conserva anche la versione senza sottotitoli; alla pubblicazione si spengono quelli automatici.
@@ -32,7 +32,7 @@ Versione corta e operativa. Identità, piano editoriale, pubblicazione e storia 
 - Acqua: ossigeno azzurro, due idrogeni bianchi; spiegata la moderazione, i neutroni continuano a rimbalzare sull'acqua. Densità delle molecole uguale ovunque (più neutroni possono urtare la stessa molecola).
 - Barre di combustibile viste da vicino (puntata 5): l'acqua sta **fra** le barre, mai mescolata con l'uranio, larga circa metà barra. Stesso aspetto delle barrette 3D: pastiglie color rame basse (circa metà del diametro), guaina lucida con riflesso verticale, bagliori arancioni; entrando nella barra le pastiglie diventano trasparenti e compaiono i nuclei.
 - Dissolvenze lente e uniformi, senza scatti di luce. Quando si allarga una zona, controllare che non entri nell'inquadratura di un'altra (puntata 5: striscia d'acqua comparsa nella zona della pastiglia).
-- Bomba (puntata 6): lampo bianco a tutto schermo, poi un'inquadratura breve (circa 2 s) del fungo nel deserto, in stile giocattolo, senza distruzione visibile (richiesta dell'autore del 26/11/2026).
+- Bomba (puntata 6): lampo bianco a tutto schermo, poi un'inquadratura breve (circa 3,5 s) del fungo nel deserto, in stile giocattolo, senza distruzione visibile (richiesta dell'autore del 26/11/2026).
 
 ## Tempi e codice
 - Tempi "di scaletta" in tutto il codice; con la voce arriva la tabella `WARP`: serve **solo per gli eventi** (comparse, espressioni) e per le chiavi delle camere (`rt`). Ciò che si muove di continuo usa il tempo del video.

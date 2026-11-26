@@ -85,7 +85,7 @@ export function creaBomba3d() {
   sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3)); sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 4)); sGeo.setAttribute('uv', new THREE.BufferAttribute(sUv, 2)); sGeo.setIndex(sIdx);
   const scia = new THREE.Mesh(sGeo, new THREE.MeshBasicMaterial({ map: sTex, vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
   scia.frustumCulled = false; scene.add(scia);
-  const J0 = 0.2, J1 = 4.4,   // v13: più veloce (prima 5,6)
+  const J0 = 0.2, J1 = 3.6,   // v14: ancora più veloce (v12: 5,6; v13: 4,4)
         jetAt = tn => { const u = (tn - J0) / (J1 - J0); return V(-12 + 25 * u, 7.2 + 0.4 * u, -26); };   // v12: più in alto (circa 14% dell'altezza)
   function jet(tn, on) {
     JET.visible = on && tn > J0 - 0.1 && tn < J1 + 0.1; if (JET.visible) JET.position.copy(jetAt(tn));
