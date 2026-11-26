@@ -84,3 +84,8 @@
 ## 26/11/2026 — v12, note dell'autore sulla v11
 - Jet più in alto (circa 14% dell'altezza). Scia rifatta: non più palline in fila ma un nastro continuo rivolto alla camera, sfumato ai bordi, che nasce poco dietro il motore, si allarga, scende e ondeggia appena e svanisce piano (`bomba3d.js`, `scia`).
 - 0:56: il neutrone di BB che va nell'acqua rallentava perché dopo la fissione la WARP è lenta (pausa della voce) e spariva a PE(4,6), poco fuori dal bordo. Ora si muove nel tempo del video (7 u/s, x0,85 a ogni urto; chiavi fitte riportate in scaletta con `unwarp`) e sparisce a PE(7,2), circa 0,6 s dopo essere uscito.
+
+## 26/11/2026 — v13, nuova registrazione della B10 e note sulla v12
+- B10 registrata di nuovo dall'autore (`sorgenti/Battuta_rifatta-mejorada-v2.wav`): "Un incidente, anche se molto, molto improbabile, può succedere, ma un'esplosione atomica è fisicamente impossibile." (Whisper sente "molto molto" in tutte le finestre provate). In `voice_ep6.py` il file si accoda alla registrazione e le sue due frasi sostituiscono le frasi 23 e 24. Sottotitoli aggiornati. Durata 81,2 s.
+- Jet più veloce: attraversa il cielo in 4,2 s (prima 5,4).
+- Bug a 0:57: dopo il secondo rimbalzo la scia "supersonica" del neutrone nell'acqua era una lunga riga dritta. Causa: il neutrone si muove nel tempo del video, ma `supersonico.js` misurava la velocità nel tempo di scaletta, che lì è molto lento. Ora i neutroni con `tempoVideo` hanno la velocità misurata nel tempo del video, e nessuna scia va oltre l'ultimo rimbalzo.

@@ -4,6 +4,7 @@
 // dall'acqua) non hanno effetto: così si vede bene quando un neutrone rallenta.
 // Uso: const S = creaSupersonico(at); a ogni fotogramma degli atomi S.aggiorna(t, nK) (nK = grandezza dei neutroni).
 import { THREE, clamp01 } from '/comune/base.js';
+import { fwarp } from './tempi.js';
 
 const V_MIN = 6, V_PIENA = 12;
 export function creaSupersonico(at) {
@@ -24,13 +25,18 @@ export function creaSupersonico(at) {
   function aggiorna(t, nK) {
     for (const n of at.NEUT) {
       const p = at.npos(n, t), q = p && at.npos(n, t - DT);
-      const sp = p && q ? Math.hypot(p.x - q.x, p.y - q.y) / DT : 0;
+      // v13 (bug a 0:57 della v12): un neutrone che si muove nel tempo del video (n.tempoVideo) ha la velocità misurata nel
+      // tempo del video; prima, nel tratto lento della WARP, sembrava velocissimo e la scia diventava una lunga riga dritta
+      const dtm = n.tempoVideo ? Math.max(1e-4, fwarp(t) - fwarp(t - DT)) : DT;
+      const sp = p && q ? Math.hypot(p.x - q.x, p.y - q.y) / dtm : 0;
       if (sp < V_MIN && !FX.has(n)) continue;
       const f = fx(n), k = clamp01((sp - V_MIN) / (V_PIENA - V_MIN));
       const on = k > 0.001; f.scia.visible = on; if (!on) continue;
-      const dx = (p.x - q.x) / (sp * DT), dy = (p.y - q.y) / (sp * DT), ang = Math.atan2(dy, dx);
+      const dd = Math.hypot(p.x - q.x, p.y - q.y) || 1, dx = (p.x - q.x) / dd, dy = (p.y - q.y) / dd, ang = Math.atan2(dy, dx);
       // scia: dalla coda alla testa del neutrone
-      const L = Math.min(0.11 * sp, 2.6) * nK, w = 0.16 * nK;
+      let L = Math.min(0.11 * sp, 2.6) * nK; const w = 0.16 * nK;
+      // v13: la scia non va mai oltre l'ultimo rimbalzo (dopo un urto riparte da zero)
+      const bu = n.bounces && n.bounces.filter(b => b.t <= t).pop(); if (bu) L = Math.min(L, Math.hypot(p.x - bu.p.x, p.y - bu.p.y));
       f.scia.position.set(p.x - dx * L / 2, p.y - dy * L / 2, 0.12); f.scia.rotation.z = ang; f.scia.scale.set(L, w, 1); f.scia.material.opacity = 0.75 * k;
     }
   }

@@ -10,6 +10,16 @@ from scipy.ndimage import uniform_filter1d
 a, sr = sf.read('voce_in.wav', dtype='float64')
 FPS = 30
 PH = json.load(open('phrases_raw.json'))
+# v13 (26/11/2026): l'autore ha registrato di nuovo la penultima battuta (B10) in un file a parte
+# (sorgenti/Battuta_rifatta-mejorada-v2.wav, 9,9 s, due frasi). Il file si accoda alla registrazione dopo 1 s di silenzio
+# e le sue due frasi prendono il posto delle frasi 23 e 24 (gli istanti sono quelli rilevati con detect6.py sul file nuovo).
+b, srb = sf.read('../sorgenti/Battuta_rifatta-mejorada-v2.wav', dtype='float64'); assert srb == sr
+if a.ndim > 1: a = a.mean(1)
+if b.ndim > 1: b = b.mean(1)
+OFF = len(a) / sr + 1.0
+a = np.concatenate([a, np.zeros(int(sr * 1.0)), b])
+PH[23] = [round(OFF + 1.35, 3), round(OFF + 5.65, 3)]   # Un incidente, anche se molto, molto improbabile, può succedere,
+PH[24] = [round(OFF + 6.10, 3), round(OFF + 9.11, 3)]   # ma un'esplosione atomica è fisicamente impossibile.
 # testo (trascrizione di controllo):
 #  0 Ma una centrale nucleare può esplodere come una bomba atomica? | 1 No. | 2 E non perché qualcuno la tiene a bada: | 3 lo impedisce la fisica.
 #  4 In una bomba | 5 l'uranio 235 | 6 è quasi puro: | 7 più di 90 nuclei su 100.
@@ -18,7 +28,7 @@ PH = json.load(open('phrases_raw.json'))
 #  14 Tutti gli altri sono uranio 238, | 15 e molti neutroni finiscono lì, | 16 assorbiti.
 #  17 Per andare avanti, la reazione ha bisogno dell'acqua, | 18 che rallenta i neutroni. | 19 E i neutroni più sono lenti, | 20 più probabilità hanno di interagire con l'uranio 235.
 #  21 E se il nocciolo si scalda troppo, l'acqua si dilata e frena meno i neutroni: | 22 la reazione rallenta da sola.
-#  23 Un incidente è molto improbabile ma può succedere, | 24 ma un'esplosione atomica è fisicamente impossibile. | 25 Hai qualche domanda? | 26 Fammela nei commenti!
+#  23 Un incidente, anche se molto, molto improbabile, può succedere, | 24 ma un'esplosione atomica è fisicamente impossibile.  (v13: dalla battuta rifatta) | 25 Hai qualche domanda? | 26 Fammela nei commenti!
 # battute: (inizio, fine di scaletta, frasi, ancore [(t scaletta, frase, istante nella registrazione)])
 BLK = [
   (0.5, 4.0, [0], []),

@@ -54,6 +54,7 @@ export function costruisci(at, acqua, nBB) {
   }
   const vecchi = nd.keys.map(k => k[1]);
   nd.keys = vk.map(([p, tv]) => [p, unwarp(tv)]);
+  nd.tempoVideo = true;   // v13: per la scia (supersonico.js) la velocità si misura nel tempo del video
   nd.bounces.forEach((b, i) => { const tn = unwarp(tb[i]); acqua.MOLS.forEach(m => { if (m.hitT === vecchi[i + 1]) m.hitT = tn; }); b.t = tn; });
   console.log('B8: neutrone a sinistra verso', dirL.toArray().map(x => x.toFixed(2)).join(','), '; neutrone a destra con 2 rimbalzi');
 }

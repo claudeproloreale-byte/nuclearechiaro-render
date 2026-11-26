@@ -14,7 +14,7 @@ TXT = [["Ma una centrale", "nucleare può esplodere", "come una bomba", "atomica
        ["E i neutroni", "più sono lenti,"], ["più probabilità", "hanno di interagire", "con l'uranio 235."],
        ["E se il nocciolo", "si scalda troppo,", "l'acqua si dilata", "e frena meno", "i neutroni:"],
        ["la reazione", "rallenta da sola."],
-       ["Un incidente", "è molto improbabile", "ma può succedere,"], ["ma un'esplosione", "atomica", "è fisicamente", "impossibile."],
+       ["Un incidente,", "anche se molto,", "molto improbabile,", "può succedere,"], ["ma un'esplosione", "atomica", "è fisicamente", "impossibile."],
        ["Hai qualche domanda?"], ["Fammela nei commenti!"]]
 assert len(TXT) == len(PH)
 # regola del canale (17/11/2026): a fine riga si tolgono . , : ; (e sempre le virgolette «»); restano ? e ! e la punteggiatura in mezzo alla riga

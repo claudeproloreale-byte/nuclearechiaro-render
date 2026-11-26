@@ -1,5 +1,6 @@
 #!/bin/bash
-# Ricostruisce la traccia audio finale (mix_final.wav) dalla registrazione in ../sorgenti.
+# Ricostruisce la traccia audio finale (mix_final.wav) dalle registrazioni in ../sorgenti
+# (Voce_6-mejorada-v2.wav e, per la B10, Battuta_rifatta-mejorada-v2.wav: vedi voice_ep6.py).
 # Richiede: python3 con numpy, scipy, soundfile; ffmpeg.
 set -e
 cd "$(dirname "$0")"
