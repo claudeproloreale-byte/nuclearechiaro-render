@@ -6,6 +6,7 @@
 import { V, xy, dirTo, polySegs, segDist, setSeed, rnd } from '/comune/base.js';
 import { YR, PE, E, gapL, gapR, behindMascot } from './zonaR.js';
 import { puntiCattura, lunghezzaCurva, fattore, alonePulsa } from '../cattura.js';
+import { fwarp, unwarp } from '../tempi.js';
 
 export const W_IN = 34.6, B8_HIT = 37.4;
 export const BB = PE(-1.1, -1.6);
@@ -16,7 +17,7 @@ export const caps = [...polySegs([W_FROM, ...W_PTS, BB]), [PE(-1.1, -7), PE(-1.1
 // v7: ultimo tratto curvo (cattura da parte di BB), anche lui libero dalle molecole
 const CURVA = puntiCattura(W_PTS[W_PTS.length - 1], BB, -1).pts;
 // v11: percorso del neutrone nato da BB che va nell'acqua: due rimbalzi, poi esce a destra (sopra la mascotte)
-const DESTRA = [PE(1.0, -2.3), PE(2.5, -1.5), PE(4.6, -2.2)];
+const DESTRA = [PE(1.0, -2.3), PE(2.5, -1.5), PE(7.2, -3.07)];   // v12: l'ultimo tratto va ben oltre il bordo destro
 
 export function costruisci(at, acqua, nBB) {
   // v7 (idea dell'autore sulla v6, nota a 37,2): dopo l'ultimo rimbalzo il neutrone lento non punta dritto a BB, passerebbe
@@ -40,7 +41,20 @@ export function costruisci(at, acqua, nBB) {
   dirL = dirL || V(-1, 0, 0);
   at.neutron(at.seg(BB.clone().addScaledVector(dirL, 0.32).setZ(0.15), BB.clone().addScaledVector(dirL, 4.2).setZ(0.15), B8_HIT + 0.05, 9), 'out', { trail: 8 });
   const d0 = dirTo(BB, DESTRA[0]);
-  acqua.zigNeutron([BB.clone().addScaledVector(d0, 0.32), ...DESTRA], B8_HIT + 0.05, { v0: 11, K: 0.85, end: 'out', trail: 8 });
+  // v12 (nota dell'autore a 0:56 della v11: rallentava in modo innaturale e spariva troppo presto): dopo la fissione la voce
+  // fa una pausa e la WARP lì è lenta, quindi il moto di questo neutrone segue il tempo del video (7 u/s, x0,85 a ogni urto),
+  // con chiavi fitte riportate in tempo di scaletta; sparisce a PE(7,2), quando è già fuori dall'inquadratura da circa 0,6 s.
+  const PD = [BB.clone().addScaledVector(d0, 0.32), ...DESTRA].map(p => p.clone().setZ(0.15));
+  const nd = acqua.zigNeutron(PD, B8_HIT + 0.05, { v0: 11, K: 0.85, end: 'out', trail: 8 });
+  const vk = [[PD[0], fwarp(B8_HIT + 0.05)]], tb = [];
+  for (let i = 0; i < PD.length - 1; i++) {
+    const L = PD[i].distanceTo(PD[i + 1]), dur = L / (7 * Math.pow(0.85, i)), n = Math.max(2, Math.ceil(dur / 0.04)), tv0 = vk[vk.length - 1][1];
+    for (let j = 1; j <= n; j++) vk.push([PD[i].clone().lerp(PD[i + 1], j / n), tv0 + dur * j / n]);
+    tb.push(vk[vk.length - 1][1]);
+  }
+  const vecchi = nd.keys.map(k => k[1]);
+  nd.keys = vk.map(([p, tv]) => [p, unwarp(tv)]);
+  nd.bounces.forEach((b, i) => { const tn = unwarp(tb[i]); acqua.MOLS.forEach(m => { if (m.hitT === vecchi[i + 1]) m.hitT = tn; }); b.t = tn; });
   console.log('B8: neutrone a sinistra verso', dirL.toArray().map(x => x.toFixed(2)).join(','), '; neutrone a destra con 2 rimbalzi');
 }
 

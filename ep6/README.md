@@ -2,7 +2,7 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p6`; richieste in `richieste`, versioni in `versioni/p6-v<k>`). Come si lavora: `piano app/app.md` nel progetto. Il vecchio documento della scaletta è superato.
 
-**Stato:** v11 (26/11/2026): jet con scia nel cielo iniziale, fungo più lungo con esplosione, schivata della mascotte più morbida, neutroni di BB che escono dall'inquadratura. Durata 80,4 s. L'autore registrerà di nuovo la penultima battuta (B10, "Un incidente è molto improbabile…"): quando arriva, sostituirla in `sorgenti/` e rifare `audio/build_audio.sh` (controllare le frasi 23-24 in `voice_ep6.py`).
+**Stato:** v12 (26/11/2026): jet più in alto con scia a nastro; il neutrone di BB nell'acqua si muove nel tempo del video. Durata 80,4 s. L'autore registrerà di nuovo la penultima battuta (B10, "Un incidente è molto improbabile…"): quando arriva, sostituirla in `sorgenti/` e rifare `audio/build_audio.sh` (controllare le frasi 23-24 in `voice_ep6.py`).
 Storico: `STORICO.md` · Regole: `regole.md`.
 
 ## Dove si corregge

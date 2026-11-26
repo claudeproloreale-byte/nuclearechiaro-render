@@ -74,14 +74,31 @@ export function creaBomba3d() {
     wing([[-0.45, 0.1], [-0.85, 0.1], [-0.95, 0.55], [-0.75, 0.55]], 0.03, 0);                                        // deriva
   }
   JET.scale.setScalar(1.25); JET.rotation.x = 0.35;   // un po' inclinato verso la camera, si vedono le ali
-  const trailM = std(0xffffff, { roughness: 1, transparent: true, opacity: 0.8, depthWrite: false });
-  const puffs = []; for (let i = 0; i < 70; i++) { const m = mesh(new THREE.SphereGeometry(1, 12, 8), trailM.clone(), scene); m.visible = false; puffs.push(m); }
-  const J0 = 0.2, J1 = 5.6, jetAt = tn => { const u = (tn - J0) / (J1 - J0); return V(-12 + 25 * u, 5.3 + 0.6 * u, -26); };
+  // v12 (nota dell'autore: la scia a palline era brutta): nastro continuo rivolto alla camera, sfumato ai bordi (texture),
+  // che nasce poco dietro il motore, si allarga con l'età, ondeggia appena e svanisce piano (alfa per vertice).
+  const NS = 120, DT = 0.035;   // 120 tratti da 35 ms: circa 4,2 s di scia
+  const sTex = (() => { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g2 = c.getContext('2d'), r = g2.createLinearGradient(0, 0, 0, 64);
+    r.addColorStop(0, 'rgba(255,255,255,0)'); r.addColorStop(0.3, 'rgba(255,255,255,0.75)'); r.addColorStop(0.5, 'rgba(255,255,255,1)'); r.addColorStop(0.7, 'rgba(255,255,255,0.75)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+    g2.fillStyle = r; g2.fillRect(0, 0, 4, 64); return new THREE.CanvasTexture(c); })();
+  const sGeo = new THREE.BufferGeometry(), sPos = new Float32Array((NS + 1) * 2 * 3), sCol = new Float32Array((NS + 1) * 2 * 4), sUv = new Float32Array((NS + 1) * 2 * 2), sIdx = [];
+  for (let i = 0; i <= NS; i++) { sUv.set([i / NS, 0, i / NS, 1], i * 4); if (i < NS) { const a = i * 2; sIdx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+  sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3)); sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 4)); sGeo.setAttribute('uv', new THREE.BufferAttribute(sUv, 2)); sGeo.setIndex(sIdx);
+  const scia = new THREE.Mesh(sGeo, new THREE.MeshBasicMaterial({ map: sTex, vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+  scia.frustumCulled = false; scene.add(scia);
+  const J0 = 0.2, J1 = 5.6, jetAt = tn => { const u = (tn - J0) / (J1 - J0); return V(-12 + 25 * u, 7.2 + 0.4 * u, -26); };   // v12: più in alto (circa 14% dell'altezza)
   function jet(tn, on) {
     JET.visible = on && tn > J0 - 0.1 && tn < J1 + 0.1; if (JET.visible) JET.position.copy(jetAt(tn));
-    puffs.forEach((m, i) => { const age = i * 0.06, ts = tn - age; m.visible = on && ts > J0 && ts < J1;
-      if (!m.visible) return; const p = jetAt(ts); m.position.set(p.x - 1.15, p.y + 0.02 * Math.sin(i), p.z);
-      const g = 0.07 + 0.05 * age; m.scale.set(g * 1.6, g, g); m.material.opacity = 0.75 * Math.max(0, 1 - age / 4.2) * Math.min(1, age / 0.1 + 0.3); });
+    scia.visible = on && tn > J0;
+    if (!scia.visible) return;
+    for (let i = 0; i <= NS; i++) {
+      const age = i * DT, ts = tn - age, p = jetAt(ts), w = 0.035 + 0.07 * age + 0.012 * age * age;
+      const y = p.y + 0.03 * Math.sin(ts * 3.1) * Math.min(1, age) - 0.06 * age;   // scende appena e ondeggia mentre si allarga
+      sPos.set([p.x - 1.15, y - w, p.z, p.x - 1.15, y + w, p.z], i * 6);
+      let a = 0.85 * smooth(clamp01((age - 0.04) / 0.18)) * Math.max(0, 1 - age / (NS * DT)) ** 1.3;   // nasce poco dietro il motore, svanisce piano
+      if (ts < J0 || ts > J1) a = 0;   // la scia esiste solo dove il jet è passato; dopo J1 la vecchia svanisce da sola
+      sCol.set([1, 1, 1, a, 1, 1, 1, a], i * 8);
+    }
+    sGeo.attributes.position.needsUpdate = true; sGeo.attributes.color.needsUpdate = true;
   }
   function veicolo(x, z, ry, v) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); ombra(g, 0, 0, 5.2, 3.0, 0.5); const o = { g, wheels: [], x0: x, ry, v }; VEH.push(o); return o; }
 

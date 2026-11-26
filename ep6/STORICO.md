@@ -80,3 +80,7 @@
 - Fungo più lungo: 3,6 s (prima 2,4; ancora in `voice_ep6.py`); esplosione lontana e sorda sul fungo (colpo grave, scoppio filtrato, rombo che rotola, in `music6.py`).
 - 0:42, schivata della mascotte nella B7: ora segue il tempo del video (prima la scaletta, con il passo della WARP), smootherstep e piccolo arco verso sinistra; andata 1,2 s, ritorno 2,0 s (`mascotte6.js`, `posMascotte`).
 - 0:56, neutroni nati da BB: non più assorbiti da due U-238. Uno va a sinistra verso il centro della pastiglia ed esce dall'inquadratura; l'altro va nell'acqua, rimbalza su due molecole ed esce a destra prima che la camera si allarghi sulla B9 (`b8.js`, `DESTRA`).
+
+## 26/11/2026 — v12, note dell'autore sulla v11
+- Jet più in alto (circa 14% dell'altezza). Scia rifatta: non più palline in fila ma un nastro continuo rivolto alla camera, sfumato ai bordi, che nasce poco dietro il motore, si allarga, scende e ondeggia appena e svanisce piano (`bomba3d.js`, `scia`).
+- 0:56: il neutrone di BB che va nell'acqua rallentava perché dopo la fissione la WARP è lenta (pausa della voce) e spariva a PE(4,6), poco fuori dal bordo. Ora si muove nel tempo del video (7 u/s, x0,85 a ogni urto; chiavi fitte riportate in scaletta con `unwarp`) e sparisce a PE(7,2), circa 0,6 s dopo essere uscito.
