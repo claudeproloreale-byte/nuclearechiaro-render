@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registratore — Nucleare Chiaro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cabina di registrazione: calma, un gesto alla volta, niente distrazioni.
+   IDEA: il gobbo (teleprompter) dello studio: la battuta grande al centro, la spia rossa "on air".
+   PICTURE: la battuta corrente su fondo blu notte, con la striscia delle battute e il livello del microfono.
+   COLOUR and TYPE: blu notte #0c1c4a, azzurro #58b0ff, giallo #ffd23f, corallo #f06a52 per la registrazione; Poppins + Inter.
+   LAYOUT: barra in alto, gobbo, comandi grandi sotto; in fondo "Unisci ed esporta". Una colonna, comoda col pollice. */
+:root{--bg:#08122e;--panel:#0f1d45;--line:#22336a;--ink:#eef3ff;--soft:#a9b8e0;--blue:#58b0ff;--yellow:#ffd23f;--coral:#f06a52;--green:#3ecf8e;--night:#0c1c4a;color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Poppins,Inter,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(20px,3.4vw,28px)}h2{font-size:22px}
+button,input,select{font:inherit;color:inherit}
+button{min-height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-weight:600}
+button:hover:not(:disabled){border-color:var(--blue)}button:disabled{opacity:.4;cursor:default}
+button.main{background:var(--yellow);color:var(--night);border-color:var(--yellow)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+input,select{font-size:16px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.top{position:sticky;top:0;z-index:5;background:var(--night);display:flex;align-items:center;gap:14px;padding:10px max(3vw,14px);flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.top .sp{flex:1}
+main{max-width:980px;margin:0 auto;padding:clamp(14px,3vw,32px) max(3vw,14px) 60px}
+.muted{color:var(--soft)}.small{font-size:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x proximity}
+.strip button{flex:none;min-width:52px;min-height:40px;padding:0 10px;font-size:14px;border-radius:10px;scroll-snap-align:center;position:relative}
+.strip button.ok{border-color:var(--green)}.strip button.ok::after{content:"";position:absolute;right:5px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--green)}
+.strip button.warn{border-color:var(--yellow)}
+.strip button.on{background:var(--ink);color:var(--night)}
+.prompter{position:relative;background:var(--night);border:1px solid var(--line);border-radius:22px;padding:clamp(22px,4vw,44px);min-height:clamp(240px,38vh,420px);display:grid;align-content:center;gap:16px;margin-top:6px}
+.prompter .nm{font:700 15px Poppins;color:var(--blue);display:flex;gap:10px;align-items:center}
+.prompter .txt{font:600 clamp(24px,4.4vw,40px)/1.28 Poppins;text-wrap:pretty}
+.prompter.rec{border-color:var(--coral);box-shadow:0 0 0 3px #f06a5240}
+.onair{display:none;align-items:center;gap:8px;font:700 13px Inter;color:var(--coral);position:absolute;right:20px;top:18px}
+.prompter.rec .onair{display:flex}
+.onair i{width:12px;height:12px;border-radius:50%;background:var(--coral)}
+@media(prefers-reduced-motion:no-preference){.onair i{animation:blink 1s infinite}@keyframes blink{50%{opacity:.25}}}
+.meter{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green) 0 70%,var(--yellow) 70% 90%,var(--coral) 90%);transition:width .06s linear}
+.ctrl{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin-top:16px}
+#rec{background:var(--coral);border-color:var(--coral);color:#fff;font-size:18px;min-height:64px}
+#rec.stop{background:var(--ink);border-color:var(--ink);color:var(--night)}
+.ctrl2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.info{min-height:24px;margin-top:10px}
+.warn{color:var(--yellow)}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:12px;margin-top:28px}
+.opts{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.opts label{display:flex;gap:8px;align-items:center;min-height:44px}
+.opts input[type=checkbox]{width:22px;height:22px}
+.opts input[type=text]{width:80px;text-align:right}
+.prog{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;width:0;background:var(--blue)}
+audio{width:100%}
+.dl{display:flex;gap:10px;flex-wrap:wrap}
+.dl a{display:inline-flex;align-items:center;min-height:48px;padding:0 18px;border-radius:14px;background:var(--yellow);color:var(--night);font-weight:700;text-decoration:none}
+.dl a.sec{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--night);padding:10px 16px;border-radius:12px;display:none;z-index:9;font-weight:600;max-width:92vw}
+.empty{display:grid;gap:14px;max-width:640px}
+kbd{font:600 13px Inter;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+@media(max-width:560px){.keys{display:none}.top h1{font-size:18px}.ctrl{grid-template-columns:1fr 1fr}.ctrl #rec{grid-column:1/-1;order:-1}.prompter .txt{font-size:24px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#58b0ff"/><circle cx="11" cy="13" r="3" fill="#fff"/><circle cx="19" cy="13" r="3" fill="#fff"/><circle cx="11.5" cy="13.5" r="1.4" fill="#0c1c4a"/><circle cx="19.5" cy="13.5" r="1.4" fill="#0c1c4a"/><path d="M10 19q5 4 10 0" stroke="#7a1030" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>
+  <h1 id="title">Registratore</h1>
+  <span class="sp"></span>
+  <select id="dev" aria-label="Microfono" hidden></select>
+</header>
+<main id="main">
+  <section id="empty" class="empty" hidden>
+    <h2>Aprite il registratore dall'app</h2>
+    <p class="muted">Il link dell'app (Audio › Registrazione) porta con sé le battute della puntata. Senza quel link potete fare una prova con una battuta qualsiasi.</p>
+    <div><button class="main" id="demo">Prova con una battuta</button></div>
+  </section>
+  <section id="rec-ui" hidden>
+    <div class="row" style="justify-content:space-between"><span class="muted small" id="count"></span><span class="muted small keys">Tasti: <kbd>Spazio</kbd> registra/stop · <kbd>R</kbd> riascolta · <kbd>←</kbd> <kbd>→</kbd></span></div>
+    <nav class="strip" id="strip" aria-label="Battute"></nav>
+    <div class="prompter" id="prompter">
+      <span class="onair"><i></i>REC <span id="rt">0,0 s</span></span>
+      <div class="nm" id="nm"></div>
+      <div class="txt" id="txt"></div>
+      <div class="meter" aria-hidden="true"><i id="lvl"></i></div>
+    </div>
+    <div class="ctrl">
+      <button id="prev">← Indietro</button>
+      <button id="rec">● Registra</button>
+      <button id="next">Avanti →</button>
+    </div>
+    <div class="ctrl2">
+      <button id="play" disabled>▶ Riascolta</button>
+      <button id="redo" disabled>↺ Rifai</button>
+    </div>
+    <div class="info small" id="info"></div>
+
+    <section class="box" id="exp">
+      <div class="row" style="justify-content:space-between"><h2>Unisci ed esporta</h2><span class="muted small" id="have"></span></div>
+      <div class="opts">
+        <label>Pausa fra le battute <input type="text" id="gap" value="1,0" inputmode="decimal"> s</label>
+        <label><input type="checkbox" id="trim" checked> Togli il silenzio prima e dopo ogni battuta</label>
+      </div>
+      <p class="muted small" style="margin:0">Le pause dentro una battuta restano come registrate. Si esporta un MP3 mono a 192 kbps (per Adobe Podcast) e il file dei tempi delle frasi, da caricare entrambi nell'app.</p>
+      <div><button class="main" id="join" disabled>Unisci ed esporta</button></div>
+      <div class="prog" id="prog" hidden><i></i></div>
+      <div id="out" hidden>
+        <audio id="aout" controls></audio>
+        <div class="dl" style="margin-top:10px"><a id="dmp3" download>Scarica MP3</a><a id="djson" class="sec" download>Scarica i tempi</a><button id="copyT">Copia i tempi</button></div>
+        <table style="margin-top:12px"><thead><tr><th>Battuta</th><th style="text-align:right">Inizio</th><th style="text-align:right">Fine</th></tr></thead><tbody id="tt"></tbody></table>
+      </div>
+    </section>
+  </section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script src="lame.min.js"></script>
+<script>
+{
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const f1 = x => (+x).toFixed(1).replace('.', ',');
+const f2 = x => (+x).toFixed(2).replace('.', ',');
+let toastT; const toast = m => { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 3500); };
+
+/* ---------- battute dal link ---------- */
+const b64d = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
+async function inflate(bytes) {
+  const st = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new TextDecoder().decode(await new Response(st).arrayBuffer());
+}
+async function readHash() {
+  const h = location.hash.slice(1); const m = h.match(/^d=([zj])\.(.+)$/); if (!m) return null;
+  const bytes = b64d(m[2]); const txt = m[1] === 'z' ? await inflate(bytes) : new TextDecoder().decode(bytes);
+  const d = JSON.parse(txt); if (!d || !Array.isArray(d.b)) return null;
+  return { p: String(d.p), t: String(d.t || ''), b: d.b.map(x => ({ id: String(x[0]), nome: String(x[1]), voce: String(x[2] || '') })).filter(x => x.voce.trim()) };
+}
+
+/* ---------- archivio nel browser (IndexedDB) ---------- */
+let dbp = null;
+function idb() {
+  if (!dbp) dbp = new Promise((res, rej) => { const r = indexedDB.open('nc-registratore', 1); r.onupgradeneeded = () => r.result.createObjectStore('prese'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  return dbp;
+}
+async function tx(mode, fn) { const db = await idb(); return new Promise((res, rej) => { const t = db.transaction('prese', mode); const st = t.objectStore('prese'); const r = fn(st); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); }); }
+const keyOf = b => E.p + ':' + b.id;
+const getTake = b => tx('readonly', s => s.get(keyOf(b))).catch(() => null);
+const putTake = (b, v) => tx('readwrite', s => s.put(v, keyOf(b)));
+const delTake = b => tx('readwrite', s => s.delete(keyOf(b)));
+
+/* ---------- stato ---------- */
+const E = { p: null, t: '', b: [], i: 0, takes: {}, sr: 48000 };
+let ctx = null, stream = null, node = null, src = null, chunks = [], recording = false, recStart = 0, playing = null;
+
+async function start(data) {
+  Object.assign(E, data, { i: 0, takes: {} });
+  $('#title').textContent = `Puntata ${E.p}` + (E.t ? ' · ' + E.t : '');
+  document.title = `Registratore · Puntata ${E.p}`;
+  $('#empty').hidden = true; $('#rec-ui').hidden = false;
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
+  for (const b of E.b) { const t = await getTake(b); if (t) E.takes[b.id] = t; }
+  const first = E.b.findIndex(b => !E.takes[b.id]); E.i = first < 0 ? 0 : first;
+  show(); devices();
+}
+function show() {
+  const b = E.b[E.i]; if (!b) return; const t = E.takes[b.id];
+  $('#count').textContent = `Battuta ${E.i + 1} di ${E.b.length}`;
+  $('#nm').innerHTML = `${esc(b.nome)}${t ? ` <span class="muted small" style="font:500 14px Inter">· registrata (${f1(t.pcm.length / t.sr)} s)</span>` : ''}`;
+  $('#txt').textContent = b.voce;
+  $('#strip').innerHTML = E.b.map((x, k) => { const tk = E.takes[x.id]; const cls = tk ? (tk.voce !== x.voce ? 'warn' : 'ok') : ''; return `<button data-k="${k}" class="${cls} ${k === E.i ? 'on' : ''}" title="${esc(x.voce.slice(0, 60))}">${esc(x.nome)}</button>`; }).join('');
+  $('#strip').querySelectorAll('[data-k]').forEach(el => el.onclick = () => { if (recording) return; stopPlay(); E.i = +el.dataset.k; show(); });
+  const on = $('#strip .on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+  $('#play').disabled = !t || recording; $('#redo').disabled = !t || recording;
+  $('#prev').disabled = recording || E.i === 0; $('#next').disabled = recording || E.i === E.b.length - 1;
+  $('#rec').textContent = recording ? '■ Stop' : t ? '● Registra di nuovo' : '● Registra'; $('#rec').classList.toggle('stop', recording);
+  $('#prompter').classList.toggle('rec', recording);
+  let info = '';
+  if (t && t.voce !== b.voce) info = '<span class="warn">Il testo è cambiato dopo questa presa: conviene rifarla.</span>';
+  else if (t && t.peak >= 0.99) info = '<span class="warn">La presa satura (picco al massimo): rifatela un po\' più lontano dal microfono.</span>';
+  else if (t && t.peak < 0.06) info = '<span class="warn">La presa è molto bassa: avvicinatevi al microfono.</span>';
+  $('#info').innerHTML = info;
+  const n = E.b.filter(x => E.takes[x.id]).length;
+  $('#have').textContent = `${n} di ${E.b.length} battute registrate`;
+  $('#join').disabled = !n || recording;
+}
+
+/* ---------- microfono ---------- */
+async function devices() {
+  try {
+    const ds = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
+    const sel = $('#dev'); if (ds.length < 2 || !ds[0].label) { sel.hidden = true; return; }
+    const cur = localStorage.getItem('nc-mic') || '';
+    sel.innerHTML = ds.map(d => `<option value="${esc(d.deviceId)}" ${d.deviceId === cur ? 'selected' : ''}>${esc(d.label || 'Microfono')}</option>`).join(''); sel.hidden = false;
+    sel.onchange = () => { try { localStorage.setItem('nc-mic', sel.value); } catch {} closeMic(); };
+  } catch {}
+}
+const WORKLET = `class R extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor('rec',R)`;
+async function openMic() {
+  if (stream) return;
+  let id = ''; try { id = localStorage.getItem('nc-mic') || ''; } catch {}
+  const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 };
+  if (id) audio.deviceId = { exact: id };
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio }); }
+  catch (e) { if (id) { try { localStorage.removeItem('nc-mic'); } catch {} delete audio.deviceId; stream = await navigator.mediaDevices.getUserMedia({ audio }); } else throw e; }
+  if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: 'application/javascript' }))); }
+  if (ctx.state === 'suspended') await ctx.resume();
+  E.sr = ctx.sampleRate;
+  src = ctx.createMediaStreamSource(stream); node = new AudioWorkletNode(ctx, 'rec');
+  const mute = ctx.createGain(); mute.gain.value = 0; src.connect(node); node.connect(mute); mute.connect(ctx.destination);
+  node.port.onmessage = e => { const c = e.data; let pk = 0; for (let k = 0; k < c.length; k++) { const a = Math.abs(c[k]); if (a > pk) pk = a; }
+    const db = pk > 0 ? 20 * Math.log10(pk) : -90; $('#lvl').style.width = Math.max(0, Math.min(100, (db + 60) / 60 * 100)) + '%';
+    if (recording) { chunks.push(c); $('#rt').textContent = f1((performance.now() - recStart) / 1000) + ' s'; } };
+  devices();
+}
+function closeMic() { try { stream && stream.getTracks().forEach(t => t.stop()); src && src.disconnect(); node && node.disconnect(); } catch {} stream = null; src = null; node = null; $('#lvl').style.width = '0'; }
+
+async function toggleRec() {
+  if (recording) return stopRec();
+  stopPlay();
+  try { await openMic(); } catch (e) { toast('Microfono non disponibile: ' + (e && e.name === 'NotAllowedError' ? 'permesso negato' : (e && e.message) || e)); return; }
+  chunks = []; recording = true; recStart = performance.now(); show();
+}
+async function stopRec() {
+  recording = false;
+  await new Promise(r => setTimeout(r, 120));
+  const n = chunks.reduce((a, c) => a + c.length, 0), pcm = new Float32Array(n); let o = 0; for (const c of chunks) { pcm.set(c, o); o += c.length; } chunks = [];
+  const b = E.b[E.i];
+  if (n < E.sr * 0.3) { toast('Presa troppo corta: non salvata'); show(); return; }
+  let peak = 0; for (let k = 0; k < n; k++) { const a = Math.abs(pcm[k]); if (a > peak) peak = a; }
+  const take = { pcm, sr: E.sr, voce: b.voce, nome: b.nome, peak, data: new Date().toISOString() };
+  E.takes[b.id] = take;
+  try { await putTake(b, take); } catch { toast('Presa tenuta in memoria, ma il browser non l\'ha salvata: non ricaricate la pagina'); }
+  show();
+}
+function stopPlay() { if (playing) { try { playing.stop(); } catch {} playing = null; $('#play').textContent = '▶ Riascolta'; } }
+async function playTake() {
+  if (playing) { stopPlay(); return; }
+  const t = E.takes[E.b[E.i].id]; if (!t) return;
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') await ctx.resume();
+  const buf = ctx.createBuffer(1, t.pcm.length, t.sr); buf.copyToChannel(t.pcm, 0);
+  const s = ctx.createBufferSource(); s.buffer = buf; s.connect(ctx.destination); s.onended = () => { if (playing === s) stopPlay(); };
+  s.start(); playing = s; $('#play').textContent = '■ Ferma';
+}
+async function redo() {
+  const b = E.b[E.i]; if (!E.takes[b.id]) return;
+  delete E.takes[b.id]; try { await delTake(b); } catch {} show(); toggleRec();
+}
+function move(k) { if (recording) return; stopPlay(); E.i = Math.max(0, Math.min(E.b.length - 1, E.i + k)); show(); }
+
+/* ---------- unione ---------- */
+function trimRange(pcm, sr) {
+  const w = Math.round(sr * 0.01), n = Math.floor(pcm.length / w), r = new Float32Array(n);
+  let mx = 0; for (let k = 0; k < n; k++) { let s = 0; for (let j = k * w; j < (k + 1) * w; j++) s += pcm[j] * pcm[j]; r[k] = Math.sqrt(s / w); if (r[k] > mx) mx = r[k]; }
+  const th = Math.max(mx * Math.pow(10, -35 / 20), Math.pow(10, -58 / 20));
+  let a = 0; while (a < n && r[a] < th) a++; let z = n - 1; while (z > a && r[z] < th) z--;
+  if (a >= n) return [0, pcm.length];
+  return [Math.max(0, a * w - Math.round(sr * 0.12)), Math.min(pcm.length, (z + 1) * w + Math.round(sr * 0.25))];
+}
+function resample(pcm, from, to) {
+  if (from === to) return pcm; const n = Math.round(pcm.length * to / from), o = new Float32Array(n), k = from / to;
+  for (let i = 0; i < n; i++) { const x = i * k, j = Math.floor(x), f = x - j; o[i] = (pcm[j] || 0) * (1 - f) + (pcm[j + 1] || 0) * f; }
+  return o;
+}
+async function join() {
+  const gap = Math.max(0, Math.min(5, +$('#gap').value.replace(',', '.') || 0)), doTrim = $('#trim').checked;
+  const list = E.b.filter(b => E.takes[b.id]); if (!list.length) return;
+  const missing = E.b.length - list.length;
+  $('#join').disabled = true; $('#prog').hidden = false; const bar = $('#prog i'); bar.style.width = '2%';
+  const SR = 48000, fade = Math.round(SR * 0.01), parts = [], tempi = []; let t = 0;
+  for (const b of list) {
+    const tk = E.takes[b.id]; let pcm = resample(tk.pcm, tk.sr, SR);
+    if (doTrim) { const [a, z] = trimRange(pcm, SR); pcm = pcm.slice(a, z); }
+    for (let k = 0; k < fade && k < pcm.length; k++) { const g = k / fade; pcm[k] *= g; pcm[pcm.length - 1 - k] *= g; }
+    if (parts.length && gap) { parts.push(new Float32Array(Math.round(SR * gap))); t += gap; }
+    tempi.push({ id: b.id, nome: b.nome, inizio: +t.toFixed(3), fine: +(t + pcm.length / SR).toFixed(3), voce: b.voce });
+    parts.push(pcm); t += pcm.length / SR;
+  }
+  const total = parts.reduce((a, p) => a + p.length, 0), all = new Float32Array(total); let o = 0; for (const p of parts) { all.set(p, o); o += p.length; }
+  /* MP3 192 kbps mono */
+  const enc = new lamejs.Mp3Encoder(1, SR, 192), BL = 1152 * 20, out = [];
+  for (let k = 0; k < total; k += BL) {
+    const n = Math.min(BL, total - k), s = new Int16Array(n);
+    for (let j = 0; j < n; j++) { const v = Math.max(-1, Math.min(1, all[k + j])); s[j] = v < 0 ? v * 32768 : v * 32767; }
+    const m = enc.encodeBuffer(s); if (m.length) out.push(m);
+    if ((k / BL) % 25 === 0) { bar.style.width = (2 + 96 * k / total) + '%'; await new Promise(r => setTimeout(r)); }
+  }
+  const fl = enc.flush(); if (fl.length) out.push(fl);
+  bar.style.width = '100%';
+  const mp3 = new Blob(out, { type: 'audio/mpeg' });
+  const meta = { puntata: E.p, titolo: E.t, creato: new Date().toISOString(), pausa: gap, rifilatura: doTrim, durata: +(total / SR).toFixed(3), battute: tempi };
+  const json = new Blob([JSON.stringify(meta, null, 1)], { type: 'application/json' });
+  const set = (el, blob, name) => { if (el.dataset.u) URL.revokeObjectURL(el.dataset.u); const u = URL.createObjectURL(blob); el.dataset.u = u; el.href = u; el.download = name; };
+  set($('#dmp3'), mp3, `p${E.p}-voce.mp3`); set($('#djson'), json, `p${E.p}-tempi.json`);
+  const au = $('#aout'); if (au.dataset.u) URL.revokeObjectURL(au.dataset.u); au.dataset.u = URL.createObjectURL(mp3); au.src = au.dataset.u;
+  $('#tt').innerHTML = tempi.map(x => `<tr><td>${esc(x.nome)}</td><td class="n">${f2(x.inizio)} s</td><td class="n">${f2(x.fine)} s</td></tr>`).join('');
+  $('#copyT').onclick = () => navigator.clipboard.writeText(JSON.stringify(meta)).then(() => toast('Tempi copiati'), () => toast('Copia non riuscita'));
+  $('#out').hidden = false; $('#prog').hidden = true; $('#join').disabled = false;
+  toast(`Pronto: ${f1(total / SR)} s, ${(mp3.size / 1048576).toFixed(1).replace('.', ',')} MB` + (missing ? ` · mancano ${missing} battute` : ''));
+}
+
+/* ---------- comandi ---------- */
+$('#rec').onclick = toggleRec; $('#play').onclick = playTake; $('#redo').onclick = redo;
+$('#prev').onclick = () => move(-1); $('#next').onclick = () => move(1); $('#join').onclick = () => join().catch(e => { toast('Unione non riuscita: ' + (e.message || e)); $('#join').disabled = false; $('#prog').hidden = true; });
+$('#demo').onclick = () => start({ p: 'prova', t: 'prova', b: [{ id: 'prova1', nome: 'B1', voce: 'Una centrale nucleare non può esplodere come una bomba atomica. Vediamo perché.' }] });
+addEventListener('keydown', e => {
+  if ($('#rec-ui').hidden || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === ' ') { e.preventDefault(); if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); toggleRec(); }
+  else if (e.key === 'ArrowRight') move(1); else if (e.key === 'ArrowLeft') move(-1);
+  else if (e.key === 'r' || e.key === 'R') playTake();
+});
+addEventListener('hashchange', () => location.reload());
+addEventListener('beforeunload', e => { if (recording) { e.preventDefault(); e.returnValue = ''; } });
+
+(async () => {
+  let d = null;
+  try { d = await readHash(); if (d) localStorage.setItem('nc-reg-last', JSON.stringify(d)); } catch (e) { toast('Link non valido'); }
+  if (!d && !location.hash) { try { d = JSON.parse(localStorage.getItem('nc-reg-last')); } catch {} }
+  if (d && d.b.length) start(d); else $('#empty').hidden = false;
+})();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+name: Pagine
+# Pubblica la cartella sito/ (registratore) con GitHub Pages.
+# Una volta sola: Settings → Pages → Source: "GitHub Actions".
+on:
+  push:
+    branches: [main]
+    paths: ['sito/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.dep.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: sito
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sito
+      - id: dep
+        uses: actions/deploy-pages@v4
