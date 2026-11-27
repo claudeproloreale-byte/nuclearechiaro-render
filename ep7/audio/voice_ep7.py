@@ -1,4 +1,4 @@
-# Puntata 7 — voce definitiva (p7-voce-enhanced-v2.mp3 caricato nell'app il 27/11/2026, versione migliorata, 124,4 s, 31 frasi
+# Puntata 7 — voce definitiva (p7-voce-enhanced-v2.mp3, caricato nell'app il 27/11/2026 e mandato in chat in MP3, versione migliorata, 124,4 s, 31 frasi
 # rilevate a -50 dB come in detect6.py -> phrases_raw.json). Stesso metodo delle puntate 5 e 6 (Post 6/audio/voice_ep6.py):
 # ogni battuta della scaletta si appoggia sulla voce; dove la voce è più lunga l'animazione rallenta, dove è più corta
 # l'animazione va alla sua velocità e la pausa dopo si allunga. Alcuni eventi sono agganciati a parole (ANC: tempo di scaletta,
@@ -98,12 +98,9 @@ for k, (s, e) in enumerate(PH):
     f1, f2 = int(0.02 * sr), int(0.08 * sr); seg[:f1] *= np.linspace(0, 1, f1); seg[-f2:] *= np.linspace(1, 0, f2)
     i0 = int((starts[k] - PRE) * sr); out[i0:i0 + len(seg)] += seg
     newPH.append([round(starts[k], 3), round(starts[k] + e - s, 3)])
-# v11 (nota audio dell'autore: «silenzio improvviso dopo "paura"»): la versione migliorata chiude di colpo la fine delle frasi
-# (da -33 a -80 dB in 0,1 s). Una coda d'ambiente leggera (stanza piccola, 0,7 s, -20 dB) fa spegnere le parole in modo naturale.
-from scipy.signal import fftconvolve
-rg = np.random.default_rng(7); ti = np.arange(int(0.7 * sr)) / sr
-ir = rg.standard_normal(len(ti)) * np.exp(-ti * 7.5); ir = sosfiltfilt(butter(2, [250, 5000], 'bandpass', fs=sr, output='sos'), ir); ir /= np.sqrt((ir ** 2).sum())
-out = out + 10 ** (-20 / 20) * fftconvolve(out, ir)[:len(out)]
+# v12: tolta la coda d'ambiente della v11 (all'autore non piace). La registrazione non è tagliata: dopo «paura?» la voce scende
+# da -33 a -79 dB come nell'MP3 originale. Da qui la sorgente è l'MP3 caricato (voce_in.wav da p7-voce-enhanced-v2.mp3, stesso
+# allineamento del WebM dell'app), non la conversione WebM.
 out = out[:int(TOTAL * sr)]
 sf.write('voice_edit.wav', out, sr, subtype='PCM_24')
 json.dump(newPH, open('phrases.json', 'w')); json.dump(W, open('warp7.json', 'w'))
