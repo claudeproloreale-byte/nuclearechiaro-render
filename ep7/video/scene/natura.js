@@ -8,6 +8,7 @@
 //   B5   la camera entra in un puntino (ZOOM), fino al lampo bianco del primo piano
 // Tutte le x di questo file sono relative a NX (dx); z e y sono quelle del mondo.
 import { THREE, V, std, mesh, glow, smooth, ramp, setSeed, rnd, clamp01, lerp, hash, tube, pipeCurve } from '/comune/base.js';
+import { ATOM_OUT } from '../tempi.js';
 
 export const NX = 26;
 export const CAM_NAT = [NX, 1.0, -12, NX, -0.5, -40];   // v5: ancora più vicina e bassa (omino e rocce in primo piano)
@@ -77,20 +78,22 @@ export function creaNatura(C) {
 
   const fosf = [];   // { mats, glows, t0 }: cose che si illuminano nella B3
   // ---------------- gruppo di rocce in primo piano (rocce grandi irregolari, sassolini, ciuffi d'erba)
+  // v6: rocce e banano in primo piano solo fino all'entrata negli atomi; al ritorno (B10–B12) il prato davanti è libero per i pesi
+  const fp = new THREE.Group(); nat.add(fp);
   const rocks = { mats: [], glows: [], t0: FOSF.rocce };
   const grassM = std(0x4e9e44, { roughness: 0.9 });
   [[-1.05, -29.0, 0.85, 0x9a958c], [-0.05, -29.5, 0.65, 0x8c8f96], [-1.95, -29.6, 0.6, 0xa39d92], [-0.55, -28.3, 0.4, 0x908b82], [0.35, -28.6, 0.34, 0x9a958c], [-1.75, -28.4, 0.3, 0x8c8f96],
    [0.15, -27.95, 0.16, 0xa39d92], [-0.85, -27.8, 0.15, 0x878a85], [-2.3, -28.6, 0.16, 0x9a958c], [0.75, -29.2, 0.2, 0x8c8f96]].forEach(([x, z, s, c], i) => {
     const m = std(c, { roughness: 0.92, flatShading: true, emissive: 0x6dff5a, emissiveIntensity: 0 });
-    const r = mesh(rockGeo(s, 3 + i * 1.3), m, nat, V(x, gy(x, z) + s * 0.12, z)); r.rotation.y = rnd() * 6;
+    const r = mesh(rockGeo(s, 3 + i * 1.3), m, fp, V(x, gy(x, z) + s * 0.12, z)); r.rotation.y = rnd() * 6;
     rocks.mats.push(m);
-    if (s > 0.4) { const g = glow(0x8dff6a, nat, s * 3); g.position.set(x, gy(x, z) + s * 0.35, z + s * 0.6); rocks.glows.push(g); }
+    if (s > 0.4) { const g = glow(0x8dff6a, fp, s * 3); g.position.set(x, gy(x, z) + s * 0.35, z + s * 0.6); rocks.glows.push(g); }
   });
-  for (let i = 0; i < 16; i++) { const x = -2.5 + rnd() * 3.6, z = -27.7 - rnd() * 2.2, s = 0.18 + rnd() * 0.16; const b = mesh(new THREE.ConeGeometry(0.035, s, 4), grassM, nat, V(x, gy(x, z) + s / 2 - 0.03, z)); b.rotation.set((rnd() - 0.5) * 0.6, 0, (rnd() - 0.5) * 0.6); }
+  for (let i = 0; i < 16; i++) { const x = -2.5 + rnd() * 3.6, z = -27.7 - rnd() * 2.2, s = 0.18 + rnd() * 0.16; const b = mesh(new THREE.ConeGeometry(0.035, s, 4), grassM, fp, V(x, gy(x, z) + s / 2 - 0.03, z)); b.rotation.set((rnd() - 0.5) * 0.6, 0, (rnd() - 0.5) * 0.6); }
   fosf.push(rocks);
 
   // ---------------- banano in primo piano a sinistra
-  const BT = new THREE.Group(); { const x = 1.75, z = -29.6; BT.position.set(x, gy(x, z) - 0.05, z); BT.scale.set(-1.05, 1.05, 1.05); } nat.add(BT);   // v5: a destra, dietro la mascotte; specchiato (casco verso il centro)
+  const BT = new THREE.Group(); { const x = 1.75, z = -29.6; BT.position.set(x, gy(x, z) - 0.05, z); BT.scale.set(-1.05, 1.05, 1.05); } fp.add(BT);   // v5: a destra, dietro la mascotte; specchiato (casco verso il centro)
   const stemM = std(0x7f9448, { roughness: 0.85 }), sheathM = std(0x8a6a3a, { roughness: 0.95, side: THREE.DoubleSide }), stemM2 = std(0x6f8a3e, { roughness: 0.85 });
   const TOP = 3.4, UP = TOP - 2.7;   // altezza del fusto; la corona e il casco salgono di UP
   { const s = mesh(new THREE.CylinderGeometry(0.15, 0.25, TOP, 18, 4), stemM, BT, V(0, TOP / 2, 0)); s.rotation.z = 0.03;
@@ -207,6 +210,7 @@ export function creaNatura(C) {
   }
 
   function aggiorna(t, tn) {
+    fp.visible = t < ATOM_OUT;
     const off = 1 - smooth(ramp(t, ...FOSF.spente));
     for (const f of fosf) {
       const on = smooth(ramp(t, f.t0, f.t0 + 0.4)) * off, puls = 1 + 0.5 * clamp01(1 - Math.abs(t - f.t0 - 0.35) / 0.4) + 0.12 * Math.sin(tn * 3.1 + f.t0);

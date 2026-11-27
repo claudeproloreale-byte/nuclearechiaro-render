@@ -21,7 +21,8 @@ export function creaSpazio() {
   const blobs = [[-3.5, 5.5, -18, 0x5a7cff, 14], [3.8, -4.5, -22, 0x9a5cff, 16], [-2.5, -7, -25, 0x3aa0ff, 12]].map(([x, y, z, c, s]) => { const b = glow(c, scene, s); b.position.set(x, y, z); b.material.opacity = 0.22; return b; });
   // simbolo della radioattività grande al centro (v3), verde chiaro fosforescente, con un alone che respira
   const simb = new THREE.Group(); simb.position.set(0, 0.75, 0); scene.add(simb);
-  const fosM = std(0xf2f4f6, { roughness: 0.5, emissive: 0x5fe04a, emissiveIntensity: 0 });   // v5: bianco, poi lampeggia di verde (LAMPEGGIA)
+  const fosM = std(0xffffff, { roughness: 0.5, emissive: 0xffffff, emissiveIntensity: 1 });   // v5: bianco, poi lampeggia di verde (LAMPEGGIA); v6: bianco pieno (emissivo bianco)
+  const BIANCO = new THREE.Color(0xffffff).multiplyScalar(0.28), VERDE = new THREE.Color(0x5fe04a).multiplyScalar(0.75);
   mesh(trifoglio(0.2, 0.12), fosM, simb);
   const sGlow = glow(0x7ee860, simb, 3.0); sGlow.position.z = -0.2;
   const sGlow2 = glow(0xc8ffb0, simb, 1.6); sGlow2.position.z = 0.15;
@@ -30,7 +31,7 @@ export function creaSpazio() {
     simb.rotation.set(0.12 * Math.sin(tn * 0.9), 0.25 * Math.sin(tn * 0.7), 0.05 * Math.sin(tn * 0.5));
     simb.scale.setScalar(1 + 0.03 * Math.sin(tn * 2.2));
     const lp = tn < LAMPEGGIA ? 0 : Math.pow(0.5 + 0.5 * Math.sin((tn - LAMPEGGIA) * 2 * Math.PI * 1.4 - Math.PI / 2), 1.5);   // lampeggio 1,4 volte al secondo
-    fosM.emissiveIntensity = 0.75 * lp; fosM.color.setRGB(0.95 - 0.2 * lp, 0.96, 0.96 - 0.3 * lp);
+    fosM.emissive.copy(BIANCO).lerp(VERDE, lp); fosM.color.setRGB(1 - 0.25 * lp, 1, 1 - 0.34 * lp);
     sGlow.material.opacity = 0.32 * lp; sGlow2.material.opacity = 0;
     blobs.forEach((b, i) => { b.material.opacity = 0.2 + 0.05 * Math.sin(tn * 0.7 + i); });
     camera.position.set(Math.sin(tn * 0.3) * 0.05, Math.sin(tn * 0.23) * 0.04, 12); camera.lookAt(0, 0, 0);

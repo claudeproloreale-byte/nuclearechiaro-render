@@ -37,21 +37,23 @@ export function creaPrimoPiano7(I, hud) {
   const notteM = basic(0x13234f), lineaM = new THREE.MeshBasicMaterial({ color: 0x9fc4ff, transparent: true, opacity: 0.55 });
   const punta = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false });
   const CARRO = [[-0.165, 0.085], [-0.1, 0.075], [-0.045, 0.05], [0.01, 0.02], [0.02, -0.06], [0.125, -0.075], [0.135, 0.02]].map(([x, y]) => [x * 1.55, y * 1.55 + 0.01]);
-  function stella(c) {
-    const g = new THREE.Group(); g.position.z = -0.05; c.add(g);
-    mesh(new THREE.CircleGeometry(0.4, 64), notteM, g, V(0, 0, -0.2));
-    const lin = (a, b) => { const A = V(a[0], a[1], -0.15), B = V(b[0], b[1], -0.15), l = mesh(new THREE.PlaneGeometry(A.distanceTo(B), 0.008), lineaM, g, A.clone().lerp(B, 0.5)); l.rotation.z = Math.atan2(B.y - A.y, B.x - A.x); };
+  // v6: il cielo e le stelle stanno nel disco (ic.g), non nel gruppo del modellino (ic.c), che centerIcons sposta per la
+  // prospettiva: prima il cerchio scuro era fuori centro rispetto al bordo bianco e blu
+  function stella(c, ic) {
+    const g = new THREE.Group(); g.scale.setScalar(ic.r / 0.42); g.position.z = -0.295; ic.g.add(g);   // alla stessa profondità del disco bianco: niente spostamento di prospettiva
+    mesh(new THREE.CircleGeometry(0.39, 64), notteM, g, V(0, 0, 0));
+    const lin = (a, b) => { const A = V(a[0], a[1], 0.012), B = V(b[0], b[1], 0.012), l = mesh(new THREE.PlaneGeometry(A.distanceTo(B), 0.008), lineaM, g, A.clone().lerp(B, 0.5)); l.rotation.z = Math.atan2(B.y - A.y, B.x - A.x); };
     [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]].forEach(([i, j]) => lin(CARRO[i], CARRO[j]));
-    const stars = CARRO.map(([x, y], i) => { const st = new THREE.Group(); st.position.set(x, y, -0.1); g.add(st);
+    const stars = CARRO.map(([x, y], i) => { const st = new THREE.Group(); st.position.set(x, y, 0.025); g.add(st);
       const gl = glow(0xfff6d8, st, 0.11); gl.material.opacity = 1;
       [0, Math.PI / 2].forEach(r => { const sp = mesh(new THREE.PlaneGeometry(0.11, 0.008), punta, st); sp.rotation.z = r; });
       return st; });
-    const fondo = Array.from({ length: 14 }, (_, i) => { const a = hash(i * 3.3) * 6.28, r = 0.08 + hash(i * 5.7) * 0.27, f = glow(0xcfe0ff, g, 0.035); f.position.set(Math.cos(a) * r, Math.sin(a) * r, -0.12); return f; });
+    const fondo = Array.from({ length: 14 }, (_, i) => { const a = hash(i * 3.3) * 6.28, r = 0.08 + hash(i * 5.7) * 0.24, f = glow(0xcfe0ff, g, 0.035); f.position.set(Math.cos(a) * r, Math.sin(a) * r, 0.018); return f; });
     return { anima: t => { stars.forEach((st, i) => st.scale.setScalar(0.85 + 0.25 * Math.sin(t * 3 + i * 1.7) ** 2));
       fondo.forEach((f, i) => { f.material.opacity = 0.35 + 0.35 * Math.sin(t * 4 + i * 2.1) ** 2; }); } };
   }
   const fabbrica = [roccia, banana, stella];
-  const B11 = [[-0.7, 2.2], [0, 2.2], [0.7, 2.2]].map(([x, y], i) => { const ic = I.icon(x, y, 0.26); const mod = fabbrica[i](ic.c); icone.push(ic); return { ic, mod }; });
+  const B11 = [[-0.7, 2.2], [0, 2.2], [0.7, 2.2]].map(([x, y], i) => { const ic = I.icon(x, y, 0.26); const mod = fabbrica[i](ic.c, ic); icone.push(ic); return { ic, mod }; });
 
   // lampo bianco dell'entrata negli atomi
   const lampo = t => clamp01(1 - Math.abs(t - ZOOM[1]) / 0.35) ** 0.8 * smooth(ramp(t, ZOOM[0] + 0.6, ZOOM[1]));
@@ -63,11 +65,13 @@ export function creaPrimoPiano7(I, hud) {
   // ---------------- cubetti (B11–B13)
   const cubeG = new THREE.Group(); hud.add(cubeG);
   const cubeM = std(0xffd23a, { roughness: 0.45, metalness: 0.15, emissive: 0xffb020, emissiveIntensity: 0.15 }), cubeGeo = trifoglio(0.017, 0.035);   // pesi a forma di simbolo (v4)
-  const cubi = Array.from({ length: 52 }, (_, i) => { const m = mesh(cubeGeo, cubeM, cubeG); m.userData.p = V(-1.23 + (i % 13) * 0.205, 1.55 - Math.floor(i / 13) * 0.205, 0); return m; });
+  const cubi = Array.from({ length: 52 }, (_, i) => { const m = mesh(cubeGeo, cubeM, cubeG); m.userData.p = V(-1.23 + (i % 13) * 0.205, 0.61 - Math.floor(i / 13) * 0.205, 0); return m; });
   const voloM = std(0x8fd0ff, { roughness: 0.5, emissive: 0x3f9fe0, emissiveIntensity: 0.25 }), cuboVolo = mesh(cubeGeo, voloM, cubeG);
   const granM = std(0xff8a3a, { emissive: 0xff6a10, emissiveIntensity: 0.6 }), granello = mesh(trifoglio(0.0045, 0.01), granM, cubeG);
   const granGlow = glow(0xffb070, cubeG, 0.3);
-  const VOLO_P = V(-0.3, 0.8, 0), GRAN_P = V(0.3, 0.75, 0), SALE = [65.3, 65.9];   // dopo le icone la griglia sale di 0,55
+  // v6: nella B11–B12 la griglia sta in basso, sul prato libero (rocce e banano tolti al ritorno dagli atomi), e l'aereo passa alto nel cielo;
+  // all'inizio della B13 (la collina gira verso la centrale) pesi e peso del volo salgono in cielo, dove erano nella v5
+  const VOLO_P = V(-0.3, -0.35, 0), GRAN_P = V(0.3, 0.75, 0), SALE = [70.7, 71.7], SU = 1.5, AEREO_Y = 2.25;
   // aereo di linea (v4, più realistico): fusoliera affusolata con finestrini, ali a freccia con due motori, deriva e piani di coda
   const plane = new THREE.Group(); hud.add(plane);
   { const w = std(0xf6f8fb, { roughness: 0.35, metalness: 0.1, side: THREE.DoubleSide }), grey = std(0xb8c2cf, { roughness: 0.4, metalness: 0.3 }), bl = std(0x2f6fd0, { roughness: 0.5 }), win = std(0x23344d, { roughness: 0.3 });
@@ -92,12 +96,12 @@ export function creaPrimoPiano7(I, hud) {
     cubeG.visible = t > CUBI[0] && t < FINE_DOSE[1];
     cubi.forEach((m, i) => {
       const t0 = CUBI[0] + i * (CUBI[1] - CUBI[0]) / 52, u = ramp(t, t0, t0 + 0.3);
-      m.visible = u > 0; m.position.copy(m.userData.p); m.position.y += 0.35 * (1 - backOut(u)) + 0.55 * smooth(ramp(t, ...SALE)); m.scale.setScalar(Math.max(0.001, smooth(ramp(t, t0, t0 + 0.12)) * out));
+      m.visible = u > 0; m.position.copy(m.userData.p); m.position.y += 0.35 * (1 - backOut(u)) + SU * smooth(ramp(t, ...SALE)); m.scale.setScalar(Math.max(0.001, smooth(ramp(t, t0, t0 + 0.12)) * out));
     });
-    { const u = ramp(t, CUBO_VOLO, CUBO_VOLO + 0.45); cuboVolo.visible = u > 0; cuboVolo.position.set(VOLO_P.x, lerp(1.2, VOLO_P.y, u * u), 0); cuboVolo.rotation.z = (1 - u) * 0.6; cuboVolo.scale.setScalar(Math.max(0.001, out)); }
+    { const u = ramp(t, CUBO_VOLO, CUBO_VOLO + 0.8); cuboVolo.visible = u > 0; cuboVolo.position.set(VOLO_P.x, lerp(AEREO_Y - 0.1, VOLO_P.y, u * u) + SU * smooth(ramp(t, ...SALE)), 0); cuboVolo.rotation.z = (1 - u) * 0.6; cuboVolo.scale.setScalar(Math.max(0.001, out)); }
     { const u = ramp(t, GRANELLO, GRANELLO + 0.45); granello.visible = u > 0; granello.position.set(GRAN_P.x, lerp(1.2, GRAN_P.y, u * u), 0); granello.scale.setScalar(Math.max(0.001, out));
       granGlow.position.copy(granello.position); granGlow.material.opacity = u > 0 ? (0.45 + 0.3 * Math.sin(tn * 6)) * out : 0; }
-    const a = ramp(t, ...AEREO); plane.visible = a > 0 && a < 1; plane.position.set(lerp(-2.4, 2.4, a), 1.1 + 0.04 * Math.sin(tn * 3), 0.3);
+    const a = ramp(t, ...AEREO); plane.visible = a > 0 && a < 1; plane.position.set(lerp(-2.4, 2.4, a), AEREO_Y + 0.04 * Math.sin(tn * 3), 0.3);
   }
   // ---------------- fusto delle scorie (B15)
   const icF = I.icon(0, 1.3, 0.62); icone.push(icF);   // v4: più grande
