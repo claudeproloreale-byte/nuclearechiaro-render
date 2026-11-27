@@ -81,7 +81,7 @@ export function creaNatura(C) {
   // ---------------- gruppo di rocce in primo piano (rocce grandi irregolari, sassolini, ciuffi d'erba)
   // v6: rocce e banano in primo piano solo fino all'entrata negli atomi; al ritorno (B10–B12) il prato davanti è libero per i pesi
   const fp = new THREE.Group(); nat.add(fp);
-  const rocks = { mats: [], glows: [], t0: FOSF.rocce };
+  const rocks = { mats: [], glows: [], t0: FOSF.rocce, k: 0.6, pk: 0.5 };   // v11: luccichio delle rocce più tenue (k: intensità, pk: pulsazione)
   const grassM = std(0x4e9e44, { roughness: 0.9 });
   [[-1.05, -29.0, 0.85, 0x9a958c], [-0.05, -29.5, 0.65, 0x8c8f96], [-1.95, -29.6, 0.6, 0xa39d92], [-0.55, -28.3, 0.4, 0x908b82], [0.35, -28.6, 0.34, 0x9a958c], [-1.75, -28.4, 0.3, 0x8c8f96],
    [0.15, -27.95, 0.16, 0xa39d92], [-0.85, -27.8, 0.15, 0x878a85], [-2.3, -28.6, 0.16, 0x9a958c], [0.75, -29.2, 0.2, 0x8c8f96]].forEach(([x, z, s, c], i) => {
@@ -219,7 +219,7 @@ export function creaNatura(C) {
     fp.visible = t < ATOM_OUT;
     const off = 1 - smooth(ramp(t, ...FOSF.spente));
     for (const f of fosf) {
-      const on = smooth(ramp(t, f.t0, f.t0 + 0.4)) * off, puls = 1 + 0.5 * clamp01(1 - Math.abs(t - f.t0 - 0.35) / 0.4) + 0.12 * Math.sin(tn * 3.1 + f.t0);
+      const on = smooth(ramp(t, f.t0, f.t0 + 0.4)) * off * (f.k ?? 1), pk = f.pk ?? 1, puls = 1 + pk * (0.5 * clamp01(1 - Math.abs(t - f.t0 - 0.35) / 0.4) + 0.12 * Math.sin(tn * 3.1 + f.t0));
       f.mats.forEach(m => { m.emissiveIntensity = 0.7 * on * puls; });
       f.glows.forEach(g => { g.material.opacity = 0.5 * on * puls; g.visible = on > 0.001; });
     }

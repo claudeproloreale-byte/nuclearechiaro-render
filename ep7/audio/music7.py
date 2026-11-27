@@ -128,6 +128,8 @@ kend = int(TF / BAR)
 for n, (ts, kind, chs) in enumerate(SEZ):
     k0 = int(round(w(ts) / BAR)); k1 = int(round(w(SEZ[n + 1][0]) / BAR)) if n + 1 < len(SEZ) else kend
     for i, k in enumerate(range(k0, k1)): sezione(k, kind, chs[i % len(chs)], i)
+# v11 (nota audio dell'autore): nella B1 un tappeto continuo (La minore, poi Fa) che regge la pausa dopo «paura?» fino alla collina
+T1 = w(4.25); put(mus, 0, pad([57, 60, 64, 69], T1 * 0.55, 0.6, 0.8), 0.36); put(mus, T1 * 0.5, pad([53, 57, 60, 65], T1 * 0.5, 0.6, 0.9), 0.36)
 # la mascotte esce: accordo finale
 put(mus, TF, pad([48, 55, 60, 64, 67, 72], 0.5, 0.02, 1.4), 0.36)
 for i, m in enumerate([60, 64, 67, 72, 76, 79, 84]): put(mus, TF + i * 0.035, kal(m, 1.6, 1.2), 0.28, pan=-0.5 + i * 0.16)

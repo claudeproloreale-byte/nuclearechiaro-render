@@ -98,6 +98,12 @@ for k, (s, e) in enumerate(PH):
     f1, f2 = int(0.02 * sr), int(0.08 * sr); seg[:f1] *= np.linspace(0, 1, f1); seg[-f2:] *= np.linspace(1, 0, f2)
     i0 = int((starts[k] - PRE) * sr); out[i0:i0 + len(seg)] += seg
     newPH.append([round(starts[k], 3), round(starts[k] + e - s, 3)])
+# v11 (nota audio dell'autore: «silenzio improvviso dopo "paura"»): la versione migliorata chiude di colpo la fine delle frasi
+# (da -33 a -80 dB in 0,1 s). Una coda d'ambiente leggera (stanza piccola, 0,7 s, -20 dB) fa spegnere le parole in modo naturale.
+from scipy.signal import fftconvolve
+rg = np.random.default_rng(7); ti = np.arange(int(0.7 * sr)) / sr
+ir = rg.standard_normal(len(ti)) * np.exp(-ti * 7.5); ir = sosfiltfilt(butter(2, [250, 5000], 'bandpass', fs=sr, output='sos'), ir); ir /= np.sqrt((ir ** 2).sum())
+out = out + 10 ** (-20 / 20) * fftconvolve(out, ir)[:len(out)]
 out = out[:int(TOTAL * sr)]
 sf.write('voice_edit.wav', out, sr, subtype='PCM_24')
 json.dump(newPH, open('phrases.json', 'w')); json.dump(W, open('warp7.json', 'w'))
