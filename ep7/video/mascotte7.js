@@ -15,8 +15,11 @@ const T_ = {
 };
 const lip = creaLabiale(SPEECH, LIP), blink = creaBlink(END);
 
+// v9: nella B13 la mascotte scende più in basso a destra, per lasciare il prato ai pesi (primopiano.js); torna su con lo zoom nella cupola
+export const GIU = [1.38, -1.36], GIU_T = [70.5, 71.1, 77.3, 78.0];
 export function posa(tn, t) {
   let [mx, my, ms] = CORNER;
+  { const g = smooth(ramp(t, GIU_T[0], GIU_T[1])) * (1 - smooth(ramp(t, GIU_T[2], GIU_T[3]))); mx += (GIU[0] - mx) * g; my += (GIU[1] - my) * g; }
   ms *= backOut(ramp(t, 0.2, 0.55)) * (1 - smooth(ramp(t, EXIT - 0.25, EXIT)));   // entra "a molla", esce rimpicciolendo
   return {
     pos: [mx, my, ms], lift: smooth(ramp(t, EXIT - 0.4, EXIT)) * 0.08, visible: ms > 0.001 && t < EXIT,

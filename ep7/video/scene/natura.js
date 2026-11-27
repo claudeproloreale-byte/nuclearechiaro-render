@@ -3,7 +3,7 @@
 //   B2   sole, gruppo di rocce in primo piano a sinistra, banano a destra dietro la mascotte (foglie lunghe con nervatura,
 //        casco di banane a mani, fiore viola)
 //   B3   le rocce si illuminano di verde su «rocce», le banane su «cibo»; su «spazio» arrivano dal cielo i raggi cosmici (sottili)
-//   B4   un omino (bambino giocattolo, testa grande) entra da sinistra camminando sul prato, con l'ombra sotto i piedi; si ferma,
+//   B4   un omino (adulto giocattolo dalla v9; prima un bambino a testa grande) entra da sinistra camminando sul prato, con l'ombra sotto i piedi; si ferma,
 //        si gira verso di noi sorpreso, sul corpo si accendono i puntini; la camera si avvicina piano
 //   B5   la camera entra in un puntino (ZOOM), fino al lampo bianco del primo piano
 // Tutte le x di questo file sono relative a NX (dx); z e y sono quelle del mondo.
@@ -143,48 +143,49 @@ export function creaNatura(C) {
     raggi.push({ A, B, t0, dur: 0.75 + 0.2 * rnd(), trail: Array.from({ length: 30 }, () => glow(k % 3 ? 0xb8d4ff : 0xd8b8ff, nat, 0.38)), hit: glow(0xc8e0ff, nat, 0.7) });
   }
 
-  // ---------------- omino (B4): bambino giocattolo, testa grande, maglietta arancione; cammina sul prato
+  // ---------------- omino (B4): adulto giocattolo (v9: testa più piccola, gambe, busto e braccia più lunghi, collo), maglietta arancione
   const MZ = -27.0, MX0 = -3.3, MX1 = 0.05;   // v5: più vicino alla camera
   const skin = std(0xf6c9a2, { roughness: 0.7 }), shirt = std(0xff9a3c, { roughness: 0.7 }), pants = std(0x3a5fa8, { roughness: 0.8 }), shoe = std(0xe8504a, { roughness: 0.6 }), sole = std(0xf4f4f4, { roughness: 0.6 });
   const hairM = std(0x6b4226, { roughness: 0.8 }), dark = std(0x241c28, { roughness: 0.4 }), white = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const man = new THREE.Group(); man.scale.setScalar(0.95); nat.add(man);
   const shadow = mesh(new THREE.CircleGeometry(0.5, 32), new THREE.MeshBasicMaterial({ color: 0x1d4a22, transparent: true, opacity: 0.35, depthWrite: false }), nat); shadow.rotation.x = -Math.PI / 2; shadow.scale.set(1, 0.6, 1);
   const body = new THREE.Group(); man.add(body);
-  const legs = [-1, 1].map(sd => { const p = new THREE.Group(); p.position.set(sd * 0.15, 0.78, 0); body.add(p);
-    mesh(new THREE.CapsuleGeometry(0.12, 0.42, 6, 16), pants, p, V(0, -0.33, 0));
-    const f = mesh(new THREE.SphereGeometry(0.14, 16, 12), shoe, p, V(0, -0.68, 0.06)); f.scale.set(0.95, 0.6, 1.4);
-    const s2 = mesh(new THREE.CylinderGeometry(0.135, 0.135, 0.03, 16), sole, p, V(0, -0.75, 0.06)); s2.scale.set(0.95, 1, 1.4); return p; });
-  mesh(new THREE.CapsuleGeometry(0.33, 0.42, 8, 24), shirt, body, V(0, 1.12, 0));
-  mesh(new THREE.CylinderGeometry(0.3, 0.33, 0.16, 24), pants, body, V(0, 0.86, 0));
-  const arms = [-1, 1].map(sd => { const p = new THREE.Group(); p.position.set(sd * 0.38, 1.38, 0); p.rotation.z = sd * 0.12; body.add(p);
-    mesh(new THREE.CapsuleGeometry(0.1, 0.36, 6, 16), shirt, p, V(0, -0.24, 0));
-    mesh(new THREE.SphereGeometry(0.1, 16, 12), skin, p, V(0, -0.52, 0)); return p; });
-  const head = new THREE.Group(); head.position.set(0, 1.98, 0); body.add(head);
+  const legs = [-1, 1].map(sd => { const p = new THREE.Group(); p.position.set(sd * 0.14, 1.0, 0); body.add(p);
+    mesh(new THREE.CapsuleGeometry(0.11, 0.7, 6, 16), pants, p, V(0, -0.46, 0));
+    const f = mesh(new THREE.SphereGeometry(0.13, 16, 12), shoe, p, V(0, -0.9, 0.07)); f.scale.set(0.95, 0.6, 1.5);
+    const s2 = mesh(new THREE.CylinderGeometry(0.125, 0.125, 0.03, 16), sole, p, V(0, -0.97, 0.07)); s2.scale.set(0.95, 1, 1.5); return p; });
+  mesh(new THREE.CapsuleGeometry(0.29, 0.58, 8, 24), shirt, body, V(0, 1.47, 0));
+  mesh(new THREE.CylinderGeometry(0.27, 0.29, 0.18, 24), pants, body, V(0, 1.06, 0));
+  mesh(new THREE.CylinderGeometry(0.09, 0.1, 0.2, 16), skin, body, V(0, 2.07, 0));   // collo
+  const arms = [-1, 1].map(sd => { const p = new THREE.Group(); p.position.set(sd * 0.35, 1.86, 0); p.rotation.z = sd * 0.1; body.add(p);
+    mesh(new THREE.CapsuleGeometry(0.085, 0.62, 6, 16), shirt, p, V(0, -0.38, 0));
+    mesh(new THREE.SphereGeometry(0.09, 16, 12), skin, p, V(0, -0.8, 0)); return p; });
+  const head = new THREE.Group(); head.position.set(0, 2.36, 0); head.scale.setScalar(0.66); body.add(head);   // raggio 0,30
   mesh(new THREE.SphereGeometry(0.46, 40, 30), skin, head);
   { const h = mesh(new THREE.SphereGeometry(0.485, 40, 20, 0, Math.PI * 2, 0, Math.PI * 0.42), hairM, head); h.rotation.x = -0.32;
     [-0.2, 0, 0.2].forEach((x, i) => { const c = mesh(new THREE.SphereGeometry(0.12, 14, 10), hairM, head, V(x, 0.36 - Math.abs(x) * 0.3, 0.3)); c.scale.set(1.2, 0.6, 0.8); }); }
   [-1, 1].forEach(sd => mesh(new THREE.SphereGeometry(0.09, 12, 10), skin, head, V(sd * 0.45, 0, 0)));
   const eyes = [-1, 1].map(sd => { const e = new THREE.Group(); e.position.set(sd * 0.16, 0.02, 0.42); head.add(e);
-    const b = mesh(new THREE.SphereGeometry(0.06, 16, 12), dark, e); b.scale.set(1, 1.25, 0.5);
+    const b = mesh(new THREE.SphereGeometry(0.05, 16, 12), dark, e); b.scale.set(1, 1.15, 0.5);
     mesh(new THREE.SphereGeometry(0.018, 8, 6), white, e, V(0.02, 0.03, 0.03)); return e; });
   const brows = [-1, 1].map(sd => { const b = mesh(new THREE.CapsuleGeometry(0.016, 0.08, 4, 8), hairM, head, V(sd * 0.16, 0.15, 0.43)); b.rotation.z = Math.PI / 2 - sd * 0.12; return b; });
   const smile = mesh(new THREE.TorusGeometry(0.07, 0.016, 8, 20, Math.PI), dark, head, V(0, -0.13, 0.43)); smile.rotation.z = Math.PI;
   const oh = mesh(new THREE.SphereGeometry(0.05, 16, 12), std(0x6a2030), head, V(0, -0.16, 0.425)); oh.scale.set(0.8, 1, 0.4);
-  [-1, 1].forEach(sd => { const c = glow(0xff7f98, head, 0.2); c.position.set(sd * 0.26, -0.08, 0.44); c.material.opacity = 0.45; });
+  [-1, 1].forEach(sd => { const c = glow(0xff7f98, head, 0.2); c.position.set(sd * 0.26, -0.08, 0.44); c.material.opacity = 0.2; });
   // puntini che si accendono: sulla parte davanti di maglietta, testa, gambe e braccia
   const dots = [], spots = [];
   for (let k = 0; spots.length < 44 && k < 3000; k++) {
     const a = hash(k * 1.7), b = hash(k * 2.9 + 3), w = hash(k * 4.1 + 7);
-    if (w < 0.45) { const x = (a - 0.5) * 0.6, y = 0.82 + b * 0.7; spots.push(V(x, y, Math.sqrt(Math.max(0, 0.33 ** 2 - x * x)) + 0.03)); }
-    else if (w < 0.65) { const x = (a - 0.5) * 0.7, y = 1.78 + b * 0.25; if (Math.abs(x) > 0.1 || y < 1.9) spots.push(V(x, y, Math.sqrt(Math.max(0, 0.46 ** 2 - x * x - (y - 1.98) ** 2)) + 0.03)); }
-    else if (w < 0.85) { const sd = a < 0.5 ? -1 : 1; spots.push(V(sd * 0.15 + (b - 0.5) * 0.12, 0.15 + hash(k * 6.3) * 0.55, 0.14)); }
-    else { const sd = a < 0.5 ? -1 : 1; spots.push(V(sd * (0.42 + b * 0.04), 0.95 + hash(k * 6.3) * 0.38, 0.11)); }
+    if (w < 0.45) { const x = (a - 0.5) * 0.52, y = 1.0 + b * 0.95; spots.push(V(x, y, Math.sqrt(Math.max(0, 0.29 ** 2 - x * x)) + 0.03)); }
+    else if (w < 0.6) { const x = (a - 0.5) * 0.46, y = 2.2 + b * 0.16; if (Math.abs(x) > 0.08 || y < 2.26) spots.push(V(x, y, Math.sqrt(Math.max(0, 0.3 ** 2 - x * x - (y - 2.36) ** 2)) + 0.03)); }
+    else if (w < 0.82) { const sd = a < 0.5 ? -1 : 1; spots.push(V(sd * 0.14 + (b - 0.5) * 0.1, 0.12 + hash(k * 6.3) * 0.8, 0.13)); }
+    else { const sd = a < 0.5 ? -1 : 1; spots.push(V(sd * (0.39 + b * 0.04), 1.15 + hash(k * 6.3) * 0.6, 0.1)); }
   }
   spots.forEach((p, k) => { const s = glow(0xfff2a0, body, 0.13); s.position.copy(p); dots.push({ s, ph: hash(k + 9), f: 0.6 + hash(k * 3.3) * 1.4 }); });
-  const D = V(0.12, 1.2, 0.36), dz = glow(0xfff2a0, body, 0.12); dz.position.copy(D);   // il puntino dove entra la camera
+  const D = V(0.11, 1.45, 0.31), dz = glow(0xfff2a0, body, 0.12); dz.position.copy(D);   // il puntino dove entra la camera
   const manPos = t => MX0 + (MX1 - MX0) * smooth(ramp(t, ...CAMMINA));
   const Dworld = () => { man.updateMatrixWorld(true); return dz.getWorldPosition(new THREE.Vector3()); };
-  const camMan = () => { const y = gy(MX1, MZ); return [NX + MX1, y + 1.55, MZ + 8.5, NX + MX1, y + 1.25, MZ]; };
+  const camMan = () => { const y = gy(MX1, MZ); return [NX + MX1, y + 1.75, MZ + 8.5, NX + MX1, y + 1.45, MZ]; };
 
   function omino(t, tn) {
     man.visible = shadow.visible = t > SAGOMA[0] && t < SAGOMA[1];
