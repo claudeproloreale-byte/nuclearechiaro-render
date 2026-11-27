@@ -11,6 +11,7 @@ import { THREE, V, std, mesh, glow, smooth, ramp, setSeed, rnd, clamp01, lerp, h
 import { ATOM_OUT } from '../tempi.js';
 
 export const NX = 26;
+export const ROCCIA7 = { x: -1.0, z: -31.2 };
 export const CAM_NAT = [NX, 1.0, -12, NX, -0.5, -40];   // v5: ancora più vicina e bassa (omino e rocce in primo piano)
 export const FOSF = { rocce: 11.1, banane: 12.1, raggi: [13.3, 15.4], spente: [15.8, 17.0] };
 export const SAGOMA = [15.4, 23.35], CAMMINA = [15.6, 17.9], GIRA = [17.9, 18.45], PUNTINI = 18.4, AVVICINA = [18.6, 21.9], ZOOM = [22.0, 23.3];
@@ -90,6 +91,10 @@ export function creaNatura(C) {
     if (s > 0.4) { const g = glow(0x8dff6a, fp, s * 3); g.position.set(x, gy(x, z) + s * 0.35, z + s * 0.6); rocks.glows.push(g); }
   });
   for (let i = 0; i < 16; i++) { const x = -2.5 + rnd() * 3.6, z = -27.7 - rnd() * 2.2, s = 0.18 + rnd() * 0.16; const b = mesh(new THREE.ConeGeometry(0.035, s, 4), grassM, fp, V(x, gy(x, z) + s / 2 - 0.03, z)); b.rotation.set((rnd() - 0.5) * 0.6, 0, (rnd() - 0.5) * 0.6); }
+  // v7: una roccia più indietro, a sinistra sopra il gruppo, perché il prato non sembri vuoto (rotazione fissa: non cambia la sequenza di rnd)
+  { const [x, z, sz] = [ROCCIA7.x, ROCCIA7.z, 0.6], m = std(0x95918a, { roughness: 0.92, flatShading: true, emissive: 0x6dff5a, emissiveIntensity: 0 });
+    const r = mesh(rockGeo(sz, 21.7), m, fp, V(x, gy(x, z) + sz * 0.12, z)); r.rotation.y = 2.4; rocks.mats.push(m);
+    const g = glow(0x8dff6a, fp, sz * 3); g.position.set(x, gy(x, z) + sz * 0.35, z + sz * 0.6); rocks.glows.push(g); }
   fosf.push(rocks);
 
   // ---------------- banano in primo piano a sinistra
@@ -97,7 +102,7 @@ export function creaNatura(C) {
   const stemM = std(0x7f9448, { roughness: 0.85 }), sheathM = std(0x8a6a3a, { roughness: 0.95, side: THREE.DoubleSide }), stemM2 = std(0x6f8a3e, { roughness: 0.85 });
   const TOP = 3.4, UP = TOP - 2.7;   // altezza del fusto; la corona e il casco salgono di UP
   { const s = mesh(new THREE.CylinderGeometry(0.15, 0.25, TOP, 18, 4), stemM, BT, V(0, TOP / 2, 0)); s.rotation.z = 0.03;
-    [[0, 0.5, 0.9, 1.6], [2.2, 0.35, 0.7, 1.3], [4.1, 0.9, 0.8, 1.2]].forEach(([a, y, h, w]) => mesh(new THREE.CylinderGeometry(0.235 - y * 0.03, 0.255 - y * 0.03, h, 16, 1, true, a, w), sheathM, BT, V(0, y, 0)));
+    // v7: tolte le guaine secche marroni alla base del fusto (sembravano una macchia)
     for (let k = 0; k < 6; k++) mesh(new THREE.CylinderGeometry(0.2 - k * 0.012, 0.21 - k * 0.012, 0.05, 16, 1, true), stemM2, BT, V(0, 0.75 + k * 0.45, 0)); }
   const leafMs = [std(0x4fae4a, { roughness: 0.75, side: THREE.DoubleSide }), std(0x45a043, { roughness: 0.75, side: THREE.DoubleSide }), std(0x5cb950, { roughness: 0.75, side: THREE.DoubleSide })];
   const ribM = std(0xa6d672, { roughness: 0.7 }), oldM = std(0xb39a48, { roughness: 0.9, side: THREE.DoubleSide });

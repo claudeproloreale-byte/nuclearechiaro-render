@@ -65,13 +65,13 @@ export function creaPrimoPiano7(I, hud) {
   // ---------------- cubetti (B11–B13)
   const cubeG = new THREE.Group(); hud.add(cubeG);
   const cubeM = std(0xffd23a, { roughness: 0.45, metalness: 0.15, emissive: 0xffb020, emissiveIntensity: 0.15 }), cubeGeo = trifoglio(0.017, 0.035);   // pesi a forma di simbolo (v4)
-  const cubi = Array.from({ length: 52 }, (_, i) => { const m = mesh(cubeGeo, cubeM, cubeG); m.userData.p = V(-1.23 + (i % 13) * 0.205, 0.61 - Math.floor(i / 13) * 0.205, 0); return m; });
+  const cubi = Array.from({ length: 52 }, (_, i) => { const m = mesh(cubeGeo, cubeM, cubeG); m.userData.p = V(-1.23 + (i % 13) * 0.205, 0.11 - Math.floor(i / 13) * 0.205, 0); return m; });
   const voloM = std(0x8fd0ff, { roughness: 0.5, emissive: 0x3f9fe0, emissiveIntensity: 0.25 }), cuboVolo = mesh(cubeGeo, voloM, cubeG);
   const granM = std(0xff8a3a, { emissive: 0xff6a10, emissiveIntensity: 0.6 }), granello = mesh(trifoglio(0.0045, 0.01), granM, cubeG);
   const granGlow = glow(0xffb070, cubeG, 0.3);
-  // v6: nella B11–B12 la griglia sta in basso, sul prato libero (rocce e banano tolti al ritorno dagli atomi), e l'aereo passa alto nel cielo;
+  // v6 (v7 ancora 0,5 più in basso): nella B11–B12 la griglia sta in basso, sul prato libero (rocce e banano tolti al ritorno dagli atomi), e l'aereo passa alto nel cielo;
   // all'inizio della B13 (la collina gira verso la centrale) pesi e peso del volo salgono in cielo, dove erano nella v5
-  const VOLO_P = V(-0.3, -0.35, 0), GRAN_P = V(0.3, 0.75, 0), SALE = [70.7, 71.7], SU = 1.5, AEREO_Y = 2.25;
+  const VOLO_P = V(-0.3, -0.85, 0), GRAN_P = V(0.3, 0.75, 0), SALE = [70.7, 71.7], SU = 2.0, AEREO_Y = 2.25;
   // aereo di linea (v4, più realistico): fusoliera affusolata con finestrini, ali a freccia con due motori, deriva e piani di coda
   const plane = new THREE.Group(); hud.add(plane);
   { const w = std(0xf6f8fb, { roughness: 0.35, metalness: 0.1, side: THREE.DoubleSide }), grey = std(0xb8c2cf, { roughness: 0.4, metalness: 0.3 }), bl = std(0x2f6fd0, { roughness: 0.5 }), win = std(0x23344d, { roughness: 0.3 });
