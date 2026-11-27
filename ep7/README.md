@@ -2,16 +2,17 @@
 
 **Scaletta di riferimento: nell'app di produzione** (https://claude.ai/artifact/LKLS4NqcETV4Hw6c2gwk4S, `scalette/p7`; richieste in `richieste`, versioni in `versioni/p7-v<k>`). Come si lavora: `piano app/app.md` nel progetto.
 
-**Stato:** v3 (26/11/2026), 96,4 s, 540×960, senza audio: revisione della scaletta (12 blocchi). B1 simbolo della radioattività verde fosforescente; B2–B3 sole, rocce e banano che si illuminano, raggi cosmici (niente icone); B4 omino che cammina e si gira; nuclei più distanziati; B7 un solo nucleo fa alfa, beta e gamma; B11 tre icone; B15 simbolo sul fusto. B7 7,5 s e B11 6,5 s (WARP in `tempi.js`). v2: B1 senza saluto. v1: bozza 1. Regole: `regole.md`.
+**Stato:** v4 (27/11/2026): 10 note della v3 (lato natura a destra della centrale e camera più vicina, banano e rocce nuovi, omino nella collina, alfa veloce senza scia, gamma ultimo decadimento, stella vera, pesi a simbolo, aereo di linea, fusto più grande). v3 (26/11/2026), 96,4 s, 540×960, senza audio: revisione della scaletta (12 blocchi). B1 simbolo della radioattività verde fosforescente; B2–B3 sole, rocce e banano che si illuminano, raggi cosmici (niente icone); B4 omino che cammina e si gira; nuclei più distanziati; B7 un solo nucleo fa alfa, beta e gamma; B11 tre icone; B15 simbolo sul fusto. B7 7,5 s e B11 6,5 s (WARP in `tempi.js`). v2: B1 senza saluto. v1: bozza 1. Regole: `regole.md`.
 
 ## Dove si corregge
 | Cosa | File |
 |---|---|
 | B1 spazio (stelle, simbolo della radioattività dalla v3; senza saluto) | `video/scene/spazio.js` (simbolo: `video/simbolo7.js`) |
-| Collina: lato natura con sole, rocce e banano che si illuminano, raggi cosmici (B2–B4, B10–B12; tempi in `FOSF`), passaggio alla centrale (B13), cupola e barriere che si illuminano (B14–B15) | `video/scene/collina.js` (centrale: `comune/centrale.js`) |
-| B5–B9 atomi: campo di nuclei (`DIST`), U1 e i suoi decadimenti (alfa, beta, gamma, poi beta), 16 nuclei del dimezzamento, camera | `video/scene/atomi.js` |
+| Lato natura (a destra della centrale dalla v4): sole, rocce, banano, raggi cosmici, omino e zoom nel puntino (B2–B5, B10–B12; tempi in `FOSF`, `CAMMINA`, `ZOOM`) | `video/scene/natura.js` |
+| Collina: centrale, B13 (scorre verso sinistra), passaggio alla centrale (B13), cupola e barriere che si illuminano (B14–B15) | `video/scene/collina.js` (centrale: `comune/centrale.js`) |
+| B5–B9 atomi: campo di nuclei (`DIST`), U1 e i suoi decadimenti (alfa, beta, gamma, poi stabile), 16 nuclei del dimezzamento, camera | `video/scene/atomi.js` |
 | Aspetto dei nuclei instabili (alone rosa, tremolio) e delle radiazioni alfa, beta, gamma | `video/nuclei7.js` |
-| Primo piano: tre icone (B11), omino che cammina e zoom (B4–B5), cronometro (B9), bilancia (B10), cubetti, aereo e granellino (B11–B13), fusto (B15) | `video/scene/primopiano.js` |
+| Primo piano: tre icone (B11, stella vera), pesi a simbolo, aereo di linea, lampo della B5, cronometro (B9), bilancia (B10), cubetti, aereo e granellino (B11–B13), fusto (B15) | `video/scene/primopiano.js` |
 | Mascotte (saluto, espressioni, gesti) | `video/mascotte7.js` |
 | Tempi delle battute, passaggi fra i mondi, WARP (senza voce allunga solo B7 e B11) | `video/tempi.js` |
 | Montaggio | `video/ep7.js` |

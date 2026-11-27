@@ -1,6 +1,6 @@
 // Puntata 7 — NUCLEI RADIOATTIVI (solo per questa puntata): nuclei di 40 nucleoni come in comune/atomi.js, ma alcuni sono instabili
 // (alone rosa che pulsa, nucleoni che tremano) e decadono emettendo una radiazione:
-//   'alfa'  : 2 protoni e 2 neutroni si staccano insieme ed escono lenti
+//   'alfa'  : 2 protoni e 2 neutroni si staccano insieme ed escono veloci, senza scia (v4)
 //   'beta'  : un neutrone diventa protone (cambia colore) ed esce un elettrone piccolo e veloce
 //   'gamma' : esce un lampo di energia (pacchetto luminoso con la scia ondulata) e un anello si allarga dal nucleo
 // Dopo il decadimento il nucleo si calma (livello 0) o resta un po' instabile (livello intermedio) fino al decadimento successivo.
@@ -43,7 +43,7 @@ export function creaNuclei(scene) {
           // i 2 protoni e i 2 neutroni più esterni dalla parte di dir
           const by = isP => n.parts.filter(pt => pt.isP === isP && !pt.gone).sort((a, b) => b.p.dot(d.dir) - a.p.dot(d.dir)).slice(0, 2);
           d.four = [...by(true), ...by(false)]; d.four.forEach((pt, i) => { pt.gone = d; pt.off = tetra[i]; });
-          d.trail = Array.from({ length: 8 }, () => glow(0xffd0c0, scene, 0.5));
+          d.trail = [];
         }
         if (d.type === 'beta') {
           const pt = n.parts.filter(q => !q.isP && !q.gone && !q.beta).sort((a, b) => b.p.dot(d.dir) - a.p.dot(d.dir))[0]; pt.beta = d; d.pt = pt;
@@ -67,11 +67,11 @@ export function creaNuclei(scene) {
     for (const d of n.decays) { if (t < d.t) { L = Math.max(L, (n.preRise && n.preRise(t, d)) || 0); break; } L = lerp(L, d.after, smooth(ramp(t, d.t, d.t + 0.6))); }
     return n.mod ? n.mod(t, L) : L;   // n.mod: correzione a mano del livello (es. si calma senza emettere)
   }
-  const V_ = { alfa: 1.5, beta: 3.6, gamma: 4.6 };
+  const V_ = { alfa: 3.2, beta: 3.6, gamma: 4.6 };
   // posizione della particella emessa al tempo t (null prima dell'emissione o fuori dal percorso)
   function emitPos(d, t) {
     if (t < d.t) return null;
-    const s = 0.3 + V_[d.type] * (t - d.t) * (d.type === 'alfa' ? easeOut(ramp(t, d.t, d.t + 0.4), 1.4) * 0.8 + 0.2 : 1);
+    const s = 0.3 + V_[d.type] * (t - d.t) * (d.type === 'alfa' ? easeOut(ramp(t, d.t, d.t + 0.15), 1.4) * 0.6 + 0.4 : 1);
     if (s > 16) return null;
     const p = d.c.clone().addScaledVector(d.dir, s); p.z = 0.15;
     if (d.type === 'gamma') p.addScaledVector(V(-d.dir.y, d.dir.x, 0), 0.07 * Math.sin(s * 26));

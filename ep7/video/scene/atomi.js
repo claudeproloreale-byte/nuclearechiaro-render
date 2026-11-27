@@ -3,8 +3,7 @@
 //   B6 (25,0–30,5): U1 al centro, alone rosa e nucleoni che tremano; intorno nuclei calmi
 //   B7 (31,0–38,0): lo stesso U1 lancia prima un pezzetto di nucleo (alfa, su "pezzetto"), poi un elettrone (beta),
 //                   poi un'onda luminosa (gamma, su "radiazione elettromagnetica") (v3; nella v2 erano tre nuclei diversi)
-//   B8 (38,5–46,5): U1 smette di vibrare e l'alone si spegne ("più stabile"); poi torna a tremare ("può essere ancora
-//                   instabile"), decade di nuovo (beta) e si calma ("oppure stabile")
+//   B8 (38,5–46,5): U1 smette di vibrare e l'alone si spegne ("più stabile"): il gamma è l'ultimo decadimento (v4)
 //   B9 (47,0–54,5): zoom indietro: intorno si vedono altri nuclei instabili sparsi (16); ogni 1,8 s se ne trasforma la metà
 //                   (16 → 8 → 4 → 2), cronometro in alto
 import { V, track, smooth, ramp, lerp, hash, setSeed, rnd } from '/comune/base.js';
@@ -12,7 +11,7 @@ import { creaNuclei } from '../nuclei7.js';
 import { rt, fwarp, unwarp, ATOM_IN } from '../tempi.js';
 
 export const U1 = V(0, 0.55, 0);
-export const T_ALFA = 33.6, T_BETA = 34.6, T_GAMMA = 35.7, CALMA = [39.4, 40.2], T_BETA2 = 43.6, U1_SALE = [42.0, 43.2];
+export const T_ALFA = 33.6, T_BETA = 34.6, T_GAMMA = 35.7, CALMA = [39.4, 40.2];
 const DIST = 1.35;   // distanza minima fra i nuclei del campo (v3: «ben distanziati»; v2 0,95)
 export const ONDATE = [49.8, 51.6, 53.4];
 export const OROLOGIO = [47.8, 54.7];
@@ -27,9 +26,8 @@ export function creaScena(at) {
   K.decay(u1, T_ALFA, 'alfa', V(-0.55, 0.85), 0.8);
   K.decay(u1, T_BETA, 'beta', V(-1, -0.3), 0.65);
   K.decay(u1, T_GAMMA, 'gamma', V(0.45, 1), 0.45);
-  K.decay(u1, T_BETA2, 'beta', V(1, 0.55), 0);
-  // B8: dopo il gamma vibra ancora un po', si calma su "più stabile" (CALMA), poi torna a tremare prima del secondo beta
-  u1.mod = (t, L) => (t > 36.3 && t < T_BETA2 ? Math.max(0.45 * (1 - smooth(ramp(t, ...CALMA))), smooth(ramp(t, ...U1_SALE))) : L);
+  // B8: dopo il gamma vibra ancora un po' e si calma su "più stabile" (CALMA): da lì resta stabile
+  u1.mod = (t, L) => (t > 36.3 ? 0.45 * (1 - smooth(ramp(t, ...CALMA))) : L);
   // campo di nuclei sparsi, che non si toccano e non stanno dietro la mascotte
   // B9: prima i 16 nuclei instabili, nell'inquadratura larga ma fuori da quelle della B6–B8 (lì sono tutti calmi);
   // poi il campo di nuclei calmi intorno. Tutti a distanza DIST, nessuno dietro la mascotte.
@@ -62,7 +60,7 @@ export function creaScena(at) {
 // camera degli atomi
 const view = (x, y, z) => [x, y, z, x, y];
 const logZ = (z0, z1, u) => z0 * Math.pow(z1 / z0, u);
-const CAM = track(rt([[25.4, view(0, 0.3, 8)], [31.2, view(0, 0.3, 8.6)], [33.0, view(0, 0.35, 9.6)], [41.3, view(0, 0.35, 9.6)], [42.3, view(0.05, 0.45, 8.8)], [44.0, view(0.05, 0.45, 8.8)], [45.0, view(0, 0.2, 10.4)], [47.0, view(0, 0.1, 11.3)]]));
+const CAM = track(rt([[25.4, view(0, 0.3, 8)], [31.2, view(0, 0.3, 8.6)], [33.0, view(0, 0.35, 9.6)], [44.5, view(0, 0.35, 9.6)], [47.0, view(0, 0.1, 11.3)]]));
 export function camAt(tn) {
   const t = unwarp(tn);
   if (t < 25.4) { const u = smooth(ramp(tn, fwarp(ATOM_IN), fwarp(25.4))); return view(0, lerp(0.55, 0.3, u), logZ(40, 8, u)); }
