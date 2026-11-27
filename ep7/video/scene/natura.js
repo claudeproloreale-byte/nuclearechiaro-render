@@ -81,7 +81,7 @@ export function creaNatura(C) {
   // ---------------- gruppo di rocce in primo piano (rocce grandi irregolari, sassolini, ciuffi d'erba)
   // v6: rocce e banano in primo piano solo fino all'entrata negli atomi; al ritorno (B10–B12) il prato davanti è libero per i pesi
   const fp = new THREE.Group(); nat.add(fp);
-  const rocks = { mats: [], glows: [], t0: FOSF.rocce, k: 0.6, pk: 0.5 };   // v11: luccichio delle rocce più tenue (k: intensità, pk: pulsazione)
+  const rocks = { mats: [], glows: [], t0: FOSF.rocce, k: 0.8, pk: 0.75 };   // luccichio delle rocce: v11 più tenue (0,6 e 0,5), finale a metà strada (k: intensità, pk: pulsazione)
   const grassM = std(0x4e9e44, { roughness: 0.9 });
   [[-1.05, -29.0, 0.85, 0x9a958c], [-0.05, -29.5, 0.65, 0x8c8f96], [-1.95, -29.6, 0.6, 0xa39d92], [-0.55, -28.3, 0.4, 0x908b82], [0.35, -28.6, 0.34, 0x9a958c], [-1.75, -28.4, 0.3, 0x8c8f96],
    [0.15, -27.95, 0.16, 0xa39d92], [-0.85, -27.8, 0.15, 0x878a85], [-2.3, -28.6, 0.16, 0x9a958c], [0.75, -29.2, 0.2, 0x8c8f96]].forEach(([x, z, s, c], i) => {
