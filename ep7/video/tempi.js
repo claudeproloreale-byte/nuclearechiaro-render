@@ -14,9 +14,11 @@ export const SPEECH = Object.values(B).map((b, i) => (i === 0 ? [0.5, 2.4] : b))
 export const LIP = null;   // finché non c'è la voce il labiale è simulato
 // Senza voce la WARP serve solo ad allungare due battute diventate più lunghe nella v3 (le altre restano sui tempi di scaletta):
 // B7 «…o una radiazione elettromagnetica…» 7 → 7,5 s; B11 «…, l'unità di misura delle radiazioni» 5 → 6,5 s. Video 96,4 s.
+// v8 (battute più lunghe nella scaletta): B7 «…un'onda elettromagnetica. Quel lancio è la radiazione e questo processo si chiama
+// decadimento» 7 → 9 s; B15 «…E perché ci possono fare male?…» 3 → 4,5 s. Video 99,4 s.
 // Con la registrazione la tabella si rifà sui tempi reali della voce.
-export const WARP = [[0, 0], [31.0, 31.0], [38.0, 38.5], [60.0, 60.5], [65.0, 67.0], [END, END + 2]];
-export const VIDEO_END = END + 2;
+export const WARP = [[0, 0], [31.0, 31.0], [38.0, 40.0], [60.0, 62.0], [65.0, 68.5], [86.5, 90.0], [89.5, 94.5], [END, END + 5.0]];
+export const VIDEO_END = END + 5.0;
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
 // passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:

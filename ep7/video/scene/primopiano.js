@@ -65,13 +65,16 @@ export function creaPrimoPiano7(I, hud) {
   // ---------------- cubetti (B11–B13)
   const cubeG = new THREE.Group(); hud.add(cubeG);
   const cubeM = std(0xffd23a, { roughness: 0.45, metalness: 0.15, emissive: 0xffb020, emissiveIntensity: 0.15 }), cubeGeo = trifoglio(0.017, 0.035);   // pesi a forma di simbolo (v4)
-  const cubi = Array.from({ length: 52 }, (_, i) => { const m = mesh(cubeGeo, cubeM, cubeG); m.userData.p = V(-1.23 + (i % 13) * 0.205, 0.11 - Math.floor(i / 13) * 0.205, 0); return m; });
+  const cubi = Array.from({ length: 52 }, (_, i) => { const m = mesh(cubeGeo, cubeM, cubeG); m.userData.p = V(-1.23 + (i % 13) * 0.205, 0.11 - Math.floor(i / 13) * 0.205, 0);
+    m.userData.q = V(-1.35 + (i % 13) * 0.1475, -0.5965 - Math.floor(i / 13) * 0.1475, 0); return m; });
   const voloM = std(0x8fd0ff, { roughness: 0.5, emissive: 0x3f9fe0, emissiveIntensity: 0.25 }), cuboVolo = mesh(cubeGeo, voloM, cubeG);
   const granM = std(0xff8a3a, { emissive: 0xff6a10, emissiveIntensity: 0.6 }), granello = mesh(trifoglio(0.0045, 0.01), granM, cubeG);
   const granGlow = glow(0xffb070, cubeG, 0.3);
   // v6 (v7 ancora 0,5 più in basso): nella B11–B12 la griglia sta in basso, sul prato libero (rocce e banano tolti al ritorno dagli atomi), e l'aereo passa alto nel cielo;
   // all'inizio della B13 (la collina gira verso la centrale) pesi e peso del volo salgono in cielo, dove erano nella v5
-  const VOLO_P = V(-0.3, -0.85, 0), GRAN_P = V(0.3, 0.75, 0), SALE = [70.7, 71.7], SU = 2.0, AEREO_Y = 2.25;
+  // v8: nella B13 non salgono più in cielo: scendono sul prato sotto la centrale (fra il 62% e il 75% dell'altezza), più fitti
+  // (scala 0,8) e a sinistra della mascotte; il peso del volo e il granello della centrale in una riga sotto, a sinistra
+  const VOLO_P = V(-0.3, -0.85, 0), VOLO_Q = V(-1.35, -1.216, 0), GRAN_P = V(-1.2025, -1.216, 0), SALE = [70.7, 71.7], STRINGI = 0.8, AEREO_Y = 2.25;
   // aereo di linea (v4, più realistico): fusoliera affusolata con finestrini, ali a freccia con due motori, deriva e piani di coda
   const plane = new THREE.Group(); hud.add(plane);
   { const w = std(0xf6f8fb, { roughness: 0.35, metalness: 0.1, side: THREE.DoubleSide }), grey = std(0xb8c2cf, { roughness: 0.4, metalness: 0.3 }), bl = std(0x2f6fd0, { roughness: 0.5 }), win = std(0x23344d, { roughness: 0.3 });
@@ -94,12 +97,15 @@ export function creaPrimoPiano7(I, hud) {
   function dose(t, tn) {
     const out = 1 - smooth(ramp(t, ...FINE_DOSE));
     cubeG.visible = t > CUBI[0] && t < FINE_DOSE[1];
+    // prima si stringono verso sinistra, poi scendono (così non passano dietro la mascotte)
+    const sp = smooth(ramp(t, ...SALE)), sx = smooth(ramp(t, SALE[0], SALE[0] + 0.6)), sy = smooth(ramp(t, SALE[1] - 0.6, SALE[1]));
+    const verso = (P, Q, out) => out.set(lerp(P.x, Q.x, sx), lerp(P.y, Q.y, sy), 0);
     cubi.forEach((m, i) => {
       const t0 = CUBI[0] + i * (CUBI[1] - CUBI[0]) / 52, u = ramp(t, t0, t0 + 0.3);
-      m.visible = u > 0; m.position.copy(m.userData.p); m.position.y += 0.35 * (1 - backOut(u)) + SU * smooth(ramp(t, ...SALE)); m.scale.setScalar(Math.max(0.001, smooth(ramp(t, t0, t0 + 0.12)) * out));
+      m.visible = u > 0; verso(m.userData.p, m.userData.q, m.position); m.position.y += 0.35 * (1 - backOut(u)); m.scale.setScalar(Math.max(0.001, smooth(ramp(t, t0, t0 + 0.12)) * out * lerp(1, STRINGI, sp)));
     });
-    { const u = ramp(t, CUBO_VOLO, CUBO_VOLO + 0.8); cuboVolo.visible = u > 0; cuboVolo.position.set(VOLO_P.x, lerp(AEREO_Y - 0.1, VOLO_P.y, u * u) + SU * smooth(ramp(t, ...SALE)), 0); cuboVolo.rotation.z = (1 - u) * 0.6; cuboVolo.scale.setScalar(Math.max(0.001, out)); }
-    { const u = ramp(t, GRANELLO, GRANELLO + 0.45); granello.visible = u > 0; granello.position.set(GRAN_P.x, lerp(1.2, GRAN_P.y, u * u), 0); granello.scale.setScalar(Math.max(0.001, out));
+    { const u = ramp(t, CUBO_VOLO, CUBO_VOLO + 0.8); cuboVolo.visible = u > 0; verso(V(VOLO_P.x, lerp(AEREO_Y - 0.1, VOLO_P.y, u * u), 0), VOLO_Q, cuboVolo.position); cuboVolo.rotation.z = (1 - u) * 0.6; cuboVolo.scale.setScalar(Math.max(0.001, out * lerp(1, STRINGI, sp))); }
+    { const u = ramp(t, GRANELLO, GRANELLO + 0.45); granello.visible = u > 0; granello.position.set(GRAN_P.x, lerp(-0.2, GRAN_P.y, u * u), 0); granello.scale.setScalar(Math.max(0.001, out));
       granGlow.position.copy(granello.position); granGlow.material.opacity = u > 0 ? (0.45 + 0.3 * Math.sin(tn * 6)) * out : 0; }
     const a = ramp(t, ...AEREO); plane.visible = a > 0 && a < 1; plane.position.set(lerp(-2.4, 2.4, a), AEREO_Y + 0.04 * Math.sin(tn * 3), 0.3);
   }
