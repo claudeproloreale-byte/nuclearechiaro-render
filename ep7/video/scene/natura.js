@@ -1,6 +1,7 @@
 // Puntata 7 — LATO NATURA della collina (B2–B5, B10–B12). Dalla v4 sta a DESTRA della centrale (centro NX = +26): nella B13
 // la camera scorre verso sinistra e il cavo elettrico, che esce dalla centrale verso sinistra, resta fuori dal movimento.
-//   B2   sole, gruppo di rocce in primo piano, banano grande (foglie lunghe con nervatura, casco di banane a mani, fiore viola)
+//   B2   sole, gruppo di rocce in primo piano a sinistra, banano a destra dietro la mascotte (foglie lunghe con nervatura,
+//        casco di banane a mani, fiore viola)
 //   B3   le rocce si illuminano di verde su «rocce», le banane su «cibo»; su «spazio» arrivano dal cielo i raggi cosmici (sottili)
 //   B4   un omino (bambino giocattolo, testa grande) entra da sinistra camminando sul prato, con l'ombra sotto i piedi; si ferma,
 //        si gira verso di noi sorpreso, sul corpo si accendono i puntini; la camera si avvicina piano
@@ -9,7 +10,7 @@
 import { THREE, V, std, mesh, glow, smooth, ramp, setSeed, rnd, clamp01, lerp, hash, tube, pipeCurve } from '/comune/base.js';
 
 export const NX = 26;
-export const CAM_NAT = [NX, 2.6, -6, NX, 1.2, -40];   // v4: più vicina al prato (rocce e banano più grandi)
+export const CAM_NAT = [NX, 1.0, -12, NX, -0.5, -40];   // v5: ancora più vicina e bassa (omino e rocce in primo piano)
 export const FOSF = { rocce: 11.1, banane: 12.1, raggi: [13.3, 15.4], spente: [15.8, 17.0] };
 export const SAGOMA = [15.4, 23.35], CAMMINA = [15.6, 17.9], GIRA = [17.9, 18.45], PUNTINI = 18.4, AVVICINA = [18.6, 21.9], ZOOM = [22.0, 23.3];
 
@@ -71,25 +72,25 @@ export function creaNatura(C) {
   const flM = [std(0xffffff), std(0xffd23a), std(0xff8fa8)];
   for (let i = 0; i < 46; i++) { const x = -6 + rnd() * 14, z = -31 - rnd() * 13; mesh(new THREE.SphereGeometry(0.07, 8, 6), flM[i % 3], nat, V(x, gy(x, z) + 0.05, z)); }
   // sole (in alto a sinistra di questa inquadratura)
-  const sun = glow(0xfff0b0, nat, 17); sun.position.set(-8, 18, -95); sun.material.opacity = 0.9;
-  mesh(new THREE.SphereGeometry(1.9, 32, 20), new THREE.MeshBasicMaterial({ color: 0xfff6c8 }), nat, V(-8, 18, -96));
+  const sun = glow(0xfff0b0, nat, 15); sun.position.set(-7, 13.5, -95); sun.material.opacity = 0.9;
+  mesh(new THREE.SphereGeometry(1.9, 32, 20), new THREE.MeshBasicMaterial({ color: 0xfff6c8 }), nat, V(-7, 13.5, -96));
 
   const fosf = [];   // { mats, glows, t0 }: cose che si illuminano nella B3
   // ---------------- gruppo di rocce in primo piano (rocce grandi irregolari, sassolini, ciuffi d'erba)
   const rocks = { mats: [], glows: [], t0: FOSF.rocce };
   const grassM = std(0x4e9e44, { roughness: 0.9 });
-  [[-1.1, -31.4, 1.05, 0x9a958c], [0.15, -31.9, 0.8, 0x8c8f96], [-2.2, -32.0, 0.75, 0xa39d92], [-0.45, -30.6, 0.5, 0x908b82], [0.55, -30.9, 0.42, 0x9a958c], [-1.95, -30.7, 0.38, 0x8c8f96],
-   [0.3, -30.2, 0.2, 0xa39d92], [-0.9, -30.0, 0.18, 0x878a85], [-2.5, -30.9, 0.2, 0x9a958c], [1.0, -31.5, 0.25, 0x8c8f96]].forEach(([x, z, s, c], i) => {
+  [[-1.05, -29.0, 0.85, 0x9a958c], [-0.05, -29.5, 0.65, 0x8c8f96], [-1.95, -29.6, 0.6, 0xa39d92], [-0.55, -28.3, 0.4, 0x908b82], [0.35, -28.6, 0.34, 0x9a958c], [-1.75, -28.4, 0.3, 0x8c8f96],
+   [0.15, -27.95, 0.16, 0xa39d92], [-0.85, -27.8, 0.15, 0x878a85], [-2.3, -28.6, 0.16, 0x9a958c], [0.75, -29.2, 0.2, 0x8c8f96]].forEach(([x, z, s, c], i) => {
     const m = std(c, { roughness: 0.92, flatShading: true, emissive: 0x6dff5a, emissiveIntensity: 0 });
     const r = mesh(rockGeo(s, 3 + i * 1.3), m, nat, V(x, gy(x, z) + s * 0.12, z)); r.rotation.y = rnd() * 6;
     rocks.mats.push(m);
     if (s > 0.4) { const g = glow(0x8dff6a, nat, s * 3); g.position.set(x, gy(x, z) + s * 0.35, z + s * 0.6); rocks.glows.push(g); }
   });
-  for (let i = 0; i < 16; i++) { const x = -2.8 + rnd() * 4.2, z = -30.0 - rnd() * 2.4, s = 0.18 + rnd() * 0.16; const b = mesh(new THREE.ConeGeometry(0.035, s, 4), grassM, nat, V(x, gy(x, z) + s / 2 - 0.03, z)); b.rotation.set((rnd() - 0.5) * 0.6, 0, (rnd() - 0.5) * 0.6); }
+  for (let i = 0; i < 16; i++) { const x = -2.5 + rnd() * 3.6, z = -27.7 - rnd() * 2.2, s = 0.18 + rnd() * 0.16; const b = mesh(new THREE.ConeGeometry(0.035, s, 4), grassM, nat, V(x, gy(x, z) + s / 2 - 0.03, z)); b.rotation.set((rnd() - 0.5) * 0.6, 0, (rnd() - 0.5) * 0.6); }
   fosf.push(rocks);
 
   // ---------------- banano in primo piano a sinistra
-  const BT = new THREE.Group(); { const x = -2.2, z = -28.6; BT.position.set(x, gy(x, z) - 0.05, z); BT.scale.setScalar(1.3); } nat.add(BT);
+  const BT = new THREE.Group(); { const x = 1.75, z = -29.6; BT.position.set(x, gy(x, z) - 0.05, z); BT.scale.set(-1.05, 1.05, 1.05); } nat.add(BT);   // v5: a destra, dietro la mascotte; specchiato (casco verso il centro)
   const stemM = std(0x7f9448, { roughness: 0.85 }), sheathM = std(0x8a6a3a, { roughness: 0.95, side: THREE.DoubleSide }), stemM2 = std(0x6f8a3e, { roughness: 0.85 });
   const TOP = 3.4, UP = TOP - 2.7;   // altezza del fusto; la corona e il casco salgono di UP
   { const s = mesh(new THREE.CylinderGeometry(0.15, 0.25, TOP, 18, 4), stemM, BT, V(0, TOP / 2, 0)); s.rotation.z = 0.03;
@@ -129,13 +130,13 @@ export function creaNatura(C) {
   for (let k = 0; k < 16; k++) {
     const t0 = FOSF.raggi[0] + (k / 16) * (FOSF.raggi[1] - FOSF.raggi[0] - 0.8) + 0.15 * rnd();
     const side = k % 4, z = -48 - rnd() * 14, d = CAM_NAT[2] - z, hw = 0.152 * d * 1.15, hh = 0.268 * d;
-    const A = side === 0 ? V(-hw, 1.2 + hh * (0.2 + 0.6 * rnd()), z) : side === 1 ? V(hw, 1.2 + hh * (0.2 + 0.6 * rnd()), z) : V((rnd() - 0.5) * 2 * hw, 1.2 + hh * 0.85, z);
+    const A = side === 0 ? V(-hw, -0.5 + hh * (0.25 + 0.55 * rnd()), z) : side === 1 ? V(hw, -0.5 + hh * (0.25 + 0.55 * rnd()), z) : V((rnd() - 0.5) * 2 * hw, -0.5 + hh * 0.8, z);
     const bx = (rnd() - 0.5) * 1.4 * hw, bz = -32 - rnd() * 9, B = V(bx, gy(bx, bz) + 0.2, bz);
-    raggi.push({ A, B, t0, dur: 0.75 + 0.2 * rnd(), trail: Array.from({ length: 30 }, () => glow(k % 3 ? 0xb8d4ff : 0xd8b8ff, nat, 0.7)), hit: glow(0xc8e0ff, nat, 1.0) });
+    raggi.push({ A, B, t0, dur: 0.75 + 0.2 * rnd(), trail: Array.from({ length: 30 }, () => glow(k % 3 ? 0xb8d4ff : 0xd8b8ff, nat, 0.38)), hit: glow(0xc8e0ff, nat, 0.7) });
   }
 
   // ---------------- omino (B4): bambino giocattolo, testa grande, maglietta arancione; cammina sul prato
-  const MZ = -28.4, MX0 = -4.6, MX1 = 0.45;
+  const MZ = -27.0, MX0 = -3.3, MX1 = 0.05;   // v5: più vicino alla camera
   const skin = std(0xf6c9a2, { roughness: 0.7 }), shirt = std(0xff9a3c, { roughness: 0.7 }), pants = std(0x3a5fa8, { roughness: 0.8 }), shoe = std(0xe8504a, { roughness: 0.6 }), sole = std(0xf4f4f4, { roughness: 0.6 });
   const hairM = std(0x6b4226, { roughness: 0.8 }), dark = std(0x241c28, { roughness: 0.4 }), white = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const man = new THREE.Group(); man.scale.setScalar(0.95); nat.add(man);

@@ -12,7 +12,7 @@ import { rt, fwarp, unwarp, ATOM_IN } from '../tempi.js';
 
 export const U1 = V(0, 0.55, 0);
 export const T_ALFA = 33.6, T_BETA = 34.6, T_GAMMA = 35.7, CALMA = [39.4, 40.2];
-const DIST = 1.35;   // distanza minima fra i nuclei del campo (v3: «ben distanziati»; v2 0,95)
+const DIST = 1.65;   // distanza minima fra i nuclei del campo (v5; v3 1,35; v2 0,95)
 export const ONDATE = [49.8, 51.6, 53.4];
 export const OROLOGIO = [47.8, 54.7];
 
@@ -28,17 +28,27 @@ export function creaScena(at) {
   K.decay(u1, T_GAMMA, 'gamma', V(0.45, 1), 0.45);
   // B8: dopo il gamma vibra ancora un po' e si calma su "più stabile" (CALMA): da lì resta stabile
   u1.mod = (t, L) => (t > 36.3 ? 0.45 * (1 - smooth(ramp(t, ...CALMA))) : L);
-  // campo di nuclei sparsi, che non si toccano e non stanno dietro la mascotte
-  // B9: prima i 16 nuclei instabili, nell'inquadratura larga ma fuori da quelle della B6–B8 (lì sono tutti calmi);
-  // poi il campo di nuclei calmi intorno. Tutti a distanza DIST, nessuno dietro la mascotte.
-  const inB9 = n => Math.abs(n.c.x) < 3.55 && n.c.y > -3.4 && n.c.y < 6.0 && !(Math.abs(n.c.x) < 2.0 && n.c.y > -3.1 && n.c.y < 3.3);
-  const libero = p => !K.NUCS.some(n => Math.hypot(n.c.x - p.x, n.c.y - p.y) < DIST) && !INQ.some(([cx, cy, d]) => dietroMascotte(p, cx, cy, d));
+  // campo di nuclei sparsi, che non si toccano e non stanno dietro la mascotte (distanza minima DIST)
+  // B9 (v5): 16 nuclei instabili distribuiti in modo uniforme su tutta l'inquadratura larga (griglia 4×4 con un po' di
+  // casualità); quelli che stanno anche nelle inquadrature della B6–B8 sono calmi fino allo zoom indietro (ACCENDI).
+  const libero = (p, dd = DIST) => !K.NUCS.some(n => Math.hypot(n.c.x - p.x, n.c.y - p.y) < dd) && !INQ.some(([cx, cy, d]) => dietroMascotte(p, cx, cy, d))
+    && !(Math.abs(p.x) < 1.25 && Math.abs(p.y - 4.6) < 1.25);   // v5: niente dietro il cronometro della B9
   setSeed(7202);
-  const gruppo = [];
-  for (let k = 0; k < 50000 && gruppo.length < 16; k++) {
-    const p = V(lerp(-3.4, 3.4, rnd()), lerp(-3.3, 5.9, rnd()), 0);
-    if (!inB9({ c: p }) || !libero(p)) continue;
-    p.z = (rnd() - 0.5) * 0.4; gruppo.push(K.add(p, 1));
+  const gruppo = [], GX = [-3.3, 3.3], GY = [-3.2, 5.8];
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+    const cx = lerp(GX[0], GX[1], (c + 0.5) / 4), cy = lerp(GY[0], GY[1], (r + 0.5) / 4);
+    for (let k = 0; k < 400; k++) {
+      const j = k < 200 ? 0.35 : 0.8, p = V(cx + (rnd() - 0.5) * 2 * j, cy + (rnd() - 0.5) * 2 * j * 1.3, 0);
+      if (!libero(p)) continue;
+      p.z = (rnd() - 0.5) * 0.4; gruppo.push(K.add(p, 1)); break;
+    }
+  }
+  // se una cella era piena (U1, mascotte), il nucleo mancante va nel posto libero più lontano dagli altri instabili
+  for (let dd = DIST; gruppo.length < 16; dd *= 0.92) {   // se non c'è posto, si accetta una distanza un po' minore
+    let best = null, bd = -1;
+    for (let k = 0; k < 3000; k++) { const p = V(lerp(GX[0], GX[1], rnd()), lerp(GY[0], GY[1], rnd()), 0); if (!libero(p, dd)) continue;
+      const d = Math.min(...gruppo.map(n => Math.hypot(n.c.x - p.x, n.c.y - p.y))); if (d > bd) { bd = d; best = p; } }
+    if (best) { best.z = (rnd() - 0.5) * 0.4; gruppo.push(K.add(best, 1)); }
   }
   setSeed(7201);
   const field = [];
@@ -47,7 +57,9 @@ export function creaScena(at) {
     if (!libero(p)) continue;
     p.z = (rnd() - 0.5) * 0.4; field.push(K.add(p, 0));
   }
-  gruppo.forEach(n => { n.lev0 = 1; });
+  const ACCENDI = [45.6, 46.8];
+  gruppo.forEach(n => { n.lev0 = 1; n.mod = (t, L) => L * smooth(ramp(t, ...ACCENDI)); });
+  gruppo.sort((a, b) => hash(a.c.x * 13.1 + a.c.y * 7.7) - hash(b.c.x * 13.1 + b.c.y * 7.7));   // ondate mescolate su tutto lo schermo
   // metà alla volta: 10, poi 5, poi 2 (ne restano 3); ogni ondata dura mezzo secondo; tipi a rotazione
   const tipi = ['alfa', 'beta', 'gamma'], quanti = [8, 4, 2];   // 16 → 8 → 4 → 2
   let j = 0;

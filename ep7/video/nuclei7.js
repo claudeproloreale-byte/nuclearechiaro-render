@@ -73,7 +73,7 @@ export function creaNuclei(scene) {
     if (t < d.t) return null;
     const s = 0.3 + V_[d.type] * (t - d.t) * (d.type === 'alfa' ? easeOut(ramp(t, d.t, d.t + 0.15), 1.4) * 0.6 + 0.4 : 1);
     if (s > 16) return null;
-    const p = d.c.clone().addScaledVector(d.dir, s); p.z = 0.15;
+    const p = d.c.clone().addScaledVector(d.dir, s); p.z = d.c.z + 0.15;   // v5: relativo al nucleo (prima assoluto: un nucleone finiva davanti al lampo)
     if (d.type === 'gamma') p.addScaledVector(V(-d.dir.y, d.dir.x, 0), 0.07 * Math.sin(s * 26));
     return p;
   }
@@ -103,7 +103,8 @@ export function creaNuclei(scene) {
         n.halo.position.copy(n.c); n.halo.visible = L > 0.01;
         n.halo.material.opacity = 0.62 * L * (1 + 0.3 * Math.sin(tn * 7 + n.ph)); n.halo.scale.setScalar(1.2 * Math.min(zoomK, 2.2) * (1 + 0.12 * Math.sin(tn * 5.3 + n.ph)));
         const f = n.decays.reduce((m, d) => Math.max(m, t >= d.t ? 1 - (t - d.t) / 0.45 : 0), 0);
-        n.flash.position.copy(n.c); n.flash.position.z += 0.3; n.flash.material.opacity = 0.9 * clamp01(f); n.flash.scale.setScalar(1.6 * Math.min(zoomK, 2.5) * (1 + (1 - clamp01(f))));
+        n.flash.position.copy(n.c); n.flash.position.z += 0.42;   // davanti a tutti i nucleoni (v5)
+        n.flash.material.opacity = 0.9 * clamp01(f); n.flash.scale.setScalar(1.6 * Math.min(zoomK, 2.5) * (1 + (1 - clamp01(f))));
       }
     }
     inst.instanceMatrix.needsUpdate = true; inst.instanceColor.needsUpdate = true;

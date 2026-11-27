@@ -3,7 +3,7 @@
 //   B4–B5 l'omino e lo zoom nel puntino sono nella collina dalla v4 (scene/natura.js); qui resta il lampo bianco (23,3)
 //   B9  cronometro: un giro ogni tempo di dimezzamento (scene/atomi.js, ONDATE)
 //   B10 bilancia
-//   B11 tre icone in alto (roccia, banana, stella vera: palla di gas luminosa) e 52 pesi gialli a forma di simbolo della
+//   B11 tre icone in alto (roccia, banana, cielo notturno con il Grande Carro, v5) e 52 pesi gialli a forma di simbolo della
 //       radioattività (un anno di radioattività naturale = 52 settimane; v4, prima erano cubetti)
 //   B12 un aereo di linea passa e lascia cadere un peso azzurro (un volo ≈ una settimana)
 //   B13 dalla centrale cade un simbolo arancione minuscolo
@@ -32,19 +32,23 @@ export function creaPrimoPiano7(I, hud) {
     [pts[0], pts[20]].forEach(p => mesh(new THREE.SphereGeometry(0.03, 10, 8), brown, m, p));
     return m;
   }
-  // stella vera (v4): palla di gas luminosa con la superficie a granuli e la corona; ne escono raggi cosmici
-  const solTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d');
-    const gr = x.createRadialGradient(128, 128, 10, 128, 128, 128); gr.addColorStop(0, '#fff3b0'); gr.addColorStop(0.7, '#ffb428'); gr.addColorStop(1, '#f07818'); x.fillStyle = gr; x.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 900; i++) { const px = hash(i * 1.3) * 256, py = hash(i * 2.7 + 1) * 256, r = 2 + hash(i * 5.1) * 6; x.fillStyle = hash(i * 7.7) < 0.5 ? 'rgba(255,250,200,0.35)' : 'rgba(200,80,10,0.3)'; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill(); }
-    for (let i = 0; i < 5; i++) { x.fillStyle = 'rgba(150,50,10,0.55)'; x.beginPath(); x.arc(hash(i * 11.1) * 256, 70 + hash(i * 13.3) * 120, 4 + hash(i * 3.1) * 5, 0, 7); x.fill(); }
-    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  // stelle (v5): dentro il disco un pezzo di cielo notturno con il Grande Carro (7 stelle con i raggi a croce, unite da linee
+  // sottili) e qualche stellina di fondo che brilla. Prima: una stella sola come palla di gas, poco riconoscibile.
+  const notteM = basic(0x13234f), lineaM = new THREE.MeshBasicMaterial({ color: 0x9fc4ff, transparent: true, opacity: 0.55 });
+  const punta = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false });
+  const CARRO = [[-0.165, 0.085], [-0.1, 0.075], [-0.045, 0.05], [0.01, 0.02], [0.02, -0.06], [0.125, -0.075], [0.135, 0.02]].map(([x, y]) => [x * 1.55, y * 1.55 + 0.01]);
   function stella(c) {
-    const g = new THREE.Group(); g.position.set(0.04, 0.06, 0); c.add(g);
-    const sfera = mesh(new THREE.SphereGeometry(0.15, 40, 30), new THREE.MeshBasicMaterial({ map: solTex }), g);
-    const cor = glow(0xffa030, g, 0.5); cor.material.opacity = 0.7; const cor2 = glow(0xfff0a0, g, 0.4); cor2.material.opacity = 0.5; cor2.position.z = 0.1;
-    const rays = [0, 1, 2].map(i => { const r = mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.12, 6), rayM, c); r.rotation.z = -0.6; r.userData.i = i; return r; });
-    return { anima: t => { sfera.rotation.y = t * 0.4; cor.scale.setScalar(0.5 * (1 + 0.05 * Math.sin(t * 3)));
-      rays.forEach(r => { const u = (t * 1.1 + r.userData.i / 3) % 1; r.position.set(-0.06 + r.userData.i * 0.07 - u * 0.16, -0.12 - u * 0.2, 0.05); r.visible = u < 0.85; }); } };
+    const g = new THREE.Group(); g.position.z = -0.05; c.add(g);
+    mesh(new THREE.CircleGeometry(0.4, 64), notteM, g, V(0, 0, -0.2));
+    const lin = (a, b) => { const A = V(a[0], a[1], -0.15), B = V(b[0], b[1], -0.15), l = mesh(new THREE.PlaneGeometry(A.distanceTo(B), 0.008), lineaM, g, A.clone().lerp(B, 0.5)); l.rotation.z = Math.atan2(B.y - A.y, B.x - A.x); };
+    [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]].forEach(([i, j]) => lin(CARRO[i], CARRO[j]));
+    const stars = CARRO.map(([x, y], i) => { const st = new THREE.Group(); st.position.set(x, y, -0.1); g.add(st);
+      const gl = glow(0xfff6d8, st, 0.11); gl.material.opacity = 1;
+      [0, Math.PI / 2].forEach(r => { const sp = mesh(new THREE.PlaneGeometry(0.11, 0.008), punta, st); sp.rotation.z = r; });
+      return st; });
+    const fondo = Array.from({ length: 14 }, (_, i) => { const a = hash(i * 3.3) * 6.28, r = 0.08 + hash(i * 5.7) * 0.27, f = glow(0xcfe0ff, g, 0.035); f.position.set(Math.cos(a) * r, Math.sin(a) * r, -0.12); return f; });
+    return { anima: t => { stars.forEach((st, i) => st.scale.setScalar(0.85 + 0.25 * Math.sin(t * 3 + i * 1.7) ** 2));
+      fondo.forEach((f, i) => { f.material.opacity = 0.35 + 0.35 * Math.sin(t * 4 + i * 2.1) ** 2; }); } };
   }
   const fabbrica = [roccia, banana, stella];
   const B11 = [[-0.7, 2.2], [0, 2.2], [0.7, 2.2]].map(([x, y], i) => { const ic = I.icon(x, y, 0.26); const mod = fabbrica[i](ic.c); icone.push(ic); return { ic, mod }; });
