@@ -10,7 +10,7 @@ import { creaAtomi } from '/comune/atomi.js';
 import { creaMascotte } from '/comune/mascotte.js';
 import { creaIcone } from '/comune/icone.js';
 import { creaRenderer, creaPrimoPiano, creaPalco } from '/comune/palco.js';
-import { WARP, unwarp, SWITCH, START_WORLD } from './tempi.js';
+import { WARP, unwarp, fwarp, SWITCH, START_WORLD } from './tempi.js';
 import { creaSpazio } from './scene/spazio.js';
 import { creaCollina } from './scene/collina.js';
 import * as atomi from './scene/atomi.js';
@@ -50,6 +50,20 @@ window.renderFrame = function (tn) {
   P.inizio.opacity = 1 - ramp(t, 0, 0.3);
   P.render();
 };
+// ---------------- copertina (?cover=1, 28/11/2026): il lato natura di giorno con rocce e banane fosforescenti, niente mascotte,
+// sottotitoli né omino; la camera guarda un po' più in alto per lasciare il cielo al titolo e al simbolo (aggiunti da make_cover7.py).
+// Parametri nell'URL per le prove: t (istante di scaletta della natura); back, dy, yaw, pitch spostano la camera della scena (copertina del 28/11: pitch=0.07, back=2.5).
+if (new URLSearchParams(location.search).get('cover') === '1') {
+  const q = new URLSearchParams(location.search), n = (k, d) => (q.has(k) ? +q.get(k) : d);
+  const tc = n('t', 12.9), tv = fwarp(tc);
+  hud.visible = false;
+  C.scene.traverse(o => { if (o.isMesh && o.material.emissive && o.material.emissive.getHex() === 0xdde8f5) o.visible = false; });   // senza nuvole (una sola, tagliata nell'angolo, sembrava una palla)
+  window.renderFrame = function () {
+    P.mondo(C.scene, C.camera); COL.aggiorna(tv, tc);
+    C.camera.translateZ(n('back', 0)); C.camera.position.y += n('dy', 0); C.camera.rotateY(n('yaw', 0)); C.camera.rotateX(n('pitch', 0));
+    fadeMat.opacity = 0; P.lampo.opacity = 0; P.inizio.opacity = 0; P.render();
+  };
+}
 window.DURATION = WARP[WARP.length - 1][1];
 window.renderFrame(0);
 window.ready = true;

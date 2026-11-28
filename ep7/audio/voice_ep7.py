@@ -55,6 +55,9 @@ BLK = [
 INTRA = 0.7          # pausa massima fra frasi della stessa battuta
 PB = 1.0             # pausa fra una battuta e l'altra, circa 1 s (richiesta dell'autore del 26/11/2026)
 DOPO_ANCORA = 0.5
+# battute dopo cui la pausa si accorcia (l'animazione finisce insieme alla voce, un po' più veloce): richiesta dell'autore del
+# 28/11/2026, fra B2 e B3 a schermo non succede nulla (prima 1,4 s di pausa)
+CORTA = {1: 0.75}
 EXIT_DOPO, TAIL = 1.0, 1.5
 EXIT_S, END_S = 92.9, 94.4
 
@@ -72,7 +75,9 @@ for bi, (ss, se, idx, anc) in enumerate(BLK):
     s_a, v_a = W[-1]
     if bi + 1 == len(BLK): break
     ns = BLK[bi + 1][0]
-    if s_a < se:
+    if bi in CORTA and s_a < se:
+        v_se = vend; W.append([se, round(v_se, 3)]); r = vend + CORTA[bi]
+    elif s_a < se:
         v_se = max(vend, v_a + (se - s_a)); W.append([se, round(v_se, 3)])
         r = max(vend + PB, v_se + 0.3)
     else:
