@@ -6,7 +6,9 @@
 # frase, istante nella registrazione; istanti dalle pause fra le parole e dalla trascrizione di controllo con Whisper turbo).
 # Pause fra frasi della stessa battuta: come registrate, 0,7 s al massimo; fra battute circa 1 s (PB). Niente riverbero sulla voce.
 # Produce: voice_fx.wav, phrases.json (tempi nel video), warp7.json (tabella WARP), battute.json, ../video/lip7.js (labiale a 30 fps).
-import soundfile as sf, numpy as np, subprocess, json
+import soundfile as sf, numpy as np, subprocess, json, os
+# VERSIONE=tiktok (28/11/2026, esperimento dell'autore): montaggio più veloce solo per TikTok, file con suffisso _tt
+TT = os.environ.get('VERSIONE') == 'tiktok'; SUF = '_tt' if TT else ''
 from scipy.signal import butter, sosfiltfilt, stft
 from scipy.ndimage import uniform_filter1d
 a, sr = sf.read('voce_in.wav', dtype='float64')
@@ -58,12 +60,28 @@ DOPO_ANCORA = 0.5
 # battute dopo cui la pausa si accorcia (l'animazione finisce insieme alla voce, un po' più veloce): richiesta dell'autore del
 # 28/11/2026, fra B2 e B3 a schermo non succede nulla (prima 1,4 s di pausa)
 CORTA = {1: 0.75}
+VMAX = 1.0           # quanto l'animazione può accelerare per stare dietro alla voce (1 = mai più veloce della scaletta)
 EXIT_DOPO, TAIL = 1.0, 1.5
 EXIT_S, END_S = 92.9, 94.4
+R0 = BLK[0][0]
+if TT:
+    # Versione TikTok: «carta bianca» dall'autore per un montaggio più veloce. Si tagliano le frasi che non portano un'informazione
+    # nuova o che ripetono ciò che si vede; pause brevi; l'animazione può andare fino a 1,7 volte più veloce della scaletta.
+    #  B2: solo «esiste da sempre, ed è ovunque» (la pausa dopo «esseri umani» è a 5,95 s nella registrazione)
+    #  B8: solo «Così il nucleo si trasforma in un altro atomo.»   B11: senza «l'unità di misura della radiazione»
+    #  B15: senza «E perché ci possono fare male?»
+    PH[1] = [5.95, PH[1][1]]
+    BLK = [list(x) for x in BLK]
+    BLK[7][2] = [8]; BLK[10][2] = [16]; BLK[14][2] = [24, 26]
+    INTRA, PB, DOPO_ANCORA, CORTA, VMAX = 0.3, 0.3, 0.25, {}, 1.7
+    EXIT_DOPO, TAIL, R0 = 0.6, 1.0, 0.25
+    VMAXB = {1: 3.0, 7: 2.6}   # B2 (collina calma) e B8 (il nucleo si calma): lì non succede quasi nulla, si può correre di più
+VMAXB = globals().get('VMAXB', {})
+USATE = {k for b in BLK for k in b[2]}
 
 starts = [None] * len(PH); W = [[0.0, 0.0]]
 vt = lambda k, raw: starts[k] + raw - PH[k][0]
-r = BLK[0][0]
+r = R0
 for bi, (ss, se, idx, anc) in enumerate(BLK):
     t = r
     for j, k in enumerate(idx):
@@ -74,14 +92,15 @@ for bi, (ss, se, idx, anc) in enumerate(BLK):
     for (sa, k, raw) in anc: W.append([sa, round(vt(k, raw), 3)])
     s_a, v_a = W[-1]
     if bi + 1 == len(BLK): break
+    vm = VMAXB.get(bi, VMAX)
     ns = BLK[bi + 1][0]
     if bi in CORTA and s_a < se:
         v_se = vend; W.append([se, round(v_se, 3)]); r = vend + CORTA[bi]
     elif s_a < se:
-        v_se = max(vend, v_a + (se - s_a)); W.append([se, round(v_se, 3)])
-        r = max(vend + PB, v_se + 0.3)
+        v_se = max(vend, v_a + (se - s_a) / vm); W.append([se, round(v_se, 3)])
+        r = max(vend + PB, v_se + ((ns - se) / vm if TT else 0.3))
     else:
-        r = max(vend + PB, v_a + max(DOPO_ANCORA, ns - s_a))
+        r = max(vend + PB, v_a + max(DOPO_ANCORA, (ns - s_a) / vm))
 last = starts[28] + PH[28][1] - PH[28][0]
 W.append([EXIT_S, round(last + EXIT_DOPO, 3)]); W.append([END_S, round(last + EXIT_DOPO + TAIL, 3)])
 for p, q in zip(W, W[1:]): assert q[0] > p[0] and q[1] > p[1], (p, q)
@@ -90,29 +109,30 @@ print('WARP (scaletta -> video, velocità dell\'animazione):')
 for p, q in zip(W, W[1:]): print('  %6.2f -> %6.2f   x%.2f' % (p[0], p[1], (q[0] - p[0]) / (q[1] - p[1])))
 # battute nel video (per l'app): dalla prima all'ultima frase di ogni battuta
 BAT = [[round(starts[idx[0]], 2), round(starts[idx[-1]] + PH[idx[-1]][1] - PH[idx[-1]][0], 2)] for (_, _, idx, _) in BLK]
-json.dump(BAT, open('battute.json', 'w'))
+json.dump(BAT, open('battute' + SUF + '.json', 'w'))
 # livellamento per frase (±3 dB)
 h = int(sr * 0.01)
 def loud(s, e, a):
     x = a[int(s * sr):int(e * sr)]; m = len(x) // h; rr = np.sqrt((x[:m * h].reshape(m, h) ** 2).mean(1)); rr = rr[rr > 10 ** (-45 / 20)]
     return 20 * np.log10(np.sqrt((rr ** 2).mean()))
-L = [loud(s, e, a) for s, e in PH]; med = np.median(L); G = [float(np.clip(med - l, -3, 3)) for l in L]
+L = [loud(s, e, a) if k in USATE else 0.0 for k, (s, e) in enumerate(PH)]; med = np.median([l for k, l in enumerate(L) if k in USATE]); G = [float(np.clip(med - l, -3, 3)) for l in L]
 out = np.zeros(int((TOTAL + 0.5) * sr)); newPH = []
 PRE, POST = 0.08, 0.15
 for k, (s, e) in enumerate(PH):
+    if k not in USATE: newPH.append(None); continue
     seg = a[int((s - PRE) * sr):int((e + POST) * sr)].copy() * 10 ** (G[k] / 20)
     f1, f2 = int(0.02 * sr), int(0.08 * sr); seg[:f1] *= np.linspace(0, 1, f1); seg[-f2:] *= np.linspace(1, 0, f2)
     i0 = int((starts[k] - PRE) * sr); out[i0:i0 + len(seg)] += seg
     newPH.append([round(starts[k], 3), round(starts[k] + e - s, 3)])
 out = out[:int(TOTAL * sr)]
-sf.write('voice_edit.wav', out, sr, subtype='PCM_24')
-json.dump(newPH, open('phrases.json', 'w')); json.dump(W, open('warp7.json', 'w'))
+sf.write('voice_edit' + SUF + '.wav', out, sr, subtype='PCM_24')
+json.dump(newPH, open('phrases' + SUF + '.json', 'w')); json.dump(W, open('warp7' + SUF + '.json', 'w'))
 print('BATTUTE', BAT); print('TOTALE', round(TOTAL, 2))
 # la voce è già la versione migliorata: stessa catena leggera delle puntate 5 e 6 (tono invariato)
 flt = ("highpass=f=75,equalizer=f=230:t=q:w=1.0:g=-2.5,equalizer=f=3800:t=q:w=0.9:g=3,highshelf=f=9000:g=2.5,"
        "deesser=i=0.2,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=150:makeup=1.5,alimiter=limit=0.8:level=false")
-subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', 'voice_edit.wav', '-af', flt, '-ar', '48000', 'voice_fx.wav'], check=True)
-v, sr = sf.read('voice_fx.wav'); PHR = [p for p in newPH if p]
+subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', 'voice_edit' + SUF + '.wav', '-af', flt, '-ar', '48000', 'voice_fx' + SUF + '.wav'], check=True)
+v, sr = sf.read('voice_fx' + SUF + '.wav'); PHR = [q for q in newPH if q]
 band = sosfiltfilt(butter(2, [180, 3500], 'bandpass', fs=sr, output='sos'), v)
 hop = sr // FPS; nf = int(TOTAL * FPS)
 rms = np.array([np.sqrt((band[max(0, i * hop - hop):i * hop + hop] ** 2).mean()) for i in range(nf)])
@@ -126,5 +146,5 @@ cen = (P * fq[:, None]).sum(0) / (P.sum(0) + 1e-12); cen = np.interp(tq, t_, cen
 lo, hi = np.percentile(cen[env > 0.5], [15, 85])
 nar = env * np.clip(0.35 + 0.65 * (hi - cen) / (hi - lo), 0, 1)
 lip = {'open': [round(float(q), 3) for q in opn], 'narrow': [round(float(q), 3) for q in nar], 'env': [round(float(q), 3) for q in env]}
-open('../video/lip7.js', 'w').write('// labiale della puntata 7, generato da audio/voice_ep7.py\nexport default ' + json.dumps(lip) + ';\n')
+open('../video/lip7' + SUF + '.js', 'w').write('// labiale della puntata 7, generato da audio/voice_ep7.py\nexport default ' + json.dumps(lip) + ';\n')
 print('lip: fotogrammi', nf)

@@ -3,7 +3,8 @@
 import numpy as np, soundfile as sf, json
 from scipy.signal import butter, sosfilt, fftconvolve
 
-WARP = json.load(open('warp7.json'))
+SUF = '_tt' if __import__('os').environ.get('VERSIONE') == 'tiktok' else ''   # versione TikTok (vedi voice_ep7.py)
+WARP = json.load(open('warp7' + SUF + '.json'))
 SR = 48000; TOTAL = WARP[-1][1]; N = int(SR * TOTAL)
 rng = np.random.default_rng(17)
 BEAT = 0.6; BAR = 2.4
@@ -190,5 +191,5 @@ ir = rng.standard_normal((int(1.1 * SR), 2)) * np.exp(-tt(1.1) * 5.5)[:, None]; 
 def verb(x, wet): return x + wet * np.stack([fftconvolve(x[:, c], ir[:, c])[:N] for c in (0, 1)], 1)
 mus = verb(mus, 0.22); sfx = verb(sfx, 0.18)
 endf = np.clip((TOTAL - np.arange(N) / SR) / 0.5, 0, 1)[:, None]
-sf.write('music7.wav', mus * endf, SR, subtype='PCM_24'); sf.write('sfx7.wav', sfx * endf, SR, subtype='PCM_24')
+sf.write('music7' + SUF + '.wav', mus * endf, SR, subtype='PCM_24'); sf.write('sfx7' + SUF + '.wav', sfx * endf, SR, subtype='PCM_24')
 print('picchi', np.abs(mus).max(), np.abs(sfx).max(), 'accordo finale', round(TF, 2))

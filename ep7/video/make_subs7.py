@@ -2,7 +2,9 @@
 # (../audio/phrases.json, voce montata). Numeri in cifre; punteggiatura secondo la regola del canale; righe di 22 caratteri al massimo.
 # Dentro le frasi lunghe le righe si dividono in proporzione ai caratteri, ripartendo dalle pause fra le parole (TAGLI).
 import json, re
-PH = json.load(open('../audio/phrases.json')); RAW = json.load(open('../audio/phrases_raw.json'))
+import os
+TT = os.environ.get('VERSIONE') == 'tiktok'; SUF = '_tt' if TT else ''   # versione TikTok (vedi ../audio/voice_ep7.py)
+PH = json.load(open('../audio/phrases' + SUF + '.json')); RAW = json.load(open('../audio/phrases_raw.json'))
 TXT = [["La radioattività", "ti fa paura?"],
        ["Ma non l'abbiamo", "inventata noi", "esseri umani:", "esiste da sempre,", "ed è ovunque."],
        ["Viene dalle rocce,", "dal cibo e", "persino dallo spazio."],
@@ -20,10 +22,12 @@ TXT = [["La radioattività", "ti fa paura?"],
        ["Dentro il reattore,", "però, i frammenti", "della fissione", "sono molto", "radioattivi:"], ["per questo restano", "chiusi nelle pastiglie,"], ["nelle barre,", "nel vessel", "e nella cupola."],
        ["E dove finiscono dopo?"], ["E perché ci possono", "fare male?"], ["Ne parleremo", "nella puntata", "dedicata alle scorie."],
        ["Hai qualche domanda?"], ["Fammela nei commenti!"]]
+if TT: TXT[1] = ["Esiste da sempre,", "ed è ovunque."]; RAW[1][0] = 5.95   # B2 accorciata
 # pause fra le parole nella registrazione: frase -> [(indice della riga che riparte, istante nella registrazione)]
 TAGLI = {1: [(3, 5.95)], 9: [(3, 52.85), (4, 53.43)], 16: [(2, 76.57)], 2: [(1, 10.69), (2, 11.73)], 3: [(2, 16.82)], 7: [(2, 35.93), (4, 38.19), (6, 40.24)],
          18: [(3, 86.48)], 23: [(1, 105.01), (2, 106.02)]}
 TXT = [None if lines is None else [re.sub(r'[.,:;]+$', '', l.replace('«', '').replace('»', '')).strip() for l in lines] for lines in TXT]
+TAGLI.pop(1, None) if TT else None
 assert all(len(l) <= 22 for ls in TXT if ls for l in ls)
 def ts(t): h = int(t // 3600); m = int(t // 60) % 60; return '%d:%02d:%05.2f' % (h, m, t % 60)
 cues = []
@@ -53,7 +57,7 @@ Style: S,Poppins,112,&H00FFFFFF,&H00FFFFFF,&H004A1C0C,&H804A1C0C,-1,0,0,0,100,10
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 ev = ''.join('Dialogue: 0,%s,%s,S,,0,0,0,,{\\pos(540,%d)\\fscx88\\fscy88\\t(0,90,\\fscx100\\fscy100)}%s\n' % (ts(a), ts(b), Y, l) for a, b, l in cues)
-open('subs/ep7.ass', 'w').write(head + ev)
+open('subs/ep7' + SUF + '.ass', 'w').write(head + ev)
 srt = lambda t: '%02d:%02d:%02d,%03d' % (t // 3600, t // 60 % 60, t % 60, round(t % 1 * 1000) % 1000)
-open('subs/ep7.srt', 'w').write(''.join('%d\n%s --> %s\n%s\n\n' % (i + 1, srt(a), srt(b), l) for i, (a, b, l) in enumerate(cues)))
+open('subs/ep7' + SUF + '.srt', 'w').write(''.join('%d\n%s --> %s\n%s\n\n' % (i + 1, srt(a), srt(b), l) for i, (a, b, l) in enumerate(cues)))
 print(len(cues), 'righe; più lunga:', max(len(l) for _, _, l in cues), 'caratteri')
