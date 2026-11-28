@@ -2,29 +2,27 @@
 # (../audio/phrases.json, voce montata). Numeri in cifre; punteggiatura secondo la regola del canale; righe di 22 caratteri al massimo.
 # Dentro le frasi lunghe le righe si dividono in proporzione ai caratteri, ripartendo dalle pause fra le parole (TAGLI).
 import json, re
-PH = json.load(open('../audio/phrases.json')); RAW = json.load(open('../audio/phrases_raw.json')); RAW[24][0] = 95.62
+PH = json.load(open('../audio/phrases.json')); RAW = json.load(open('../audio/phrases_raw.json'))
 TXT = [["La radioattività", "ti fa paura?"],
-       ["Ma non l'abbiamo", "inventata noi", "esseri umani:", "esiste da sempre,", "ed è ovunque."], None,   # B2 riregistrata il 28/11/2026
-       ["Viene dalle rocce,", "dal cibo e", "persino dallo spazio."], None,                                  # B3 riregistrata il 28/11/2026
+       ["Ma non l'abbiamo", "inventata noi", "esseri umani:", "esiste da sempre,", "ed è ovunque."],
+       ["Viene dalle rocce,", "dal cibo e", "persino dallo spazio."],
        ["Anche il tuo corpo", "è un po' radioattivo:", "dentro di te,", "ogni secondo,", "circa 4000 atomi", "decadono."],
        ["Ma cosa vuol dire,", "radioattivo?"],
-       ["Alcuni nuclei hanno", "troppi neutroni", "o troppi protoni:"], ["sono instabili."],
-       ["Prima o poi", "si sistemano da soli,"], ["lanciando fuori", "un pezzetto di nucleo", "o un'onda", "elettromagnetica."],
-       ["Quel lancio", "è la radiazione", "e questo processo", "si chiama decadimento."],
-       ["Così il nucleo", "si trasforma", "in un altro atomo."], ["Questo può essere", "a sua volta", "ancora instabile,"], ["e quindi radioattivo,", "oppure stabile."],
+       ["Alcuni nuclei hanno", "troppi neutroni", "o troppi protoni:"], ["ciò li rende instabili."],
+       ["Prima o poi", "si sistemano da soli,", "lanciando fuori", "un pezzetto di nucleo", "o un'onda", "elettromagnetica.",
+        "Quel lancio", "è la radiazione", "e questo processo", "si chiama decadimento."],
+       ["Così il nucleo", "si trasforma", "in un altro atomo."], ["Questo può essere", "a sua volta", "ancora instabile,", "e quindi radioattivo,", "oppure stabile."],
        ["Ogni tipo di nucleo", "ha il suo ritmo:"], ["in un certo tempo", "se ne trasforma", "la metà."], ["Per alcuni", "bastano secondi,"], ["per altri servono", "miliardi di anni."],
        ["Quindi la domanda", "giusta non è", "se c'è radioattività,"], ["ma quanta", "ne riceviamo."],
-       ["In un anno,", "dalla natura,", "ognuno di noi", "ne riceve circa", "2 o 3 millisievert,"], ["l'unità di misura", "delle radiazioni."],
+       ["In un anno,", "dalla natura,", "ognuno di noi", "ne riceve circa", "2 o 3 millisievert,"], ["l'unità di misura", "della radiazione."],
        ["Un volo da Roma", "a New York", "equivale a circa", "una settimana", "di questa", "radioattività", "naturale."],
-       ["E vivere accanto", "a una centrale", "nucleare?", "Molto meno", "di un volo,", "all'anno."],
-       ["Dentro il reattore,", "però, i frammenti", "della fissione", "sono molto", "radioattivi:", "per questo restano", "chiusi nelle pastiglie,", "nelle barre,", "nel vessel", "e nella cupola."],
+       ["E vivere accanto", "a una centrale", "nucleare?"], ["Molto meno", "di un volo,", "all'anno."],
+       ["Dentro il reattore,", "però, i frammenti", "della fissione", "sono molto", "radioattivi:"], ["per questo restano", "chiusi nelle pastiglie,"], ["nelle barre,", "nel vessel", "e nella cupola."],
        ["E dove finiscono dopo?"], ["E perché ci possono", "fare male?"], ["Ne parleremo", "nella puntata", "dedicata alle scorie."],
        ["Hai qualche domanda?"], ["Fammela nei commenti!"]]
-assert len(TXT) == len(PH)
-RAW[1] = [1.85, 5.65]; RAW[3] = [6.95, 10.46]   # dalla registrazione nuova (voice_ep7.py)
 # pause fra le parole nella registrazione: frase -> [(indice della riga che riparte, istante nella registrazione)]
-TAGLI = {1: [(3, 3.92)], 3: [(1, 8.24), (2, 9.18)], 5: [(2, 20.28)], 10: [(2, 42.24)], 24: [(3, 97.96)], 25: [(1, 102.99), (5, 106.09), (7, 108.47), (8, 109.42), (9, 110.31)],
-         23: [(3, 91.14)]}
+TAGLI = {1: [(3, 5.95)], 9: [(3, 52.85), (4, 53.43)], 16: [(2, 76.57)], 2: [(1, 10.69), (2, 11.73)], 3: [(2, 16.82)], 7: [(2, 35.93), (4, 38.19), (6, 40.24)],
+         18: [(3, 86.48)], 23: [(1, 105.01), (2, 106.02)]}
 TXT = [None if lines is None else [re.sub(r'[.,:;]+$', '', l.replace('«', '').replace('»', '')).strip() for l in lines] for lines in TXT]
 assert all(len(l) <= 22 for ls in TXT if ls for l in ls)
 def ts(t): h = int(t // 3600); m = int(t // 60) % 60; return '%d:%02d:%05.2f' % (h, m, t % 60)

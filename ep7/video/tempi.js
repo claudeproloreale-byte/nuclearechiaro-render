@@ -13,10 +13,10 @@ export const EXIT = 92.9, END = 94.4;
 // labiale simulato: la B1 (v2) è corta, «La radioattività ti fa paura?» dura circa 1,9 s
 export const SPEECH = Object.values(B).map((b, i) => (i === 0 ? [0.5, 2.4] : b));
 export const LIP = LIP7;   // labiale dalla voce vera (audio/voice_ep7.py), a 30 fps, letto con il tempo del video
-// tabella WARP [[t scaletta, t video], ...] dalla voce dell'autore (27/11/2026; B2 e B3 riregistrate il 28/11/2026, audio/voice_ep7.py -> audio/warp7.json);
+// tabella WARP [[t scaletta, t video], ...] dalla voce dell'autore (seconda registrazione completa del 28/11/2026, audio/voice_ep7.py -> audio/warp7.json);
 // prima (v3–v9, senza voce) allungava solo la B7, la B11 e la B15.
-export const WARP = [[0.0, 0.0], [0.5, 0.5], [1.9, 1.35], [4.0, 3.45], [4.5, 3.75], [10.0, 9.25], [10.5, 9.55], [11.1, 10.22], [12.1, 11.08], [13.3, 12.57], [15.0, 14.27], [15.5, 14.57], [18.4, 16.62], [21.5, 20.32], [22.0, 21.32], [24.5, 23.82], [25.0, 24.12], [30.5, 29.62], [31.0, 30.05], [33.6, 33.5], [35.7, 34.96], [38.0, 40.83], [38.5, 41.83], [46.5, 49.83], [47.0, 50.67], [54.5, 59.18], [55.0, 60.18], [59.5, 65.09], [60.0, 66.09], [65.0, 73.46], [65.5, 74.46], [67.15, 76.91], [70.5, 80.26], [71.0, 80.56], [74.0, 82.9], [77.0, 85.9], [77.5, 86.2], [84.2, 92.4], [84.9, 93.51], [85.5, 94.26], [86.0, 95.26], [86.5, 96.73], [89.5, 102.83], [90.0, 103.83], [90.9, 105.46], [91.8, 106.27], [92.9, 107.42], [94.4, 108.92]];
-export const VIDEO_END = WARP[WARP.length - 1][1];   // durata del video con la voce: 108.92 s
+export const WARP = [[0.0, 0.0], [0.5, 0.5], [1.9, 1.4], [4.0, 3.5], [4.5, 3.8], [10.0, 9.3], [10.5, 9.6], [11.1, 10.69], [12.1, 11.44], [13.3, 13.04], [15.0, 14.74], [15.5, 15.04], [18.4, 17.51], [21.5, 21.57], [22.0, 22.57], [24.5, 25.07], [25.0, 25.37], [30.5, 30.87], [31.0, 31.68], [33.6, 35.07], [35.7, 36.52], [38.0, 43.13], [38.5, 44.13], [46.5, 52.13], [47.0, 53.0], [54.5, 62.68], [55.0, 63.68], [59.5, 68.25], [60.0, 69.25], [65.0, 76.41], [65.5, 77.41], [67.15, 80.38], [70.5, 83.73], [71.0, 84.03], [74.0, 86.67], [77.0, 89.67], [77.5, 89.97], [84.2, 96.24], [84.9, 97.82], [85.5, 98.92], [86.0, 100.08], [86.5, 101.45], [89.5, 107.61], [90.0, 108.61], [90.9, 110.24], [91.8, 111.03], [92.9, 112.3], [94.4, 113.8]];
+export const VIDEO_END = WARP[WARP.length - 1][1];   // durata del video con la voce: 113.80 s
 export const { unwarp, fwarp, rt } = creaWarp(WARP, END);
 
 // passaggi fra i mondi [tempo, mondo, forza del lampo chiaro, durata]:

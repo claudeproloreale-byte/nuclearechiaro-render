@@ -1,10 +1,11 @@
-# Puntata 7 — voce definitiva (p7-voce-enhanced-v2.mp3, caricato nell'app il 27/11/2026 e mandato in chat in MP3, versione migliorata, 124,4 s, 31 frasi
-# rilevate a -50 dB come in detect6.py -> phrases_raw.json). Stesso metodo delle puntate 5 e 6 (Post 6/audio/voice_ep6.py):
+# Puntata 7 — voce definitiva: seconda registrazione completa dell'autore (p7-voce_2-mejorada-v2.mp3, mandata in chat il
+# 28/11/2026, versione migliorata, 120,3 s, 29 frasi rilevate a -50 dB come in detect6.py -> phrases_raw.json). Sostituisce la
+# registrazione del 27/11 e le B2–B3 rifatte la mattina del 28/11. Stesso metodo delle puntate 5 e 6 (Post 6/audio/voice_ep6.py):
 # ogni battuta della scaletta si appoggia sulla voce; dove la voce è più lunga l'animazione rallenta, dove è più corta
 # l'animazione va alla sua velocità e la pausa dopo si allunga. Alcuni eventi sono agganciati a parole (ANC: tempo di scaletta,
-# frase, istante nella registrazione; istanti dalle pause fra le parole e dalla trascrizione di controllo con Whisper small).
-# Pause fra frasi della stessa battuta: come registrate, 0,7 s al massimo; fra battute circa 1 s (PB).
-# Produce: voice_fx.wav, phrases.json (tempi nel video), warp7.json (tabella WARP), ../video/lip7.js (labiale a 30 fps).
+# frase, istante nella registrazione; istanti dalle pause fra le parole e dalla trascrizione di controllo con Whisper turbo).
+# Pause fra frasi della stessa battuta: come registrate, 0,7 s al massimo; fra battute circa 1 s (PB). Niente riverbero sulla voce.
+# Produce: voice_fx.wav, phrases.json (tempi nel video), warp7.json (tabella WARP), battute.json, ../video/lip7.js (labiale a 30 fps).
 import soundfile as sf, numpy as np, subprocess, json
 from scipy.signal import butter, sosfiltfilt, stft
 from scipy.ndimage import uniform_filter1d
@@ -12,54 +13,44 @@ a, sr = sf.read('voce_in.wav', dtype='float64')
 if a.ndim > 1: a = a.mean(1)
 FPS = 30
 PH = json.load(open('phrases_raw.json'))
-PH[24][0] = 95.62    # «E vivere accanto…»: il respiro prima (da 95,0) resta fuori
-# 28/11/2026: B2 e B3 riregistrate (p7-voce_1-enhanced-v2.mp3 -> voce_b23.wav: tutta la voce senza la B1, con B2 e B3 nuove; il resto
-# è la stessa ripresa di prima). Dal file nuovo si prendono solo le due battute nuove, una frase ciascuna:
-#  1 «Ma non l'abbiamo inventata noi esseri umani: esiste da sempre, ed è ovunque.»   (senza «la radioattività»)
-#  3 «Viene dalle rocce, dal cibo e persino dallo spazio.»                            («persino», non «perfino»)
-# Le frasi 2 e 4 della prima registrazione non si usano più.
-a2, _ = sf.read('voce_b23.wav', dtype='float64')
-if a2.ndim > 1: a2 = a2.mean(1)
-SRC = [a] * len(PH); SRC[1] = SRC[3] = a2
-PH[1] = [1.85, 5.65]; PH[3] = [6.95, 10.46]
-NON_USATE = {2, 4}
-# testo (trascrizione di controllo, Whisper small):
-#  0 La radioattività ti fa paura? | 1 Ma la radioattività non l'abbiamo inventata noi esseri umani: | 2 esiste da sempre, ed è ovunque.
-#  3 Viene dalle rocce, dal cibo e | 4 perfino dallo spazio. | 5 Anche il tuo corpo è un po' radioattivo: dentro di te, ogni secondo, circa 4000 atomi decadono.
-#  6 Ma cosa vuol dire, radioattivo? | 7 Alcuni nuclei hanno troppi neutroni o troppi protoni: | 8 sono instabili.
-#  9 Prima o poi si sistemano da soli, | 10 lanciando fuori un pezzetto di nucleo o un'onda elettromagnetica. | 11 Quel lancio è la radiazione e questo processo si chiama decadimento.
-#  12 Così il nucleo si trasforma in un altro atomo. | 13 Questo può essere a sua volta ancora instabile, | 14 e quindi radioattivo, oppure stabile.   (senza «più stabile»)
-#  15 Ogni tipo di nucleo ha il suo ritmo: | 16 in un certo tempo se ne trasforma la metà. | 17 Per alcuni bastano secondi, | 18 per altri servono miliardi di anni.
-#  19 Quindi la domanda giusta non è se c'è radioattività, | 20 ma quanta ne riceviamo. | 21 In un anno, dalla natura, ognuno di noi ne riceve circa 2 o 3 millisievert, | 22 l'unità di misura delle radiazioni.
-#  23 Un volo da Roma a New York equivale a circa una settimana di questa radioattività naturale.
-#  24 E vivere accanto a una centrale nucleare? Molto meno di un volo, all'anno.
-#  25 Dentro il reattore, però, i frammenti della fissione sono molto radioattivi: per questo restano chiusi nelle pastiglie, nelle barre, nel vessel e nella cupola.
-#  26 E dove finiscono dopo? | 27 E perché ci possono fare male? | 28 Ne parleremo nella puntata dedicata alle scorie.   («dedicata alle», non «sulle»)
-#  29 Hai qualche domanda? | 30 Fammela nei commenti!
+# testo (trascrizione di controllo, Whisper turbo; i sottotitoli in ../video/make_subs7.py):
+#  0 La radioattività ti fa paura? | 1 Ma non l'abbiamo inventata noi esseri umani: esiste da sempre, ed è ovunque.
+#  2 Viene dalle rocce, dal cibo e persino dallo spazio. | 3 Anche il tuo corpo è un po' radioattivo: dentro di te, ogni secondo, circa 4000 atomi decadono.
+#  4 Ma cosa vuol dire, radioattivo? | 5 Alcuni nuclei hanno troppi neutroni o troppi protoni: | 6 ciò li rende instabili.
+#  7 Prima o poi si sistemano da soli, lanciando fuori un pezzetto di nucleo o un'onda elettromagnetica. Quel lancio è la radiazione e questo processo si chiama decadimento.
+#  8 Così il nucleo si trasforma in un altro atomo. | 9 Questo può essere a sua volta ancora instabile, e quindi radioattivo, oppure stabile.
+#  10 Ogni tipo di nucleo ha il suo ritmo: | 11 in un certo tempo se ne trasforma la metà. | 12 Per alcuni bastano secondi, | 13 per altri servono miliardi di anni.
+#  14 Quindi la domanda giusta non è se c'è radioattività, | 15 ma quanta ne riceviamo.
+#  16 In un anno, dalla natura, ognuno di noi ne riceve circa 2 o 3 millisievert, | 17 l'unità di misura della radiazione.
+#  18 Un volo da Roma a New York equivale a circa una settimana di questa radioattività naturale.
+#  19 E vivere accanto a una centrale nucleare? | 20 Molto meno di un volo, all'anno.
+#  21 Dentro il reattore, però, i frammenti della fissione sono molto radioattivi: | 22 per questo restano chiusi nelle pastiglie, | 23 nelle barre, nel vessel e nella cupola.
+#  24 E dove finiscono dopo? | 25 E perché ci possono fare male? | 26 Ne parleremo nella puntata dedicata alle scorie.
+#  27 Hai qualche domanda? | 28 Fammela nei commenti!
 # battute: (inizio, fine di scaletta (ep7/video/tempi.js, B), frasi, ancore [(t scaletta, frase, istante nella registrazione)])
 BLK = [
-  (0.5, 4.0, [0], [(1.9, 0, 1.55)]),                                          # il simbolo lampeggia di verde su «ti fa paura?»
+  (0.5, 4.0, [0], [(1.9, 0, 1.28)]),                                          # il simbolo lampeggia di verde su «ti fa paura?»
   (4.5, 10.0, [1], []),
-  (10.5, 15.0, [3], [(11.1, 3, 7.62),                                     # si illuminano le rocce su «rocce»
-                        (12.1, 3, 8.48),                                     #   le banane su «cibo»
-                        (13.3, 3, 9.97)]),                                   #   arrivano i raggi cosmici su «spazio»
-  (15.5, 21.5, [5], [(18.4, 5, 20.28)]),                                      # l'omino si è girato e si accendono i puntini su «dentro»
-  (22.0, 24.5, [6], []),
-  (25.0, 30.5, [7, 8], []),
-  (31.0, 38.0, [9, 10, 11], [(33.6, 10, 40.99),                               # alfa su «pezzetto di nucleo»
-                             (35.7, 10, 42.45)]),                             # gamma su «un'onda elettromagnetica» (beta in mezzo)
-  (38.5, 46.5, [12, 13, 14], []),
-  (47.0, 54.5, [15, 16, 17, 18], []),
-  (55.0, 59.5, [19, 20], []),
-  (60.0, 65.0, [21, 22], []),
-  (65.5, 70.5, [23], [(67.15, 23, 91.14)]),                                   # il peso del volo cade su «una settimana»
-  (71.0, 77.0, [24], [(74.0, 24, 97.96)]),                                    # il granello della centrale su «Molto meno di un volo»
-  (77.5, 86.0, [25], [(84.2, 25, 107.74),                                     # barriere: «pastiglie»
-                      (84.9, 25, 108.85),                                     #   «barre»
-                      (85.5, 25, 109.6),                                      #   «vessel»
-                      (86.0, 25, 110.6)]),                                    #   «cupola»
-  (86.5, 89.5, [26, 27, 28], []),
-  (90.0, 92.4, [29, 30], [(90.9, 30, 123.29), (91.8, 30, 124.1)]),            # la mascotte indica i commenti su «fammela nei commenti»
+  (10.5, 15.0, [2], [(11.1, 2, 10.15),                                        # si illuminano le rocce su «rocce»
+                     (12.1, 2, 10.9),                                         #   le banane su «cibo»
+                     (13.3, 2, 12.5)]),                                       #   arrivano i raggi cosmici su «spazio»
+  (15.5, 21.5, [3], [(18.4, 3, 16.82)]),                                      # l'omino si è girato e si accendono i puntini su «dentro»
+  (22.0, 24.5, [4], []),
+  (25.0, 30.5, [5, 6], []),
+  (31.0, 38.0, [7], [(33.6, 7, 36.95),                                        # alfa su «pezzetto di nucleo»
+                     (35.7, 7, 38.4)]),                                       # gamma su «un'onda elettromagnetica» (beta in mezzo)
+  (38.5, 46.5, [8, 9], []),
+  (47.0, 54.5, [10, 11, 12, 13], []),
+  (55.0, 59.5, [14, 15], []),
+  (60.0, 65.0, [16, 17], []),
+  (65.5, 70.5, [18], [(67.15, 18, 86.55)]),                                   # il peso del volo cade su «una settimana»
+  (71.0, 77.0, [19, 20], [(74.0, 20, 93.04)]),                                # il granello della centrale su «Molto meno di un volo»
+  (77.5, 86.0, [21, 22, 23], [(84.2, 22, 102.57),                             # barriere: «pastiglie»
+                              (84.9, 23, 104.15),                             #   «barre»
+                              (85.5, 23, 105.25),                             #   «vessel»
+                              (86.0, 23, 106.41)]),                           #   «cupola»
+  (86.5, 89.5, [24, 25, 26], []),
+  (90.0, 92.4, [27, 28], [(90.9, 28, 119.01), (91.8, 28, 119.8)]),            # la mascotte indica i commenti su «fammela nei commenti»
 ]
 INTRA = 0.7          # pausa massima fra frasi della stessa battuta
 PB = 1.0             # pausa fra una battuta e l'altra, circa 1 s (richiesta dell'autore del 26/11/2026)
@@ -86,7 +77,7 @@ for bi, (ss, se, idx, anc) in enumerate(BLK):
         r = max(vend + PB, v_se + 0.3)
     else:
         r = max(vend + PB, v_a + max(DOPO_ANCORA, ns - s_a))
-last = starts[30] + PH[30][1] - PH[30][0]
+last = starts[28] + PH[28][1] - PH[28][0]
 W.append([EXIT_S, round(last + EXIT_DOPO, 3)]); W.append([END_S, round(last + EXIT_DOPO + TAIL, 3)])
 for p, q in zip(W, W[1:]): assert q[0] > p[0] and q[1] > p[1], (p, q)
 TOTAL = W[-1][1]
@@ -100,18 +91,14 @@ h = int(sr * 0.01)
 def loud(s, e, a):
     x = a[int(s * sr):int(e * sr)]; m = len(x) // h; rr = np.sqrt((x[:m * h].reshape(m, h) ** 2).mean(1)); rr = rr[rr > 10 ** (-45 / 20)]
     return 20 * np.log10(np.sqrt((rr ** 2).mean()))
-L = [loud(s, e, SRC[k]) if k not in NON_USATE else 0.0 for k, (s, e) in enumerate(PH)]; med = np.median([l for k, l in enumerate(L) if k not in NON_USATE]); G = [float(np.clip(med - l, -3, 3)) for l in L]
+L = [loud(s, e, a) for s, e in PH]; med = np.median(L); G = [float(np.clip(med - l, -3, 3)) for l in L]
 out = np.zeros(int((TOTAL + 0.5) * sr)); newPH = []
 PRE, POST = 0.08, 0.15
 for k, (s, e) in enumerate(PH):
-    if k in NON_USATE: newPH.append(None); continue
-    seg = SRC[k][int((s - PRE) * sr):int((e + POST) * sr)].copy() * 10 ** (G[k] / 20)
+    seg = a[int((s - PRE) * sr):int((e + POST) * sr)].copy() * 10 ** (G[k] / 20)
     f1, f2 = int(0.02 * sr), int(0.08 * sr); seg[:f1] *= np.linspace(0, 1, f1); seg[-f2:] *= np.linspace(1, 0, f2)
     i0 = int((starts[k] - PRE) * sr); out[i0:i0 + len(seg)] += seg
     newPH.append([round(starts[k], 3), round(starts[k] + e - s, 3)])
-# v12: tolta la coda d'ambiente della v11 (all'autore non piace). La registrazione non è tagliata: dopo «paura?» la voce scende
-# da -33 a -79 dB come nell'MP3 originale. Da qui la sorgente è l'MP3 caricato (voce_in.wav da p7-voce-enhanced-v2.mp3, stesso
-# allineamento del WebM dell'app), non la conversione WebM.
 out = out[:int(TOTAL * sr)]
 sf.write('voice_edit.wav', out, sr, subtype='PCM_24')
 json.dump(newPH, open('phrases.json', 'w')); json.dump(W, open('warp7.json', 'w'))
