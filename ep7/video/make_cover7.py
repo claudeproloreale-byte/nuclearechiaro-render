@@ -2,7 +2,7 @@
 # natura di giorno, rocce e banane fosforescenti, niente mascotte né nuvole), titolo nello stile del canale (righe bianche, ultima gialla,
 # Poppins grassetto con contorno blu scuro e ombra) e sotto il titolo il simbolo della radioattività bianco, grande.
 # Proporzioni del simbolo come la norma ISO 361: disco centrale di raggio r, pale da 1,5 r a 5 r, larghe 60°, una in basso.
-# Stili (prove del 28/11): classico (contorno blu e ombra), distintivo (su un disco blu con anello bianco), bagliore (alone verde
+# Stili (prove del 28/11; l'autore ha scelto «morbido»): classico (contorno blu e ombra), distintivo (su un disco blu con anello bianco), bagliore (alone verde
 # fosforescente come le rocce), morbido (pale arrotondate, contorno blu e ombra).
 # Tutto nella fascia visibile anche nella griglia 3:4 del profilo Instagram (da 240 a 1680 px di altezza).
 # uso: python3 make_cover7.py sfondo.jpg copertina.jpg stile "RADIOATTIVITÀ" "NIENTE PAURA"
