@@ -45,7 +45,7 @@ export function creaTorre(parent, o = {}) {
   front.renderOrder = 6;
   // fasce rosse in alto (davanti apribile) e bordo superiore
   guscio(7.25, 7.7, PI / 2, PI, redM, g, 0.02);
-  const redFront = guscio(7.25, 7.7, -PI / 2, PI, interno ? redF : redM, g, 0.02); redFront.renderOrder = 6;
+  const redFront = guscio(7.25, 7.7, -PI / 2, PI, interno ? redF : redM, g, 0.02); redFront.renderOrder = 7;   // dopo il guscio: non sparisce quando diventa trasparente
   mesh(new THREE.TorusGeometry(raggio(H) + 0.01, 0.06, 10, 72), std(0xdfe4ec, { roughness: 0.8 }), g, V(0, H, 0)).rotation.x = PI / 2;
   // anello di base su cui poggia il guscio
   mesh(new THREE.TorusGeometry(raggio(BASE), 0.07, 10, 72), std(0xd5dbe4, { roughness: 0.9 }), g, V(0, BASE, 0)).rotation.x = PI / 2;
@@ -88,17 +88,18 @@ export function creaTorre(parent, o = {}) {
     inner.add(sl);
     // distribuzione dell'acqua calda: anello, quattro bracci, ugelli
     const pipeM = std(0xe0863a, { roughness: 0.45, metalness: 0.2, emissive: 0xff6a20, emissiveIntensity: 0.25 });
-    const HY = 1.62, RR = RF * 0.62;
+    const HY = 2.55, RR = RF * 0.5;   // distribuzione più in alto: l'acqua cade per un bel tratto prima del riempimento
     mesh(new THREE.TorusGeometry(RR, 0.05, 10, 64), pipeM, inner, V(0, HY, 0)).rotation.x = PI / 2;
-    for (let k = 0; k < 4; k++) { const a = k * PI / 2 + PI / 4; bar(V(0, HY, 0), V(Math.sin(a) * RF * 0.95, HY, Math.cos(a) * RF * 0.95), 0.045, pipeM, inner); }
+    const RH = raggio(HY) - 0.1;
+    for (let k = 0; k < 4; k++) { const a = k * PI / 2 + PI / 4; bar(V(0, HY, 0), V(Math.sin(a) * RH, HY, Math.cos(a) * RH), 0.045, pipeM, inner); }
     const NOZ = [];
-    for (let k = 0; k < 4; k++) { const a = k * PI / 2 + PI / 4; for (let j = 1; j <= 4; j++) NOZ.push([Math.sin(a) * RF * 0.95 * j / 4.3, Math.cos(a) * RF * 0.95 * j / 4.3]); }
+    for (let k = 0; k < 4; k++) { const a = k * PI / 2 + PI / 4; for (let j = 1; j <= 4; j++) NOZ.push([Math.sin(a) * RH * j / 4.3, Math.cos(a) * RH * j / 4.3]); }
     for (let k = 0; k < 16; k++) { const a = k / 16 * PI * 2; NOZ.push([Math.sin(a) * RR, Math.cos(a) * RR]); }
     NOZ.forEach(([nx, nz]) => { const c = mesh(new THREE.ConeGeometry(0.05, 0.09, 10), pipeM, inner, V(nx, HY - 0.07, nz)); c.rotation.x = PI; });
     // tubo che porta su l'acqua calda dal fondo (riser), dal lato della sala turbine
     const riser = mesh(new THREE.CylinderGeometry(0.11, 0.11, HY - 0.05, 16), pipeM, inner, V(0, (HY + 0.05) / 2, 0));
     // pioggia
-    const N = 380, dropGeo = new THREE.CapsuleGeometry(0.02, 0.08, 3, 6), dropM = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const N = 480, dropGeo = new THREE.CapsuleGeometry(0.02, 0.08, 3, 6), dropM = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const drops = new THREE.InstancedMesh(dropGeo, dropM, N); inner.add(drops);
     const dd = Array.from({ length: N }, (_, i) => {
       const a = rnd() * PI * 2, r = Math.sqrt(rnd()) * RF * 0.97;
@@ -120,13 +121,14 @@ export function creaTorre(parent, o = {}) {
       const vis = 1 - st.apre;
       // pioggia: da HY a FY1 calda, dentro il riempimento rallenta, poi da FY0 alla vasca sempre più blu
       for (let i = 0; i < N; i++) {
-        const d = dd[i], ph = (tn * 0.55 * d.sp + d.ph) % 1;
+        const d = dd[i], ph = (tn * 0.45 * d.sp + d.ph) % 1;
         let yy, k;
-        if (ph < 0.25) { yy = lerp(HY - 0.1, FY1, ph / 0.25); k = 0; }
-        else if (ph < 0.45) { yy = lerp(FY1, FY0, (ph - 0.25) / 0.2); k = 0.3 * (ph - 0.25) / 0.2; }
-        else { yy = lerp(FY0, 0.18, (ph - 0.45) / 0.55); k = 0.3 + 0.7 * (ph - 0.45) / 0.55; }
+        if (ph < 0.4) { yy = lerp(HY - 0.1, FY1, (ph / 0.4) ** 1.4); k = 0; }
+        else if (ph < 0.6) { yy = lerp(FY1, FY0, (ph - 0.4) / 0.2); k = 0.3 * (ph - 0.4) / 0.2; }
+        else { yy = lerp(FY0, 0.18, (ph - 0.6) / 0.4); k = 0.3 + 0.7 * (ph - 0.6) / 0.4; }
         const on = st.pioggia > (hash(i * 1.37) * 0.9 + 0.05) ? 1 : 0;
-        Q.identity(); M4.compose(V(d.x + Math.sin(i + tn) * 0.01, yy, d.z), Q, S3.setScalar(on ? 1 : 0.0001));
+        const sp = ph < 0.4 ? lerp(RH / RF, 1, (ph / 0.4) ** 1.4) : 1;   // dagli ugelli (più stretti, la torre lì è più stretta) si allarga
+        Q.identity(); M4.compose(V(d.x * sp + Math.sin(i + tn) * 0.01, yy, d.z * sp), Q, S3.setScalar(on ? 1 : 0.0001));
         drops.setMatrixAt(i, M4);
         tmpC.copy(HOT).lerp(MID, Math.min(1, k * 2)); if (k > 0.5) tmpC.copy(MID).lerp(COLD, (k - 0.5) * 2);
         tmpC.lerp(COLD, st.fresca * 0.0);

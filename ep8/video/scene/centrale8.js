@@ -4,7 +4,7 @@
 //   - sala turbine con la parete davanti apribile: turbina, alternatore, condensatore con la serpentina
 //   - circuito secondario (vapore → turbina → condensatore → generatore di vapore) con le particelle (bianche = vapore, blu = acqua)
 //   - TERZO circuito: dal condensatore l'acqua scaldata va alla torre (o al mare) e torna fresca
-//   - due torri (scene/torre.js), traliccio, cavo con le scintille, bandiera italiana
+//   - due torri (scene/torre.js), cavo con le scintille (solo senza torri), bandiera italiana
 //
 // const P = creaCentrale8(inner, { torri: true, interno: true, uscita: 'torre' | 'mare', hillY })
 //   P.aggiorna(tn, t, st)   st = { cupola, sala, circ: [p, s, t] (risalto 0..1), pareti, torre: {...}, torre2: {...} }
@@ -15,7 +15,7 @@ export const DX = 3.7, DZ = -40, HX = -1.2, HZ = -39.6, AX = 2.94, TZ = -39.3, C
 export const T1 = [-7.2, -44.2], T2 = [-2.6, -49.5];
 
 export function creaCentrale8(world, o = {}) {
-  const { torri = true, interno = true, uscita = 'torre', hillY, seme = 1, mareA = null, mareB = null } = o;
+  const { torri = true, interno = true, uscita = 'torre', hillY, seme = 1, mareA = null, mareB = null, cavo = 'no' } = o;
   setSeed(8100 + seme);
   const steelM = std(0x9fb0c8, { metalness: 0.4, roughness: 0.4 });
   const darkBlueM = std(0x4a6fa8);
@@ -103,7 +103,7 @@ export function creaCentrale8(world, o = {}) {
   mesh(new THREE.BoxGeometry(1.14, 0.72, 0.94), wallGlowM, hallG, hl(CDX, CDY, TZ)).renderOrder = 9;
   const terM = new THREE.MeshStandardMaterial({ color: 0x3f8fe8, emissive: 0x1f6fe0, emissiveIntensity: 0.25, roughness: 0.4 });
   { const pts = []; for (let i = 0; i < 7; i++) pts.push(hl(CDX - 0.42 + i * 0.14, CDY + (i % 2 ? 0.2 : -0.2), TZ - 0.15));
-    tube(pipeCurve([hl(CDX - 0.42, CDY - 0.2, TZ - 0.6), ...pts, hl(CDX + 0.42, CDY - 0.2, TZ - 0.6)]), 0.04, terM, hallG, 160); }
+    tube(pipeCurve([hl(CDX - 0.42, CDY - 0.2, TZ + 0.55), ...pts, hl(CDX + 0.42, CDY - 0.2, TZ + 0.55)]), 0.04, terM, hallG, 160); }
 
   // ---------------- circuito secondario
   const SGW = V(DX + SGX, DY + SGY, DZ + SGZ);
@@ -124,20 +124,21 @@ export function creaCentrale8(world, o = {}) {
   const hotPipeM = new THREE.MeshStandardMaterial({ color: 0x6faee8, roughness: 0.45, metalness: 0.15, emissive: 0x1f6fe0, emissiveIntensity: 0.15 });
   let hotC, coldC, torre = null, torre2 = null;
   const g0 = (x, z, dy = 0.18) => V(x, hillY(x, z) + dy, z);
+  // i due capi della serpentina escono dalla parete davanti della sala turbine e scendono a terra
+  const capoCaldo = [hl(CDX - 0.42, CDY - 0.2, TZ + 0.55).add(hallG.position), V(CDX - 0.42, CDY - 0.2, -38.0), V(CDX - 0.45, HG + 0.22, -37.45)];
+  const capoFreddo = [V(CDX + 0.45, HG + 0.14, -37.6), V(CDX + 0.42, CDY - 0.2, -38.0), hl(CDX + 0.42, CDY - 0.2, TZ + 0.55).add(hallG.position)];
   if (uscita === 'torre') {
-    // dal fianco sinistro del condensatore esce verso la torre T1 (acqua calda), torna dalla vasca (acqua fresca)
+    // davanti alla centrale, ben in vista: escono dalla sala turbine, corrono a terra verso sinistra ed entrano nella torre T1 dal davanti
+    // caldo (fuori) e freddo (dentro) paralleli
     const [tx, tz] = T1, ty = hillY(tx, tz) - 0.1;
-    const dir = V(HX - tx, 0, HZ - tz).normalize(), side = V(-dir.z, 0, dir.x);
-    const edge = (k, sd) => V(tx + dir.x * k + side.x * sd, 0, tz + dir.z * k + side.z * sd);
-    const eH = edge(3.35, 0.35), eC = edge(3.35, -0.35), iH = edge(0.3, 0.12), iC = edge(2.6, -0.35);
-    hotC = pipeCurve([hl(CDX - 0.42, CDY - 0.2, TZ - 0.6).add(hallG.position), V(-2.4, CDY - 0.2, -39.9), V(-3.3, HG + 0.25, -40.4), g0(eH.x, eH.z, 0.2), V(iH.x, ty + 0.35, iH.z), V(iH.x * 0.3 + tx * 0.7, ty + 0.5, iH.z * 0.3 + tz * 0.7), V(tx, ty + 1.0, tz), V(tx, ty + 1.62, tz)]);
-    coldC = pipeCurve([V(iC.x, ty + 0.2, iC.z), g0(eC.x, eC.z, 0.12), V(-3.2, HG + 0.12, -39.9), V(-2.3, CDY - 0.2, -39.5), hl(CDX + 0.42, CDY - 0.2, TZ - 0.6).add(hallG.position)]);
-    tube(hotC, 0.075, hotPipeM, world, 200); tube(coldC, 0.075, terPipeM, world, 200);
+    hotC = pipeCurve([...capoCaldo, g0(-1.6, -36.35, 0.22), g0(-4.6, -36.3, 0.22), g0(-6.75, -37.2, 0.22), g0(-7.05, -39.6, 0.22), V(tx - 0.05, ty + 0.3, -41.6), V(tx, ty + 0.45, tz + 1.2), V(tx, ty + 1.1, tz), V(tx, ty + 2.5, tz)]);
+    coldC = pipeCurve([V(tx + 0.45, ty + 0.2, -41.3), g0(-6.4, -39.5, 0.14), g0(-6.15, -37.6, 0.14), g0(-4.6, -36.85, 0.14), g0(-1.2, -36.9, 0.14), ...capoFreddo]);
+    tube(hotC, 0.085, hotPipeM, world, 240); tube(coldC, 0.085, terPipeM, world, 240);
   } else if (uscita === 'mare') {
-    // presa e scarico: tubi che scendono verso il mare (mareA = presa, mareB = scarico, punti del mondo nel sito)
-    coldC = pipeCurve([mareA[0], ...mareA.slice(1), V(-2.3, CDY - 0.2, -39.5), hl(CDX + 0.42, CDY - 0.2, TZ - 0.6).add(hallG.position)]);
-    hotC = pipeCurve([hl(CDX - 0.42, CDY - 0.2, TZ - 0.6).add(hallG.position), V(-2.4, CDY - 0.2, -39.9), ...mareB]);
-    tube(hotC, 0.085, hotPipeM, world, 200); tube(coldC, 0.085, terPipeM, world, 200);
+    // presa e scarico: tubi che scendono verso l'acqua (mareA = presa, mareB = scarico, punti del sito)
+    coldC = pipeCurve([...mareA, ...capoFreddo]);
+    hotC = pipeCurve([...capoCaldo, ...mareB]);
+    tube(hotC, 0.085, hotPipeM, world, 240); tube(coldC, 0.085, terPipeM, world, 240);
   }
   const terHot = Array.from({ length: 22 }, () => mesh(new THREE.SphereGeometry(0.075, 12, 10), new THREE.MeshStandardMaterial({ color: 0xffb070, emissive: 0xff8040, emissiveIntensity: 1.0 }), world));
   const terCold = Array.from({ length: 22 }, () => mesh(new THREE.SphereGeometry(0.075, 12, 10), new THREE.MeshStandardMaterial({ color: 0x5fb0ff, emissive: 0x2f80f0, emissiveIntensity: 1.0 }), world));
@@ -148,21 +149,15 @@ export function creaCentrale8(world, o = {}) {
     torre2 = creaTorre(world, { x: T2[0], y: hillY(...T2) - 0.1, z: T2[1], s: 0.95, interno: false, seme: 2 });
   }
 
-  // ---------------- traliccio, cavo, scintille
-  const pylonM = std(0x6f7c93, { roughness: 0.5, metalness: 0.3 });
-  const PYX = 0.4, PYZ = -45.2, PYS = 1.3;
-  const pylon = new THREE.Group(); pylon.position.set(PYX, hillY(PYX, PYZ) - 0.1, PYZ); pylon.scale.setScalar(PYS); world.add(pylon);
-  { const Pp = (x, y) => V(x, y, 0), r = 0.05;
-    [-1, 1].forEach(sd => {
-      bar(Pp(sd * 0.6, 0), Pp(sd * 0.16, 2.3), 0.065, pylonM, pylon); bar(Pp(sd * 0.16, 2.3), Pp(0, 3.3), 0.055, pylonM, pylon);
-      bar(Pp(sd * 0.6, 0), Pp(-sd * 0.38, 1.15), r * 0.8, pylonM, pylon); bar(Pp(sd * 0.38, 1.15), Pp(-sd * 0.16, 2.3), r * 0.8, pylonM, pylon);
-      [[2.3, 0.95], [2.85, 0.62]].forEach(([y, w]) => { mesh(new THREE.SphereGeometry(0.07, 10, 8), std(0xdfe6f0), pylon, Pp(sd * w, y - 0.14)); });
-    });
-    bar(Pp(-0.38, 1.15), Pp(0.38, 1.15), r * 0.8, pylonM, pylon); bar(Pp(-0.95, 2.3), Pp(0.95, 2.3), r, pylonM, pylon); bar(Pp(-0.62, 2.85), Pp(0.62, 2.85), r, pylonM, pylon); }
-  const cableCurve = new THREE.CatmullRomCurve3([V(-1.97, AX + 0.44, TZ), V(-1.97, 4.6, -39.8), V(-1.0, 5.3, -42.6), V(PYX, pylon.position.y + 3.3 * PYS, PYZ), V(3.2, 5.6, -51), V(6.5, 5.2, -60)]);
-  mesh(new THREE.TubeGeometry(cableCurve, 160, 0.03, 6), std(0x3b4558), world);
-  const sparkM = new THREE.MeshStandardMaterial({ color: 0xfff2a0, emissive: 0xffd040, emissiveIntensity: 2.4 });
-  const cableDots = Array.from({ length: 7 }, () => mesh(new THREE.SphereGeometry(0.11, 12, 10), sparkM, world));
+  // ---------------- cavo dell'elettricità: niente traliccio (nota dell'autore, v1). Con cavo: 'sinistra' esce dall'alternatore e va
+  // verso sinistra fuori dall'inquadratura; con cavo: 'no' non c'è (centrale con le torri: davanti alla torre disturbava)
+  let cableCurve = null, cableDots = [];
+  if (cavo === 'sinistra') {
+    cableCurve = new THREE.CatmullRomCurve3([V(-1.97, AX + 0.44, TZ), V(-1.97, 4.3, -39.4), V(-3.2, 4.75, -39.6), V(-8, 4.5, -39.8), V(-14, 4.1, -40), V(-22, 3.4, -40.5)]);
+    mesh(new THREE.TubeGeometry(cableCurve, 160, 0.03, 6), std(0x3b4558), world);
+    const sparkM = new THREE.MeshStandardMaterial({ color: 0xfff2a0, emissive: 0xffd040, emissiveIntensity: 2.4 });
+    cableDots = Array.from({ length: 9 }, () => mesh(new THREE.SphereGeometry(0.11, 12, 10), sparkM, world));
+  }
 
   // ---------------- bandiera (a destra della cupola)
   const flags = [];
@@ -208,7 +203,7 @@ export function creaCentrale8(world, o = {}) {
     });
     rotor.rotation.x = -tn * 7.5;
     genM.emissiveIntensity = 0.7 + 0.2 * Math.sin(tn * 11); genGlow.material.opacity = 0.45 * (1 - s.sala);
-    cableDots.forEach((d, i) => { cableCurve.getPointAt((tn * 0.42 + i / cableDots.length) % 1, d.position); });
+    cableDots.forEach((d, i) => { cableCurve.getPointAt((tn * 0.3 + i / cableDots.length) % 1, d.position); });
     terM.emissiveIntensity = 0.25 + 1.0 * ct * puls; terPipeM.emissiveIntensity = hotPipeM.emissiveIntensity = 0.15 + 0.9 * ct * puls;
     wallGlowM.opacity = 0.35 * s.pareti * (0.6 + 0.4 * Math.sin(tn * 4));
     if (hotC) {

@@ -1,20 +1,19 @@
 // Puntata 8 — il MONDO: una collina che ruota come un piccolo pianeta (come nella puntata 2) con tre luoghi:
 //   - centro (φ = 0): la centrale con le torri e un fiume davanti (B1–B7, B9, B10–B15)
 //   - a sinistra (φ = +0,8): la centrale in riva al mare, senza torri: presa e scarico dell'acqua (B8)
-//   - a destra (φ = −0,8): una centrale a carbone con camino (fumo grigio) e torre (vapore bianco) (B9)
+//   - a destra (φ = −0,8): la centrale su un grande fiume, senza torri: presa a monte, scarico a valle (B13, estate)
 // Cielo, sole e nuvole restano fermi; d'estate (B13) il cielo si scalda e il sole si allarga.
 //
 // const W = creaMondo()   → { scene, camera, aggiorna(tn, t, st) }
 //   st = { cam: [x,y,z, gx,gy,gz], fov, giro (rotazione della collina), estate (0..1), pesci (0..1), centrale: {...},
-//          carbone: k, mare: k }
+//          mare: k, pesciMare, pesciFiume, caldoFiume (0..1: macchia tiepida dello scarico nel fiume) }
 import { THREE, W, H, V, std, basic, mesh, glow, gradientBg, addFade, setSeed, rnd, hash, lerp, clamp01, smooth } from '/comune/base.js';
 import { creaCentrale8, T1, T2 } from './centrale8.js';
 import { creaTorre } from './torre.js';
-import { creaPennacchio } from './fumo.js';
 import { acquaMat } from './acqua8.js';
 
 const R = 60, HC = V(0, -58.5, -40);
-export const PHI_MARE = 0.8, PHI_CARBONE = -0.8;
+export const PHI_MARE = 0.8, PHI_FIUME = -0.8;
 export const hillY = (x, z) => HC.y + Math.sqrt(R * R - x * x - (z - HC.z) ** 2);
 
 // striscia di superficie sulla sfera: per x da x0 a x1, z da zA(x) a zB(x), alzata di dy (coordinate "interne" del sito)
@@ -114,42 +113,48 @@ export function creaMondo() {
   const schiuma = mesh(striscia(-30, 30, x => riva(x) + 0.03, x => riva(x) + 0.16, 0.07, 400, 2), schiumaM, SM); schiuma.renderOrder = 5;
   [[-11, -38.5, 1], [-12.6, -41, 0.9], [9.4, -38.2, 1.0], [10.8, -40.4, 0.85], [-8.6, -44.5, 1.0]].forEach(([x, z, s], i) => albero(SM, x, z, s, i));
   prato(SM, 24, -10, 10, -37.5, -36.2, 87);
-  // sott'acqua i tubi stanno appena sotto la superficie (l'acqua li copre); si vedono le bocche e le ondine
-  const AIN = [V(-4.4, hillY(-4.4, -31.6) - 0.03, -31.6), V(-4.2, hillY(-4.2, -34.4) - 0.03, -34.4), V(-3.6, hillY(-3.6, -37.0) + 0.12, -37.0), V(-3.6, hillY(-3.6, -38.4) + 0.2, -38.4), V(-3.0, 1.6, -39.3)];
-  const AOUT = [V(-3.2, 1.75, -39.9), V(-2.2, hillY(-2.2, -38.6) + 0.2, -38.6), V(1.2, hillY(1.2, -37.0) + 0.12, -37.0), V(2.2, hillY(2.2, -34.6) - 0.03, -34.6), V(2.6, hillY(2.6, -31.2) - 0.03, -31.2)];
-  const CM = creaCentrale8(SM, { torri: false, interno: false, uscita: 'mare', hillY, seme: 2, mareA: AIN, mareB: AOUT });
+  // presa a destra, scarico a sinistra (così i due tubi che escono dalla sala turbine non si incrociano);
+  // sott'acqua i tubi stanno appena sotto la superficie (l'acqua li copre): si vedono le bocche e le ondine
+  const gp = (x, z, dy) => V(x, hillY(x, z) + dy, z);
+  const AIN = [gp(3.6, -31.4, -0.03), gp(3.4, -34.4, -0.03), gp(2.6, -36.4, 0.12), gp(0.9, -37.25, 0.14)];
+  const AOUT = [gp(-1.5, -37.1, 0.22), gp(-2.2, -36.2, 0.22), gp(-2.4, -34.4, -0.03), gp(-2.5, -31.2, -0.03)];
+  const CM = creaCentrale8(SM, { torri: false, interno: false, uscita: 'mare', hillY, seme: 2, mareA: AIN, mareB: AOUT, cavo: 'sinistra' });
+  const SCARICO = AOUT[AOUT.length - 1];
   // bocche di presa e di scarico (blocchi di cemento sull'acqua)
   const cemM = std(0xc8ced8, { roughness: 0.9 });
-  [AIN[0], AOUT[4]].forEach(p => { const b = mesh(new THREE.BoxGeometry(0.7, 0.3, 0.7), cemM, SM, p.clone().add(V(0, 0.08, 0))); });
+  [AIN[0], SCARICO].forEach(p => { const b = mesh(new THREE.BoxGeometry(0.7, 0.3, 0.7), cemM, SM, p.clone().add(V(0, 0.08, 0))); });
   // posizione dello scarico nelle coordinate del materiale del mare (= coordinate interne del sito)
-  mareM.uniforms.uCaldo.value.copy(AOUT[4]); mareM.uniforms.uCaldoR.value = 3.2;
+  mareM.uniforms.uCaldo.value.copy(SCARICO); mareM.uniforms.uCaldoR.value = 3.2;
   const pesciM = [[0xff8a3a, 1.0], [0xffc93a, 0.9], [0xff6a8a, 0.8], [0x7fd8ff, 1.0], [0xffa860, 0.85], [0xffe06a, 0.9]].map(([c, s], i) => ({ ...pesce(SM, c, s), i }));
-  const algheM = []; { setSeed(89); for (let i = 0; i < 22; i++) { const x = lerp(-7, 5, rnd()), z = lerp(-33.5, -27, rnd()); algheM.push(alga(SM, x, hillY(x, z) - 0.02, z, 0.4 + rnd() * 0.4, rnd() < 0.5 ? 0x3faa6a : 0x5fbf7a)); } }
+  const algheM = []; { setSeed(89); for (let i = 0; i < 22; i++) { const x = lerp(-7, 6, rnd()), z = lerp(-33.5, -27, rnd()); algheM.push(alga(SM, x, hillY(x, z) - 0.02, z, 0.4 + rnd() * 0.4, rnd() < 0.5 ? 0x3faa6a : 0x5fbf7a)); } }
   // bollicine/frecce dell'acqua: presa (blu che entra) e scarico (chiara che esce e si allarga)
   const ondine = Array.from({ length: 14 }, (_, i) => { const m = mesh(new THREE.RingGeometry(0.2, 0.26, 32), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }), SM); m.renderOrder = 6; m.userData = { ph: i / 14, out: i % 2 }; return m; });
 
-  // ===== SITO CARBONE (a destra): edificio della caldaia, camino con fumo grigio, mucchio di carbone, torre con vapore bianco
-  const SC = sito(PHI_CARBONE);
-  [[-10.4, -38, 1], [-12, -41.5, 0.85], [9.8, -36.6, 1.0], [11.2, -39.6, 0.9]].forEach(([x, z, s], i) => albero(SC, x, z, s, i));
-  prato(SC, 20, -10, 10, -36, -31, 91);
-  const bG = new THREE.Group(); bG.position.set(-0.4, hillY(-0.4, -40) - 0.05, -40); SC.add(bG);
-  const brick = std(0x9a6a5a, { roughness: 0.9 }), grey = std(0x7d8594, { roughness: 0.85 }), dark = std(0x4a505c, { roughness: 0.8 });
-  mesh(new THREE.BoxGeometry(3.2, 3.4, 2.4), grey, bG, V(0, 1.7, 0));
-  mesh(new THREE.BoxGeometry(3.4, 0.2, 2.6), dark, bG, V(0, 3.45, 0));
-  mesh(new THREE.BoxGeometry(2.2, 2.0, 2.0), brick, bG, V(2.6, 1.0, 0.1));
-  for (let i = 0; i < 4; i++) mesh(new THREE.BoxGeometry(0.34, 0.5, 0.05), new THREE.MeshStandardMaterial({ color: 0xfff0a0, emissive: 0xffd860, emissiveIntensity: 0.6 }), bG, V(-1.1 + i * 0.72, 2.2, 1.22));
-  // camino a fasce bianche e rosse
-  const chim = new THREE.Group(); chim.position.set(2.6, 0, -1.6); bG.add(chim);
-  for (let i = 0; i < 10; i++) mesh(new THREE.CylinderGeometry(0.34 - i * 0.012, 0.36 - i * 0.012, 1.0, 24), i % 2 ? std(0xe8604a) : std(0xf2f4f8), chim, V(0, 0.5 + i, 0));
-  const fumoGrigio = creaPennacchio(chim, { r: 0.5, n: 40, sale: 10, vento: [3.5, -0.8], vita: 9, colore: 0x6d7380, op: 0.85, cresce: 4, seme: 9 });
-  fumoGrigio.g.position.y = 10;
-  // mucchio di carbone e nastro trasportatore
-  const coalM = std(0x2a2d33, { roughness: 0.7, flatShading: true });
-  [[-3.2, -37.8, 1.0], [-2.3, -37.2, 0.7], [-3.9, -38.6, 0.6]].forEach(([x, z, s]) => { const c = mesh(new THREE.ConeGeometry(0.9 * s, 0.9 * s, 9), coalM, SC, V(x, hillY(x, z) + 0.4 * s, z)); c.rotation.y = s * 3; });
-  { const a = V(-3.0, hillY(-3, -38) + 0.9, -38), b = V(-1.6, 2.9, -39.0); const nb = mesh(new THREE.BoxGeometry(a.distanceTo(b), 0.08, 0.3), dark, SC, a.clone().lerp(b, 0.5)); nb.rotation.z = Math.atan2(b.y - a.y, b.x - a.x); nb.rotation.y = -Math.atan2(b.z - a.z, b.x - a.x); }
-  const torreC = creaTorre(SC, { x: -6.8, y: hillY(-6.8, -44.5) - 0.1, z: -44.5, s: 0.92, interno: false, seme: 3 });
-  mesh(new THREE.SphereGeometry(30, 160, 80), std(0x58b060, { roughness: 0.95 }), SC, V(-9, -32.6, -20));
-  mesh(new THREE.SphereGeometry(30, 160, 80), std(0x4aa256, { roughness: 0.95 }), SC, V(10, -34.2, -15));
+  // ===== SITO GRANDE FIUME (a destra, B13): centrale senza torri raffreddata direttamente dal fiume. Il fiume scorre da destra a
+  // sinistra: presa a monte (destra), scarico a valle (sinistra), la macchia tiepida si allunga verso valle.
+  const SR = sito(PHI_FIUME);
+  [[-10.6, -38.6, 1], [-12.2, -41.2, 0.85], [9.6, -38.4, 1.0], [11.2, -40.6, 0.9], [-8.4, -44.6, 1.0], [7.6, -45.2, 0.9]].forEach(([x, z, s], i) => albero(SR, x, z, s, i));
+  prato(SR, 22, -10, 10, -37.6, -36.4, 93);
+  const rA = x => -35.4 + 0.3 * Math.sin(x * 0.37 + 1) + 0.15 * Math.sin(x * 1.1), rB = x => -30.4 + 0.35 * Math.sin(x * 0.29 + 2) + 0.15 * Math.sin(x * 0.9);
+  mesh(striscia(-30, 30, x => rA(x) - 0.55, x => rB(x) + 0.55, 0.025, 400), std(0xb9a77a, { roughness: 1 }), SR);   // sponde di terra
+  const fiumeGM = acquaMat({ fondo: 0x2a74c4, chiaro: 0x66bcf0, op: 0.9, scala: 1.1, flusso: [-0.55, 0], caldo: 0xa8f2ff });
+  mesh(striscia(-30, 30, x => rA(x), x => rB(x), 0.06, 400, 40), fiumeGM, SR).renderOrder = 4;
+  const canneR = new THREE.Group(); SR.add(canneR);
+  { setSeed(95); const cm = std(0x5f9a3a, { roughness: 0.9 }), tm = std(0x7a5236);
+    for (let i = 0; i < 60; i++) { const x = lerp(-12, 12, rnd()), far = rnd() < 0.5, z = far ? rA(x) - 0.35 - rnd() * 0.25 : rB(x) + 0.35 + rnd() * 0.25, y = hillY(x, z), h = 0.35 + rnd() * 0.35;
+      const c = mesh(new THREE.CylinderGeometry(0.012, 0.016, h, 5), cm, canneR, V(x, y + h / 2, z)); c.rotation.z = (rnd() - 0.5) * 0.25;
+      if (rnd() < 0.4) mesh(new THREE.CapsuleGeometry(0.03, 0.08, 3, 6), tm, canneR, V(x + c.rotation.z * -h / 2, y + h, z)); } }
+  const RIN = [gp(2.9, -33.0, -0.03), gp(2.7, -35.0, 0.05), gp(2.2, -36.4, 0.12), gp(0.9, -37.25, 0.14)];
+  const ROUT = [gp(-1.4, -37.1, 0.22), gp(-1.9, -36.3, 0.22), gp(-2.0, -35.0, 0.05), gp(-2.1, -33.0, -0.03)];
+  const CR = creaCentrale8(SR, { torri: false, interno: false, uscita: 'mare', hillY, seme: 3, mareA: RIN, mareB: ROUT, cavo: 'sinistra' });
+  const SCARICO_R = ROUT[ROUT.length - 1];
+  [RIN[0], SCARICO_R].forEach(p => { mesh(new THREE.BoxGeometry(0.7, 0.3, 0.7), cemM, SR, p.clone().add(V(0, 0.08, 0))); });
+  fiumeGM.uniforms.uCaldo.value.copy(SCARICO_R).add(V(-1.1, 0, 0.2)); fiumeGM.uniforms.uCaldoR.value = 2.8;
+  const pesciR = [[0xff8a3a, 1.0], [0xffc93a, 0.9], [0xff6a8a, 0.8], [0x7fd8ff, 1.0], [0xffa860, 0.85], [0xffe06a, 0.9], [0xff9a5a, 0.8]].map(([c, s], i) => ({ ...pesce(SR, c, s), i }));
+  const algheR = []; { setSeed(97); for (let i = 0; i < 26; i++) { const x = lerp(-7, 7, rnd()), z = lerp(rA(x) + 0.3, rB(x) - 0.3, rnd()); algheR.push(alga(SR, x, hillY(x, z) - 0.02, z, 0.4 + rnd() * 0.4, rnd() < 0.5 ? 0x3faa6a : 0x5fbf7a)); } }
+  const ondineR = Array.from({ length: 12 }, (_, i) => { const m = mesh(new THREE.RingGeometry(0.2, 0.26, 32), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }), SR); m.renderOrder = 6; m.userData = { ph: i / 12, out: i % 2 }; return m; });
+  mesh(new THREE.SphereGeometry(30, 160, 80), std(0x58b060, { roughness: 0.95 }), SR, V(-9, -32.6, -16));
+  mesh(new THREE.SphereGeometry(30, 160, 80), std(0x4aa256, { roughness: 0.95 }), SR, V(10, -34.2, -12));
 
   const tmpV = new THREE.Vector3();
   function aggiorna(tn, t, st) {
@@ -178,20 +183,35 @@ export function creaMondo() {
     algheF.forEach(a => { ondeggiaAlga(a, tn); a.me.visible = pf > 0.01; a.me.material.opacity = 0.75 * pf; });
     const pm = st.pesciMare || 0;
     pesciM.forEach(p => {
-      const a = tn * 0.25 + p.i * 1.05, cx = -2.2 + (p.i % 3) * 1.6, cz = -31.2 - (p.i % 2) * 1.4, rr = 0.9 + (p.i % 3) * 0.3;
+      const a = tn * 0.25 + p.i * 1.05, cx = -3.4 + (p.i % 3) * 1.9, cz = -31.0 - (p.i % 2) * 1.3, rr = 0.9 + (p.i % 3) * 0.3;
       const x = cx + Math.cos(a) * rr, z = cz + Math.sin(a) * rr * 0.6;
       p.g.position.set(x, hillY(x, z) + 0.08, z); p.g.rotation.set(0, -a - Math.PI / 2, 0);
       p.tail.rotation.y = Math.sin(tn * 9 + p.i) * 0.5; p.g.visible = pm > 0.01; p.m.opacity = 0.85 * pm;
     });
     algheM.forEach(a => { ondeggiaAlga(a, tn); a.me.visible = pm > 0.01; a.me.material.opacity = 0.75 * pm; });
     ondine.forEach(m => {
-      const d = m.userData, u = (tn * 0.35 + d.ph) % 1, p = d.out ? AOUT[4] : AIN[0];
+      const d = m.userData, u = (tn * 0.35 + d.ph) % 1, p = d.out ? SCARICO : AIN[0];
       m.position.set(p.x, hillY(p.x, p.z) + 0.09, p.z); m.rotation.x = -Math.PI / 2;
       const s = d.out ? 0.6 + u * 3.2 : 2.6 - u * 2.2; m.scale.setScalar(s); m.material.opacity = (d.out ? 0.5 : 0.4) * Math.sin(u * Math.PI) * (st.mare ? 1 : 0.5);
       m.material.color.setHex(d.out ? 0xe0fbff : 0xd0ecff);
     });
     schiumaM.opacity = 0.55 + 0.2 * Math.sin(tn * 1.4);
-    fumoGrigio.aggiorna(tn, 1); torreC.aggiorna(tn, {});
+    CR.aggiorna(tn, t, { circ: [0, 0, st.fiumeG || 0] });
+    fiumeGM.uniforms.uT.value = tn; fiumeGM.uniforms.uLuce.value = 1 + 0.06 * e;
+    fiumeGM.uniforms.uCaldoK.value = (st.caldoFiume ?? 0.7) * (0.85 + 0.15 * Math.sin(tn * 1.3));
+    fiumeGM.uniforms.uCaldoR.value = 1.4 + 1.6 * (st.caldoFiume ?? 0.7);
+    const pr = st.pesciFiume || 0;
+    pesciR.forEach(p => {
+      const u = tn * 0.2 + p.i * 0.9, x = -4.5 + (p.i % 4) * 2.6 + Math.sin(u) * 1.1, z = lerp(rA(x) + 0.6, rB(x) - 0.6, 0.2 + 0.6 * ((p.i * 0.37) % 1)) + Math.sin(u * 1.7) * 0.25;
+      p.g.position.set(x, hillY(x, z) + 0.08, z); p.g.rotation.set(0, Math.cos(u) >= 0 ? 0 : Math.PI, 0);
+      p.tail.rotation.y = Math.sin(tn * 9 + p.i) * 0.5; p.g.visible = pr > 0.01; p.m.opacity = 0.85 * pr;
+    });
+    algheR.forEach(a => { ondeggiaAlga(a, tn); a.me.visible = pr > 0.01; a.me.material.opacity = 0.75 * pr; });
+    ondineR.forEach(m => {
+      const d = m.userData, u = (tn * 0.35 + d.ph) % 1, p = d.out ? SCARICO_R : RIN[0];
+      m.position.set(p.x - (d.out ? u * 1.2 : 0), hillY(p.x, p.z) + 0.09, p.z); m.rotation.x = -Math.PI / 2;
+      const s = d.out ? 0.6 + u * 2.6 : 2.4 - u * 2.0; m.scale.setScalar(s); m.material.opacity = (d.out ? 0.5 : 0.4) * Math.sin(u * Math.PI) * (st.fiumeG ? 1 : 0.5);
+    });
   }
   return { scene, camera, aggiorna, C, hillY };
 }
