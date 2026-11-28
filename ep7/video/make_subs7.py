@@ -4,8 +4,8 @@
 import json, re
 PH = json.load(open('../audio/phrases.json')); RAW = json.load(open('../audio/phrases_raw.json')); RAW[24][0] = 95.62
 TXT = [["La radioattività", "ti fa paura?"],
-       ["Ma la radioattività", "non l'abbiamo", "inventata noi", "esseri umani:"], ["esiste da sempre,", "ed è ovunque."],
-       ["Viene dalle rocce,", "dal cibo e"], ["perfino dallo spazio."],
+       ["Ma non l'abbiamo", "inventata noi", "esseri umani:", "esiste da sempre,", "ed è ovunque."], None,   # B2 riregistrata il 28/11/2026
+       ["Viene dalle rocce,", "dal cibo e", "persino dallo spazio."], None,                                  # B3 riregistrata il 28/11/2026
        ["Anche il tuo corpo", "è un po' radioattivo:", "dentro di te,", "ogni secondo,", "circa 4000 atomi", "decadono."],
        ["Ma cosa vuol dire,", "radioattivo?"],
        ["Alcuni nuclei hanno", "troppi neutroni", "o troppi protoni:"], ["sono instabili."],
@@ -21,14 +21,17 @@ TXT = [["La radioattività", "ti fa paura?"],
        ["E dove finiscono dopo?"], ["E perché ci possono", "fare male?"], ["Ne parleremo", "nella puntata", "dedicata alle scorie."],
        ["Hai qualche domanda?"], ["Fammela nei commenti!"]]
 assert len(TXT) == len(PH)
+RAW[1] = [1.85, 5.65]; RAW[3] = [6.95, 10.46]   # dalla registrazione nuova (voice_ep7.py)
 # pause fra le parole nella registrazione: frase -> [(indice della riga che riparte, istante nella registrazione)]
-TAGLI = {5: [(2, 20.28)], 10: [(2, 42.24)], 24: [(3, 97.96)], 25: [(1, 102.99), (5, 106.09), (7, 108.47), (8, 109.42), (9, 110.31)],
+TAGLI = {1: [(3, 3.92)], 3: [(1, 8.24), (2, 9.18)], 5: [(2, 20.28)], 10: [(2, 42.24)], 24: [(3, 97.96)], 25: [(1, 102.99), (5, 106.09), (7, 108.47), (8, 109.42), (9, 110.31)],
          23: [(3, 91.14)]}
-TXT = [[re.sub(r'[.,:;]+$', '', l.replace('«', '').replace('»', '')).strip() for l in lines] for lines in TXT]
-assert all(len(l) <= 22 for ls in TXT for l in ls), [l for ls in TXT for l in ls if len(l) > 22]
+TXT = [None if lines is None else [re.sub(r'[.,:;]+$', '', l.replace('«', '').replace('»', '')).strip() for l in lines] for lines in TXT]
+assert all(len(l) <= 22 for ls in TXT if ls for l in ls)
 def ts(t): h = int(t // 3600); m = int(t // 60) % 60; return '%d:%02d:%05.2f' % (h, m, t % 60)
 cues = []
-for k, ((s, e), lines) in enumerate(zip(PH, TXT)):
+for k, (ph, lines) in enumerate(zip(PH, TXT)):
+    if ph is None: continue
+    s, e = ph
     cut = [(0, s)] + [(i, s + raw - RAW[k][0]) for i, raw in TAGLI.get(k, [])] + [(len(lines), e)]
     for (i0, t0), (i1, t1) in zip(cut, cut[1:]):
         part = lines[i0:i1]; w = [len(l) + 3 for l in part]; tot = sum(w); t = t0 - 0.05

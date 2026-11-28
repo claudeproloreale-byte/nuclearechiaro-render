@@ -13,94 +13,93 @@ Style: S,Poppins,112,&H00FFFFFF,&H00FFFFFF,&H004A1C0C,&H804A1C0C,-1,0,0,0,100,10
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 0,0:00:00.45,0:00:01.33,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}La radioattività
 Dialogue: 0,0:00:01.33,0:00:02.32,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ti fa paura?
-Dialogue: 0,0:00:03.70,0:00:04.64,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ma la radioattività
-Dialogue: 0,0:00:04.64,0:00:05.33,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}non l'abbiamo
-Dialogue: 0,0:00:05.33,0:00:06.02,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}inventata noi
-Dialogue: 0,0:00:06.02,0:00:06.96,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}esseri umani
-Dialogue: 0,0:00:07.21,0:00:08.17,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}esiste da sempre
-Dialogue: 0,0:00:08.17,0:00:09.22,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ed è ovunque
-Dialogue: 0,0:00:09.92,0:00:11.18,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Viene dalle rocce
-Dialogue: 0,0:00:11.18,0:00:12.30,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dal cibo e
-Dialogue: 0,0:00:12.41,0:00:13.87,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}perfino dallo spazio
-Dialogue: 0,0:00:15.09,0:00:16.07,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Anche il tuo corpo
-Dialogue: 0,0:00:16.07,0:00:17.14,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}è un po' radioattivo
-Dialogue: 0,0:00:17.14,0:00:18.07,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dentro di te
-Dialogue: 0,0:00:18.07,0:00:18.99,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ogni secondo
-Dialogue: 0,0:00:18.99,0:00:20.16,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}circa 4000 atomi
-Dialogue: 0,0:00:20.16,0:00:21.14,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}decadono
-Dialogue: 0,0:00:21.84,0:00:22.74,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ma cosa vuol dire
-Dialogue: 0,0:00:22.74,0:00:23.71,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}radioattivo?
-Dialogue: 0,0:00:24.64,0:00:25.81,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Alcuni nuclei hanno
-Dialogue: 0,0:00:25.81,0:00:26.77,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}troppi neutroni
-Dialogue: 0,0:00:26.77,0:00:28.08,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}o troppi protoni
-Dialogue: 0,0:00:28.43,0:00:29.87,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sono instabili
-Dialogue: 0,0:00:30.57,0:00:31.34,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Prima o poi
-Dialogue: 0,0:00:31.34,0:00:32.91,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si sistemano da soli
-Dialogue: 0,0:00:32.96,0:00:33.95,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}lanciando fuori
-Dialogue: 0,0:00:33.95,0:00:35.27,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}un pezzetto di nucleo
-Dialogue: 0,0:00:35.27,0:00:35.74,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}o un'onda
-Dialogue: 0,0:00:35.74,0:00:36.79,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}elettromagnetica
-Dialogue: 0,0:00:37.18,0:00:37.95,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Quel lancio
-Dialogue: 0,0:00:37.95,0:00:38.94,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}è la radiazione
-Dialogue: 0,0:00:38.94,0:00:40.03,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e questo processo
-Dialogue: 0,0:00:40.03,0:00:41.65,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si chiama decadimento
-Dialogue: 0,0:00:42.35,0:00:43.10,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Così il nucleo
-Dialogue: 0,0:00:43.10,0:00:43.75,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si trasforma
-Dialogue: 0,0:00:43.75,0:00:44.93,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}in un altro atomo
-Dialogue: 0,0:00:45.16,0:00:46.08,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Questo può essere
-Dialogue: 0,0:00:46.08,0:00:46.72,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}a sua volta
-Dialogue: 0,0:00:46.72,0:00:47.89,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ancora instabile
-Dialogue: 0,0:00:48.00,0:00:49.26,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e quindi radioattivo
-Dialogue: 0,0:00:49.26,0:00:50.49,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}oppure stabile
-Dialogue: 0,0:00:51.19,0:00:52.21,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ogni tipo di nucleo
-Dialogue: 0,0:00:52.21,0:00:53.34,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ha il suo ritmo
-Dialogue: 0,0:00:53.50,0:00:54.35,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}in un certo tempo
-Dialogue: 0,0:00:54.35,0:00:55.11,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}se ne trasforma
-Dialogue: 0,0:00:55.11,0:00:55.83,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}la metà
-Dialogue: 0,0:00:56.23,0:00:56.80,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Per alcuni
-Dialogue: 0,0:00:56.80,0:00:57.90,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}bastano secondi
-Dialogue: 0,0:00:58.04,0:00:58.89,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}per altri servono
-Dialogue: 0,0:00:58.89,0:01:00.00,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}miliardi di anni
-Dialogue: 0,0:01:00.70,0:01:01.80,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Quindi la domanda
-Dialogue: 0,0:01:01.80,0:01:02.62,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}giusta non è
-Dialogue: 0,0:01:02.62,0:01:04.18,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}se c'è radioattività
-Dialogue: 0,0:01:04.35,0:01:04.91,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ma quanta
-Dialogue: 0,0:01:04.91,0:01:05.91,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ne riceviamo
-Dialogue: 0,0:01:06.61,0:01:07.45,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}In un anno
-Dialogue: 0,0:01:07.45,0:01:08.42,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dalla natura
-Dialogue: 0,0:01:08.42,0:01:09.46,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ognuno di noi
-Dialogue: 0,0:01:09.46,0:01:10.62,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ne riceve circa
-Dialogue: 0,0:01:10.62,0:01:12.28,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}2 o 3 millisievert
-Dialogue: 0,0:01:12.42,0:01:13.22,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}l'unità di misura
-Dialogue: 0,0:01:13.22,0:01:14.28,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}delle radiazioni
-Dialogue: 0,0:01:14.98,0:01:15.86,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Un volo da Roma
-Dialogue: 0,0:01:15.86,0:01:16.50,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}a New York
-Dialogue: 0,0:01:16.50,0:01:17.43,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}equivale a circa
-Dialogue: 0,0:01:17.43,0:01:18.13,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}una settimana
-Dialogue: 0,0:01:18.13,0:01:18.66,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di questa
-Dialogue: 0,0:01:18.66,0:01:19.36,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}radioattività
-Dialogue: 0,0:01:19.36,0:01:20.14,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}naturale
-Dialogue: 0,0:01:21.08,0:01:22.01,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}E vivere accanto
-Dialogue: 0,0:01:22.01,0:01:22.83,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}a una centrale
-Dialogue: 0,0:01:22.83,0:01:23.42,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nucleare?
-Dialogue: 0,0:01:23.42,0:01:24.06,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Molto meno
-Dialogue: 0,0:01:24.06,0:01:24.70,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di un volo
-Dialogue: 0,0:01:24.70,0:01:25.54,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}all'anno
-Dialogue: 0,0:01:26.72,0:01:28.17,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Dentro il reattore
-Dialogue: 0,0:01:28.17,0:01:29.14,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}però, i frammenti
-Dialogue: 0,0:01:29.14,0:01:29.96,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}della fissione
-Dialogue: 0,0:01:29.96,0:01:30.59,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sono molto
-Dialogue: 0,0:01:30.59,0:01:31.27,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}radioattivi
-Dialogue: 0,0:01:31.27,0:01:32.36,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}per questo restano
-Dialogue: 0,0:01:32.36,0:01:33.65,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}chiusi nelle pastiglie
-Dialogue: 0,0:01:33.65,0:01:34.60,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nelle barre
-Dialogue: 0,0:01:34.60,0:01:35.49,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nel vessel
-Dialogue: 0,0:01:35.49,0:01:36.55,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e nella cupola
-Dialogue: 0,0:01:37.25,0:01:38.95,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}E dove finiscono dopo?
-Dialogue: 0,0:01:39.12,0:01:39.95,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}E perché ci possono
-Dialogue: 0,0:01:39.95,0:01:40.74,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}fare male?
-Dialogue: 0,0:01:41.14,0:01:41.75,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ne parleremo
-Dialogue: 0,0:01:41.75,0:01:42.41,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nella puntata
-Dialogue: 0,0:01:42.41,0:01:43.65,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dedicata alle scorie
-Dialogue: 0,0:01:44.35,0:01:45.68,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Hai qualche domanda?
-Dialogue: 0,0:01:45.98,0:01:47.24,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Fammela nei commenti!
+Dialogue: 0,0:00:03.70,0:00:04.49,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ma non l'abbiamo
+Dialogue: 0,0:00:04.49,0:00:05.15,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}inventata noi
+Dialogue: 0,0:00:05.15,0:00:05.77,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}esseri umani
+Dialogue: 0,0:00:05.77,0:00:06.74,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}esiste da sempre
+Dialogue: 0,0:00:06.74,0:00:07.80,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ed è ovunque
+Dialogue: 0,0:00:09.50,0:00:10.79,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Viene dalle rocce
+Dialogue: 0,0:00:10.79,0:00:11.73,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dal cibo e
+Dialogue: 0,0:00:11.73,0:00:13.31,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}persino dallo spazio
+Dialogue: 0,0:00:14.52,0:00:15.50,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Anche il tuo corpo
+Dialogue: 0,0:00:15.50,0:00:16.57,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}è un po' radioattivo
+Dialogue: 0,0:00:16.57,0:00:17.50,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dentro di te
+Dialogue: 0,0:00:17.50,0:00:18.42,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ogni secondo
+Dialogue: 0,0:00:18.42,0:00:19.59,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}circa 4000 atomi
+Dialogue: 0,0:00:19.59,0:00:20.57,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}decadono
+Dialogue: 0,0:00:21.27,0:00:22.17,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ma cosa vuol dire
+Dialogue: 0,0:00:22.17,0:00:23.14,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}radioattivo?
+Dialogue: 0,0:00:24.07,0:00:25.24,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Alcuni nuclei hanno
+Dialogue: 0,0:00:25.24,0:00:26.20,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}troppi neutroni
+Dialogue: 0,0:00:26.20,0:00:27.51,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}o troppi protoni
+Dialogue: 0,0:00:27.86,0:00:29.30,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sono instabili
+Dialogue: 0,0:00:30.00,0:00:30.77,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Prima o poi
+Dialogue: 0,0:00:30.77,0:00:32.34,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si sistemano da soli
+Dialogue: 0,0:00:32.39,0:00:33.38,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}lanciando fuori
+Dialogue: 0,0:00:33.38,0:00:34.70,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}un pezzetto di nucleo
+Dialogue: 0,0:00:34.70,0:00:35.17,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}o un'onda
+Dialogue: 0,0:00:35.17,0:00:36.22,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}elettromagnetica
+Dialogue: 0,0:00:36.61,0:00:37.38,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Quel lancio
+Dialogue: 0,0:00:37.38,0:00:38.37,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}è la radiazione
+Dialogue: 0,0:00:38.37,0:00:39.46,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e questo processo
+Dialogue: 0,0:00:39.46,0:00:41.08,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si chiama decadimento
+Dialogue: 0,0:00:41.78,0:00:42.53,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Così il nucleo
+Dialogue: 0,0:00:42.53,0:00:43.18,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}si trasforma
+Dialogue: 0,0:00:43.18,0:00:44.36,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}in un altro atomo
+Dialogue: 0,0:00:44.59,0:00:45.51,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Questo può essere
+Dialogue: 0,0:00:45.51,0:00:46.15,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}a sua volta
+Dialogue: 0,0:00:46.15,0:00:47.32,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ancora instabile
+Dialogue: 0,0:00:47.43,0:00:48.69,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e quindi radioattivo
+Dialogue: 0,0:00:48.69,0:00:49.92,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}oppure stabile
+Dialogue: 0,0:00:50.62,0:00:51.64,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ogni tipo di nucleo
+Dialogue: 0,0:00:51.64,0:00:52.77,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ha il suo ritmo
+Dialogue: 0,0:00:52.93,0:00:53.78,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}in un certo tempo
+Dialogue: 0,0:00:53.78,0:00:54.54,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}se ne trasforma
+Dialogue: 0,0:00:54.54,0:00:55.26,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}la metà
+Dialogue: 0,0:00:55.66,0:00:56.23,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Per alcuni
+Dialogue: 0,0:00:56.23,0:00:57.33,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}bastano secondi
+Dialogue: 0,0:00:57.47,0:00:58.32,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}per altri servono
+Dialogue: 0,0:00:58.32,0:00:59.43,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}miliardi di anni
+Dialogue: 0,0:01:00.13,0:01:01.23,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Quindi la domanda
+Dialogue: 0,0:01:01.23,0:01:02.05,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}giusta non è
+Dialogue: 0,0:01:02.05,0:01:03.61,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}se c'è radioattività
+Dialogue: 0,0:01:03.78,0:01:04.34,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ma quanta
+Dialogue: 0,0:01:04.34,0:01:05.34,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ne riceviamo
+Dialogue: 0,0:01:06.04,0:01:06.88,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}In un anno
+Dialogue: 0,0:01:06.88,0:01:07.85,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dalla natura
+Dialogue: 0,0:01:07.85,0:01:08.89,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ognuno di noi
+Dialogue: 0,0:01:08.89,0:01:10.05,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}ne riceve circa
+Dialogue: 0,0:01:10.05,0:01:11.71,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}2 o 3 millisievert
+Dialogue: 0,0:01:11.85,0:01:12.65,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}l'unità di misura
+Dialogue: 0,0:01:12.65,0:01:13.71,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}delle radiazioni
+Dialogue: 0,0:01:14.41,0:01:15.29,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Un volo da Roma
+Dialogue: 0,0:01:15.29,0:01:15.93,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}a New York
+Dialogue: 0,0:01:15.93,0:01:16.86,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}equivale a circa
+Dialogue: 0,0:01:16.86,0:01:17.56,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}una settimana
+Dialogue: 0,0:01:17.56,0:01:18.09,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di questa
+Dialogue: 0,0:01:18.09,0:01:18.79,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}radioattività
+Dialogue: 0,0:01:18.79,0:01:19.57,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}naturale
+Dialogue: 0,0:01:20.51,0:01:21.44,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}E vivere accanto
+Dialogue: 0,0:01:21.44,0:01:22.26,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}a una centrale
+Dialogue: 0,0:01:22.26,0:01:22.85,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nucleare?
+Dialogue: 0,0:01:22.85,0:01:23.49,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Molto meno
+Dialogue: 0,0:01:23.49,0:01:24.13,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}di un volo
+Dialogue: 0,0:01:24.13,0:01:24.97,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}all'anno
+Dialogue: 0,0:01:26.15,0:01:27.60,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Dentro il reattore
+Dialogue: 0,0:01:27.60,0:01:28.57,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}però, i frammenti
+Dialogue: 0,0:01:28.57,0:01:29.39,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}della fissione
+Dialogue: 0,0:01:29.39,0:01:30.02,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}sono molto
+Dialogue: 0,0:01:30.02,0:01:30.70,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}radioattivi
+Dialogue: 0,0:01:30.70,0:01:31.79,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}per questo restano
+Dialogue: 0,0:01:31.79,0:01:33.08,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}chiusi nelle pastiglie
+Dialogue: 0,0:01:33.08,0:01:34.03,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nelle barre
+Dialogue: 0,0:01:34.03,0:01:34.92,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nel vessel
+Dialogue: 0,0:01:34.92,0:01:35.98,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}e nella cupola
+Dialogue: 0,0:01:36.68,0:01:38.38,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}E dove finiscono dopo?
+Dialogue: 0,0:01:38.55,0:01:39.38,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}E perché ci possono
+Dialogue: 0,0:01:39.38,0:01:40.17,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}fare male?
+Dialogue: 0,0:01:40.57,0:01:41.18,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Ne parleremo
+Dialogue: 0,0:01:41.18,0:01:41.84,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}nella puntata
+Dialogue: 0,0:01:41.84,0:01:43.08,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}dedicata alle scorie
+Dialogue: 0,0:01:43.78,0:01:45.11,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Hai qualche domanda?
+Dialogue: 0,0:01:45.41,0:01:46.67,S,,0,0,0,,{\pos(540,1526)\fscx88\fscy88\t(0,90,\fscx100\fscy100)}Fammela nei commenti!

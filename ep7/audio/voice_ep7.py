@@ -13,6 +13,16 @@ if a.ndim > 1: a = a.mean(1)
 FPS = 30
 PH = json.load(open('phrases_raw.json'))
 PH[24][0] = 95.62    # «E vivere accanto…»: il respiro prima (da 95,0) resta fuori
+# 28/11/2026: B2 e B3 riregistrate (p7-voce_1-enhanced-v2.mp3 -> voce_b23.wav: tutta la voce senza la B1, con B2 e B3 nuove; il resto
+# è la stessa ripresa di prima). Dal file nuovo si prendono solo le due battute nuove, una frase ciascuna:
+#  1 «Ma non l'abbiamo inventata noi esseri umani: esiste da sempre, ed è ovunque.»   (senza «la radioattività»)
+#  3 «Viene dalle rocce, dal cibo e persino dallo spazio.»                            («persino», non «perfino»)
+# Le frasi 2 e 4 della prima registrazione non si usano più.
+a2, _ = sf.read('voce_b23.wav', dtype='float64')
+if a2.ndim > 1: a2 = a2.mean(1)
+SRC = [a] * len(PH); SRC[1] = SRC[3] = a2
+PH[1] = [1.85, 5.65]; PH[3] = [6.95, 10.46]
+NON_USATE = {2, 4}
 # testo (trascrizione di controllo, Whisper small):
 #  0 La radioattività ti fa paura? | 1 Ma la radioattività non l'abbiamo inventata noi esseri umani: | 2 esiste da sempre, ed è ovunque.
 #  3 Viene dalle rocce, dal cibo e | 4 perfino dallo spazio. | 5 Anche il tuo corpo è un po' radioattivo: dentro di te, ogni secondo, circa 4000 atomi decadono.
@@ -29,10 +39,10 @@ PH[24][0] = 95.62    # «E vivere accanto…»: il respiro prima (da 95,0) resta
 # battute: (inizio, fine di scaletta (ep7/video/tempi.js, B), frasi, ancore [(t scaletta, frase, istante nella registrazione)])
 BLK = [
   (0.5, 4.0, [0], [(1.9, 0, 1.55)]),                                          # il simbolo lampeggia di verde su «ti fa paura?»
-  (4.5, 10.0, [1, 2], []),
-  (10.5, 15.0, [3, 4], [(11.1, 3, 12.62),                                     # si illuminano le rocce su «rocce»
-                        (12.1, 3, 13.45),                                     #   le banane su «cibo»
-                        (13.3, 4, 15.07)]),                                   #   arrivano i raggi cosmici su «spazio»
+  (4.5, 10.0, [1], []),
+  (10.5, 15.0, [3], [(11.1, 3, 7.62),                                     # si illuminano le rocce su «rocce»
+                        (12.1, 3, 8.48),                                     #   le banane su «cibo»
+                        (13.3, 3, 9.97)]),                                   #   arrivano i raggi cosmici su «spazio»
   (15.5, 21.5, [5], [(18.4, 5, 20.28)]),                                      # l'omino si è girato e si accendono i puntini su «dentro»
   (22.0, 24.5, [6], []),
   (25.0, 30.5, [7, 8], []),
@@ -87,14 +97,15 @@ BAT = [[round(starts[idx[0]], 2), round(starts[idx[-1]] + PH[idx[-1]][1] - PH[id
 json.dump(BAT, open('battute.json', 'w'))
 # livellamento per frase (±3 dB)
 h = int(sr * 0.01)
-def loud(s, e):
+def loud(s, e, a):
     x = a[int(s * sr):int(e * sr)]; m = len(x) // h; rr = np.sqrt((x[:m * h].reshape(m, h) ** 2).mean(1)); rr = rr[rr > 10 ** (-45 / 20)]
     return 20 * np.log10(np.sqrt((rr ** 2).mean()))
-L = [loud(s, e) for s, e in PH]; med = np.median(L); G = [float(np.clip(med - l, -3, 3)) for l in L]
+L = [loud(s, e, SRC[k]) if k not in NON_USATE else 0.0 for k, (s, e) in enumerate(PH)]; med = np.median([l for k, l in enumerate(L) if k not in NON_USATE]); G = [float(np.clip(med - l, -3, 3)) for l in L]
 out = np.zeros(int((TOTAL + 0.5) * sr)); newPH = []
 PRE, POST = 0.08, 0.15
 for k, (s, e) in enumerate(PH):
-    seg = a[int((s - PRE) * sr):int((e + POST) * sr)].copy() * 10 ** (G[k] / 20)
+    if k in NON_USATE: newPH.append(None); continue
+    seg = SRC[k][int((s - PRE) * sr):int((e + POST) * sr)].copy() * 10 ** (G[k] / 20)
     f1, f2 = int(0.02 * sr), int(0.08 * sr); seg[:f1] *= np.linspace(0, 1, f1); seg[-f2:] *= np.linspace(1, 0, f2)
     i0 = int((starts[k] - PRE) * sr); out[i0:i0 + len(seg)] += seg
     newPH.append([round(starts[k], 3), round(starts[k] + e - s, 3)])
@@ -109,7 +120,7 @@ print('BATTUTE', BAT); print('TOTALE', round(TOTAL, 2))
 flt = ("highpass=f=75,equalizer=f=230:t=q:w=1.0:g=-2.5,equalizer=f=3800:t=q:w=0.9:g=3,highshelf=f=9000:g=2.5,"
        "deesser=i=0.2,acompressor=threshold=-22dB:ratio=2.5:attack=8:release=150:makeup=1.5,alimiter=limit=0.8:level=false")
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', 'voice_edit.wav', '-af', flt, '-ar', '48000', 'voice_fx.wav'], check=True)
-v, sr = sf.read('voice_fx.wav'); PHR = newPH
+v, sr = sf.read('voice_fx.wav'); PHR = [p for p in newPH if p]
 band = sosfiltfilt(butter(2, [180, 3500], 'bandpass', fs=sr, output='sos'), v)
 hop = sr // FPS; nf = int(TOTAL * FPS)
 rms = np.array([np.sqrt((band[max(0, i * hop - hop):i * hop + hop] ** 2).mean()) for i in range(nf)])
